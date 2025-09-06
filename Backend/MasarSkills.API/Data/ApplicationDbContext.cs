@@ -1,6 +1,7 @@
 ﻿using MasarSkills.API.Models;
 using Microsoft.EntityFrameworkCore;
 
+
 namespace MasarSkills.API.Data
 {
     public class ApplicationDbContext:DbContext

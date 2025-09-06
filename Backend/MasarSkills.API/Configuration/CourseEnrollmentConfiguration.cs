@@ -1,6 +1,7 @@
 ﻿using MasarSkills.API.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System.Reflection.Emit;
 
 namespace MasarSkills.API.Configuration
 {
@@ -18,6 +19,12 @@ namespace MasarSkills.API.Configuration
                 .WithMany(c => c.Enrollments)
                 .HasForeignKey(cw => cw.CourseId);
 
+
+            builder.Property(ce => ce.FinalGrade)
+            .HasPrecision(5, 2); // مثال: 100.00
+
+            builder.Property(ce => ce.ProgressPercentage)
+                .HasPrecision(5, 2); // مثال: 100.00
 
         }
     }

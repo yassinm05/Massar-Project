@@ -1,6 +1,7 @@
 ﻿using MasarSkills.API.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System.Reflection.Emit;
 
 namespace MasarSkills.API.Configuration
 {
@@ -19,6 +20,16 @@ namespace MasarSkills.API.Configuration
                 .WithMany()
                 .HasForeignKey(p => p.CourseId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+
+            builder.Property(p => p.Amount)
+            .HasPrecision(18, 2);
+
+            builder.Property(p => p.AmountPaid)
+                .HasPrecision(18, 2);
+
+            builder.Property(p => p.RemainingAmount)
+                .HasPrecision(18, 2);
         }
     }
 }

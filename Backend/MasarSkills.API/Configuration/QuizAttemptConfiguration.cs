@@ -1,6 +1,7 @@
 ﻿using MasarSkills.API.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System.Reflection.Emit;
 
 namespace MasarSkills.API.Configuration
 {
@@ -15,6 +16,9 @@ namespace MasarSkills.API.Configuration
             builder.HasOne(q => q.Quiz)
                 .WithMany(q => q.Attempts)
                 .HasForeignKey(q => q.QuizId);
+
+            builder.Property(q => q.Score)
+            .HasPrecision(5, 2);
 
         }
     }
