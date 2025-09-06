@@ -36,5 +36,9 @@ namespace MasarSkills.API.Data
         public DbSet<QuestionOption> QuestionOptions { get; set; }
         public DbSet<QuizAttempt> QuizAttempts { get; set; }
         public DbSet<QuizAnswer> QuizAnswers { get; set; }
+
+        public DbSet<AdminProfile> AdminProfiles { get; set; }
+        public DbSet<Payment> Payments { get; set; }
+
     }
 }
