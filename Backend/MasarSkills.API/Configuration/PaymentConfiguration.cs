@@ -22,14 +22,14 @@ namespace MasarSkills.API.Configuration
                 .OnDelete(DeleteBehavior.Restrict);
 
 
-            builder.Property(p => p.Amount)
-            .HasPrecision(18, 2);
+            builder.Property(e => e.Amount)
+            .HasPrecision(10, 2);
 
-            builder.Property(p => p.AmountPaid)
-                .HasPrecision(18, 2);
+            builder.Property(e => e.AmountPaid)
+                .HasPrecision(10, 2);
 
-            builder.Property(p => p.RemainingAmount)
-                .HasPrecision(18, 2);
+            builder.Property(e => e.RemainingAmount)
+                .HasPrecision(10, 2);
         }
     }
 }

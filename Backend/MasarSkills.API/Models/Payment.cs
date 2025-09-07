@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 
 namespace MasarSkills.API.Models
 {
@@ -7,12 +8,14 @@ namespace MasarSkills.API.Models
         public int Id { get; set; }
         public int UserId { get; set; }
         public int? CourseId { get; set; } // يمكن أن يكون الدفع لكورس معين
+        [Precision(10, 2)]
+        public decimal Amount { get; set; }
 
-        [Required]
-        public decimal Amount { get; set; } // المبلغ الإجمالي
+        [Precision(10, 2)]
+        public decimal AmountPaid { get; set; }
 
-        public decimal AmountPaid { get; set; } // المبلغ المدفوع فعلياً
-        public decimal RemainingAmount { get; set; } // المبلغ المتبقي
+        [Precision(10, 2)]
+        public decimal RemainingAmount { get; set; }
 
         [Required]
         public string Currency { get; set; } = "EGP"; // العملة

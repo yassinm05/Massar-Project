@@ -17,8 +17,8 @@ namespace MasarSkills.API.Configuration
                 .WithMany(q => q.Attempts)
                 .HasForeignKey(q => q.QuizId);
 
-            builder.Property(q => q.Score)
-            .HasPrecision(5, 2);
+            builder.Property(e => e.Score)
+           .HasPrecision(5, 2);
 
         }
     }

@@ -20,11 +20,11 @@ namespace MasarSkills.API.Configuration
                 .HasForeignKey(cw => cw.CourseId);
 
 
-            builder.Property(ce => ce.FinalGrade)
-            .HasPrecision(5, 2); // مثال: 100.00
+            builder.Property(e => e.FinalGrade)
+            .HasPrecision(5, 2);
 
-            builder.Property(ce => ce.ProgressPercentage)
-                .HasPrecision(5, 2); // مثال: 100.00
+            builder.Property(e => e.ProgressPercentage)
+                .HasPrecision(5, 2);
 
         }
     }

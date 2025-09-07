@@ -1,22 +1,26 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 
 namespace MasarSkills.API.Models
 {
     public class CourseEnrollment
     {
         #region Property
-        public int Id { get; set; }
-        public int StudentId { get; set; }
-        public int CourseId { get; set; }
+            public int Id { get; set; }
+            public int StudentId { get; set; }
+            public int CourseId { get; set; }
 
-        public DateTime EnrollmentDate { get; set; } = DateTime.UtcNow;
-        public DateTime? CompletionDate { get; set; }
-        public decimal ProgressPercentage { get; set; }
+            public DateTime EnrollmentDate { get; set; } = DateTime.UtcNow;
+            public DateTime? CompletionDate { get; set; }
 
-        [MaxLength(20)]
-        public string Status { get; set; }
+            [Precision(5, 2)]
+            public decimal ProgressPercentage { get; set; }
 
-        public decimal? FinalGrade { get; set; }
+            [MaxLength(20)]
+            public string Status { get; set; }
+
+            [Precision(5, 2)]
+            public decimal? FinalGrade { get; set; }
         #endregion
         #region Navigation Property
         public virtual User Student { get; set; }

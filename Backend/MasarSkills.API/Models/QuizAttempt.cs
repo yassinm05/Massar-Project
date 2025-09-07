@@ -1,4 +1,6 @@
-﻿namespace MasarSkills.API.Models
+﻿using Microsoft.EntityFrameworkCore;
+
+namespace MasarSkills.API.Models
 {
     public class QuizAttempt
     {
@@ -9,6 +11,7 @@
 
         public DateTime StartTime { get; set; } = DateTime.UtcNow;
         public DateTime? EndTime { get; set; }
+        [Precision(5, 2)]
         public decimal Score { get; set; }
         public int AttemptNumber { get; set; } = 1;
 
