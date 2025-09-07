@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 
 namespace MasarSkills.API.Models
 {
@@ -13,6 +14,7 @@ namespace MasarSkills.API.Models
 
         public string Description { get; set; }
 
+        [Precision(18, 2)]
         public decimal Price { get; set; }
 
         public int DurationHours { get; set; }
