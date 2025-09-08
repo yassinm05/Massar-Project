@@ -2,13 +2,12 @@
 using MasarSkills.API.DTOs;
 using MasarSkills.API.Helpers;
 using MasarSkills.API.Models;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-
+using System.Security.Claims;
 
 namespace MasarSkills.API.Services
 {
-    public class AuthService:IAuthService
+    public class AuthService : IAuthService
     {
         private readonly ApplicationDbContext _context;
         private readonly IJwtHelper _jwtHelper;
@@ -128,6 +127,82 @@ namespace MasarSkills.API.Services
                 return new AuthResponse { Success = false, Message = ex.Message };
             }
         }
+
+        // أضف هذه الدالة الجديدة للتحقق من الـ Token
+        public async Task<AuthResponse> ValidateToken(string token)
+        {
+            try
+            {
+                var result = _jwtHelper.ValidateToken(token);
+                bool isValid = result.isValid;
+                ClaimsPrincipal principal = result.principal;
+
+                if (!isValid || principal == null)
+                {
+                    return new AuthResponse { Success = false, Message = "Invalid token" };
+                }
+
+                // 🔍 DEBUG: عرض جميع الـ claims
+                Console.WriteLine("=== جميع الـ Claims في الـ Token ===");
+                foreach (var claim in principal.Claims)
+                {
+                    Console.WriteLine($"Type: {claim.Type}, Value: {claim.Value}");
+                }
+                Console.WriteLine("===================================");
+
+                // البحث عن الـ UserId باستخدام أسماء الـ Claims الصحيحة
+                var userIdClaim = principal.FindFirst("nameid") ??
+                                 principal.FindFirst(ClaimTypes.NameIdentifier) ??
+                                 principal.FindFirst("sub") ??
+                                 principal.FindFirst("userId");
+
+                if (userIdClaim == null)
+                {
+                    Console.WriteLine("❌ لم يتم العثور على أي claim يحتوي على UserId");
+                    return new AuthResponse { Success = false, Message = "User ID not found in token" };
+                }
+
+                Console.WriteLine($"✅ تم العثور على UserId: {userIdClaim.Value} في claim: {userIdClaim.Type}");
+
+                if (!int.TryParse(userIdClaim.Value, out int userId))
+                {
+                    Console.WriteLine($"❌ لا يمكن تحويل UserId '{userIdClaim.Value}' إلى رقم");
+                    return new AuthResponse { Success = false, Message = "Invalid user ID format" };
+                }
+
+                var user = await _context.Users.FindAsync(userId);
+                if (user == null)
+                {
+                    Console.WriteLine($"❌ لم يتم العثور على user بالرقم: {userId}");
+                    return new AuthResponse { Success = false, Message = "User not found" };
+                }
+
+                if (!user.IsActive)
+                {
+                    Console.WriteLine($"❌ User {userId} غير مفعل");
+                    return new AuthResponse { Success = false, Message = "Account deactivated" };
+                }
+
+                Console.WriteLine($"✅ تم العثور على user: {user.FirstName} {user.LastName}");
+
+                return new AuthResponse
+                {
+                    Success = true,
+                    User = new UserDto
+                    {
+                        Id = user.Id,
+                        FirstName = user.FirstName,
+                        LastName = user.LastName,
+                        Email = user.Email,
+                        Role = user.Role
+                    }
+                };
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ خطأ في ValidateToken: {ex.Message}");
+                return new AuthResponse { Success = false, Message = ex.Message };
+            }
+        }
     }
 }
-

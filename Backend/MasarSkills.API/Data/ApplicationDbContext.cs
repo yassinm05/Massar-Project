@@ -40,6 +40,8 @@ namespace MasarSkills.API.Data
 
         public DbSet<AdminProfile> AdminProfiles { get; set; }
         public DbSet<Payment> Payments { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
+
 
     }
 }

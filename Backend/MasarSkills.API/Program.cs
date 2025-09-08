@@ -1,16 +1,17 @@
 ﻿using MasarSkills.API.Data;
-using MasarSkills.API.Services;
 using MasarSkills.API.Helpers;
-using Microsoft.EntityFrameworkCore;
+using MasarSkills.API.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.AspNetCore.ResponseCompression;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.IdentityModel.Tokens;
-using System.Text;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
-using Microsoft.AspNetCore.RateLimiting;
+using System.Text;
 using System.Threading.RateLimiting;
-using Microsoft.AspNetCore.ResponseCompression;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 
 
@@ -75,6 +76,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ICourseService, CourseService>();
 builder.Services.AddScoped<IJwtHelper, JwtHelper>();
+builder.Services.AddScoped<INotificationService, NotificationService>(); 
+
 
 // Add Logging
 builder.Services.AddLogging(loggingBuilder =>
@@ -214,6 +217,21 @@ app.UseResponseCaching();
 app.UseCors("AllowAll");
 app.UseRateLimiter();
 app.UseAuthentication();
+// Add middleware to check authentication
+app.Use(async (context, next) =>
+{
+    var endpoint = context.GetEndpoint();
+    if (endpoint?.Metadata?.GetMetadata<AuthorizeAttribute>() != null)
+    {
+        if (!context.User.Identity.IsAuthenticated)
+        {
+            context.Response.StatusCode = 401;
+            await context.Response.WriteAsync("Unauthorized");
+            return;
+        }
+    }
+    await next();
+});
 app.UseAuthorization();
 
 app.MapControllers();

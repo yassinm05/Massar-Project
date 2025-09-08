@@ -315,6 +315,37 @@ namespace MasarSkills.API.Data
             context.SaveChanges();
 
             Console.WriteLine("Database seeded successfully with all data including admins and payments!");
+
+            // إنشاء إشعارات تجريبية
+            var welcomeNotification = new Notification
+            {
+                UserId = studentUser.Id,
+                Title = "مرحباً بك في منصة مسار سكيلز!",
+                Message = "نحن سعداء بانضمامك إلى منصتنا. ابدأ رحلتك التعليمية الآن.",
+                Type = "Success",
+                CreatedAt = DateTime.UtcNow
+            };
+
+            var courseNotification = new Notification
+            {
+                UserId = studentUser.Id,
+                Title = "تم تسجيلك في دورة جديدة",
+                Message = "تم تسجيلك في دورة 'مقدمة في مساعدة التمريض' بنجاح.",
+                Type = "Course",
+                RelatedEntityType = "Course",
+                RelatedEntityId = course.Id,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            context.Notifications.AddRange(welcomeNotification, courseNotification);
+
+
+
+
+
+
+
+
         }
     }
 }

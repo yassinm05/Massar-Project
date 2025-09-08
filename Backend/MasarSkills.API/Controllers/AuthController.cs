@@ -36,5 +36,21 @@ namespace MasarSkills.API.Controllers
 
             return Ok(result);
         }
+        [HttpPost("validate-token")]
+        public async Task<IActionResult> ValidateToken([FromBody] ValidateTokenDto validateTokenDto)
+        {
+            var result = await _authService.ValidateToken(validateTokenDto.Token);
+
+            if (!result.Success)
+            {
+                return Unauthorized(new { message = result.Message });
+            }
+
+            return Ok(result);
+        }
+    }
+    public class ValidateTokenDto
+    {
+        public string Token { get; set; }
     }
 }
