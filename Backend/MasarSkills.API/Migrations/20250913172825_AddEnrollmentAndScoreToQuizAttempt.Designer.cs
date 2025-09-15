@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MasarSkills.API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250907173204_AddNotifications")]
-    partial class AddNotifications
+    [Migration("20250913172825_AddEnrollmentAndScoreToQuizAttempt")]
+    partial class AddEnrollmentAndScoreToQuizAttempt
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -507,6 +507,9 @@ namespace MasarSkills.API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime>("AttemptDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("AttemptNumber")
                         .HasColumnType("int");
 
@@ -529,6 +532,9 @@ namespace MasarSkills.API.Migrations
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("StudentId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -564,9 +570,14 @@ namespace MasarSkills.API.Migrations
                     b.Property<int>("QuizId")
                         .HasColumnType("int");
 
+                    b.Property<int>("TopicId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("QuizId");
+
+                    b.HasIndex("TopicId");
 
                     b.ToTable("QuizQuestions");
                 });
@@ -614,6 +625,23 @@ namespace MasarSkills.API.Migrations
                         .IsUnique();
 
                     b.ToTable("StudentProfiles");
+                });
+
+            modelBuilder.Entity("MasarSkills.API.Models.Topics", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("TopicName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Topics");
                 });
 
             modelBuilder.Entity("MasarSkills.API.Models.User", b =>
@@ -848,7 +876,15 @@ namespace MasarSkills.API.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("MasarSkills.API.Models.Topics", "Topic")
+                        .WithMany("QuizQuestions")
+                        .HasForeignKey("TopicId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("Quiz");
+
+                    b.Navigation("Topic");
                 });
 
             modelBuilder.Entity("MasarSkills.API.Models.StudentProfile", b =>
@@ -913,6 +949,11 @@ namespace MasarSkills.API.Migrations
             modelBuilder.Entity("MasarSkills.API.Models.StudentProfile", b =>
                 {
                     b.Navigation("CourseEnrollments");
+                });
+
+            modelBuilder.Entity("MasarSkills.API.Models.Topics", b =>
+                {
+                    b.Navigation("QuizQuestions");
                 });
 
             modelBuilder.Entity("MasarSkills.API.Models.User", b =>

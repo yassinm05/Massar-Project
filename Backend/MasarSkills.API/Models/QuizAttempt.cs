@@ -7,7 +7,11 @@ namespace MasarSkills.API.Models
         #region Property
         public int Id { get; set; }
         public int EnrollmentId { get; set; }
+       
+        public int StudentId { get; set; }
+
         public int QuizId { get; set; }
+        public DateTime AttemptDate { get; set; }
 
         public DateTime StartTime { get; set; } = DateTime.UtcNow;
         public DateTime? EndTime { get; set; }

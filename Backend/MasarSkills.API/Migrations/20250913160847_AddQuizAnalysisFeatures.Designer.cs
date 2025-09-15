@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MasarSkills.API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250907154614_AddMissingAPIs")]
-    partial class AddMissingAPIs
+    [Migration("20250913160847_AddQuizAnalysisFeatures")]
+    partial class AddQuizAnalysisFeatures
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -272,6 +272,55 @@ namespace MasarSkills.API.Migrations
                     b.ToTable("LearningMaterials");
                 });
 
+            modelBuilder.Entity("MasarSkills.API.Models.Notification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTime?>("ReadAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("RelatedEntityId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RelatedEntityType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Notifications");
+                });
+
             modelBuilder.Entity("MasarSkills.API.Models.Payment", b =>
                 {
                     b.Property<int>("Id")
@@ -515,9 +564,17 @@ namespace MasarSkills.API.Migrations
                     b.Property<int>("QuizId")
                         .HasColumnType("int");
 
+                    b.Property<int>("TopicId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("TopicsId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("QuizId");
+
+                    b.HasIndex("TopicsId");
 
                     b.ToTable("QuizQuestions");
                 });
@@ -565,6 +622,23 @@ namespace MasarSkills.API.Migrations
                         .IsUnique();
 
                     b.ToTable("StudentProfiles");
+                });
+
+            modelBuilder.Entity("MasarSkills.API.Models.Topics", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("TopicName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Topics");
                 });
 
             modelBuilder.Entity("MasarSkills.API.Models.User", b =>
@@ -697,6 +771,17 @@ namespace MasarSkills.API.Migrations
                     b.Navigation("Module");
                 });
 
+            modelBuilder.Entity("MasarSkills.API.Models.Notification", b =>
+                {
+                    b.HasOne("MasarSkills.API.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("MasarSkills.API.Models.Payment", b =>
                 {
                     b.HasOne("MasarSkills.API.Models.Course", "Course")
@@ -788,6 +873,10 @@ namespace MasarSkills.API.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("MasarSkills.API.Models.Topics", null)
+                        .WithMany("QuizQuestions")
+                        .HasForeignKey("TopicsId");
+
                     b.Navigation("Quiz");
                 });
 
@@ -853,6 +942,11 @@ namespace MasarSkills.API.Migrations
             modelBuilder.Entity("MasarSkills.API.Models.StudentProfile", b =>
                 {
                     b.Navigation("CourseEnrollments");
+                });
+
+            modelBuilder.Entity("MasarSkills.API.Models.Topics", b =>
+                {
+                    b.Navigation("QuizQuestions");
                 });
 
             modelBuilder.Entity("MasarSkills.API.Models.User", b =>

@@ -3,6 +3,7 @@ using MasarSkills.API.Data;
 using MasarSkills.API.DTOs;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 namespace MasarSkills.API.Controllers
 {
@@ -19,6 +20,7 @@ namespace MasarSkills.API.Controllers
 
         // GET: api/admin/users
         [HttpGet("users")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAllUsers()
         {
             var users = await _context.Users
@@ -46,6 +48,7 @@ namespace MasarSkills.API.Controllers
 
         // GET: api/admin/payments
         [HttpGet("payments")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAllPayments()
         {
             var payments = await _context.Payments
@@ -72,6 +75,7 @@ namespace MasarSkills.API.Controllers
 
         // GET: api/admin/statistics
         [HttpGet("statistics")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetStatistics()
         {
             var totalUsers = await _context.Users.CountAsync();
@@ -104,6 +108,7 @@ namespace MasarSkills.API.Controllers
 
         // PUT: api/admin/users/{userId}/status
         [HttpPut("users/{userId}/status")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateUserStatus(int userId, [FromBody] UpdateUserStatusDto statusDto)
         {
             var user = await _context.Users.FindAsync(userId);
@@ -123,6 +128,7 @@ namespace MasarSkills.API.Controllers
 
         // GET: api/admin/enrollments
         [HttpGet("enrollments")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAllEnrollments()
         {
             var enrollments = await _context.CourseEnrollments
