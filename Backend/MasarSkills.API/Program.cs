@@ -76,7 +76,9 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ICourseService, CourseService>();
 builder.Services.AddScoped<IJwtHelper, JwtHelper>();
-builder.Services.AddScoped<INotificationService, NotificationService>(); 
+builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<ILearningMaterialService, LearningMaterialService>();
+
 
 
 // Add Logging

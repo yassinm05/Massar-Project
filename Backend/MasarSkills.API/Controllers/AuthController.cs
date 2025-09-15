@@ -18,6 +18,14 @@ namespace MasarSkills.API.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            if ((registerDto.Role == "User" || registerDto.Role == "Instructor")
+                && string.IsNullOrWhiteSpace(registerDto.Specialization))
+            {
+                return BadRequest("Specialization is required for Users and Instructors.");
+            }
+
             var result = await _authService.Register(registerDto);
 
             if (!result.Success)
