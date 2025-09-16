@@ -23,7 +23,11 @@ namespace MasarSkills.API.Data
             foreach (var fk in cascadeFKs)
                 fk.DeleteBehavior = DeleteBehavior.Restrict;
 
-             
+            modelBuilder.Entity<Job>()
+              .Property(j => j.Salary)
+              .HasColumnType("decimal(18,2)");
+
+            base.OnModelCreating(modelBuilder);
         }
         public DbSet<User> Users { get; set; }
         public DbSet<StudentProfile> StudentProfiles { get; set; }
@@ -41,6 +45,7 @@ namespace MasarSkills.API.Data
         public DbSet<AdminProfile> AdminProfiles { get; set; }
         public DbSet<Payment> Payments { get; set; }
         public DbSet<Notification> Notifications { get; set; }
+        public DbSet<Job> Jobs { get; set; }    
 
 
     }
