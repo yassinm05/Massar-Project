@@ -1,4 +1,5 @@
-﻿using MasarSkills.API.Models;
+﻿using MasarSkills.API.Configurations;
+using MasarSkills.API.Models;
 using Microsoft.EntityFrameworkCore;
 
 
@@ -27,8 +28,13 @@ namespace MasarSkills.API.Data
               .Property(j => j.Salary)
               .HasColumnType("decimal(18,2)");
 
+            //modelBuilder.ApplyConfiguration(new JobApplicationConfiguration());
             base.OnModelCreating(modelBuilder);
+
+            
+
         }
+
         public DbSet<User> Users { get; set; }
         public DbSet<StudentProfile> StudentProfiles { get; set; }
         public DbSet<InstructorProfile> InstructorProfiles { get; set; }
@@ -45,7 +51,8 @@ namespace MasarSkills.API.Data
         public DbSet<AdminProfile> AdminProfiles { get; set; }
         public DbSet<Payment> Payments { get; set; }
         public DbSet<Notification> Notifications { get; set; }
-        public DbSet<Job> Jobs { get; set; }    
+        public DbSet<Job> Jobs { get; set; }
+        public DbSet<JobApplication> JobApplications { get; set; }
 
 
     }
