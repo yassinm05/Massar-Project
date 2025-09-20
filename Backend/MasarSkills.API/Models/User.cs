@@ -42,6 +42,7 @@ namespace MasarSkills.API.Models
         public virtual AdminProfile AdminProfile { get; set; }
         public virtual ICollection<CourseEnrollment> CourseEnrollments { get; set; }
         public virtual ICollection<Payment> Payments { get; set; }
+        public virtual ICollection<JobApplication> JobApplications { get; set; }
         #endregion
     }
 }
