@@ -48,6 +48,8 @@ namespace MasarSkills.API.Data
         public DbSet<QuizAttempt> QuizAttempts { get; set; }
         public DbSet<QuizAnswer> QuizAnswers { get; set; }
 
+        //new Dbset for the new topics table
+        public DbSet<Topics> Topics { get; set; }
         public DbSet<AdminProfile> AdminProfiles { get; set; }
         public DbSet<Payment> Payments { get; set; }
         public DbSet<Notification> Notifications { get; set; }

@@ -16,6 +16,14 @@ namespace MasarSkills.API.Data
                 return; // DB has been seeded
             }
 
+            context.Database.EnsureCreated();
+
+            // Check if database already has data
+            if (context.Users.Any())
+            {
+                return; // DB has been seeded
+            }
+
             // Create initial admin user
             var adminPassword = "Admin@123";
             PasswordHasher.CreatePasswordHash(adminPassword, out byte[] adminPasswordHash, out byte[] adminPasswordSalt);
@@ -336,16 +344,227 @@ namespace MasarSkills.API.Data
                 RelatedEntityId = course.Id,
                 CreatedAt = DateTime.UtcNow
             };
-
             context.Notifications.AddRange(welcomeNotification, courseNotification);
+        }
 
+        // 🔹 NEW METHOD for extra data
+        public static void SeedExtraData(ApplicationDbContext context)
+        {
+            context.Database.EnsureCreated();
 
+            // ---------- EXTRA COURSES ----------
+            if (!context.Courses.Any(c => c.Title == "أساسيات الإسعافات الأولية"))
+            {
+                var course2 = new Course
+                {
+                    Title = "أساسيات الإسعافات الأولية",
+                    Description = "دورة شاملة حول تقنيات الإسعافات الأولية للتعامل مع الحالات الطارئة.",
+                    Price = 600.00m,
+                    DurationHours = 30,
+                    ThumbnailUrl = "/images/first-aid.jpg",
+                    IsActive = true,
+                    InstructorId = context.InstructorProfiles.First().Id, // 🔹 use existing instructor
+                    CreatedAt = DateTime.UtcNow
+                };
 
+                var course3 = new Course
+                {
+                    Title = "إدارة الرعاية الصحية",
+                    Description = "مقدمة في إدارة أنظمة الرعاية الصحية والسياسات الطبية.",
+                    Price = 800.00m,
+                    DurationHours = 50,
+                    ThumbnailUrl = "/images/healthcare-management.jpg",
+                    IsActive = true,
+                    InstructorId = context.InstructorProfiles.First().Id,
+                    CreatedAt = DateTime.UtcNow
+                };
 
+                context.Courses.AddRange(course2, course3);
+                context.SaveChanges();
 
+                // ---------- MODULES FOR COURSE 2 ----------
+                var c2Module1 = new CourseModule
+                {
+                    CourseId = course2.Id,
+                    Title = "مقدمة في الإسعافات الأولية",
+                    Description = "تعرف على المبادئ الأساسية للإسعافات الأولية.",
+                    Order = 1
+                };
 
+                var c2Module2 = new CourseModule
+                {
+                    CourseId = course2.Id,
+                    Title = "التعامل مع الإصابات الشائعة",
+                    Description = "طرق التعامل مع الجروح والحروق والكسور.",
+                    Order = 2
+                };
 
+                context.CourseModules.AddRange(c2Module1, c2Module2);
 
+                // ---------- MODULES FOR COURSE 3 ----------
+                var c3Module1 = new CourseModule
+                {
+                    CourseId = course3.Id,
+                    Title = "مقدمة في إدارة الرعاية الصحية",
+                    Description = "مفاهيم الإدارة في بيئة الرعاية الصحية.",
+                    Order = 1
+                };
+
+                var c3Module2 = new CourseModule
+                {
+                    CourseId = course3.Id,
+                    Title = "السياسات والإجراءات",
+                    Description = "التعرف على السياسات الطبية وإدارة الجودة.",
+                    Order = 2
+                };
+
+                context.CourseModules.AddRange(c3Module1, c3Module2);
+                context.SaveChanges();
+            }
+
+            // ---------- NEW STUDENTS ----------
+            if (!context.Users.Any(u => u.Email == "sara.hassan@example.com"))
+            {
+                var student2Password = "Student2@123";
+                PasswordHasher.CreatePasswordHash(student2Password, out byte[] student2Hash, out byte[] student2Salt);
+
+                var student2 = new User
+                {
+                    FirstName = "Sara",
+                    LastName = "Hassan",
+                    Email = "sara.hassan@example.com",
+                    PasswordHash = student2Hash,
+                    PasswordSalt = student2Salt,
+                    Role = "Student",
+                    PaymentId = "STU002",
+                    CreatedAt = DateTime.UtcNow,
+                    IsActive = true
+                };
+
+                context.Users.Add(student2);
+                context.SaveChanges();
+
+                var student2Profile = new StudentProfile
+                {
+                    UserId = student2.Id,
+                    PhoneNumber = "+201223344556",
+                    DateOfBirth = new DateTime(1997, 8, 12),
+                    Address = "Alexandria, Egypt",
+                    EducationLevel = "Bachelor",
+                    CareerGoals = "Work as a certified nurse",
+                    Skills = "First aid, Basic healthcare management"
+                };
+
+                context.StudentProfiles.Add(student2Profile);
+                context.SaveChanges();
+
+                // ---------- ENROLLMENT ----------
+                var course2 = context.Courses.First(c => c.Title == "أساسيات الإسعافات الأولية");
+
+                var enrollment2 = new CourseEnrollment
+                {
+                    StudentId = student2.Id,
+                    CourseId = course2.Id,
+                    EnrollmentDate = DateTime.UtcNow,
+                    ProgressPercentage = 0,
+                    Status = "Enrolled"
+                };
+
+                context.CourseEnrollments.Add(enrollment2);
+
+                // ---------- PAYMENT ----------
+                var payment4 = new Payment
+                {
+                    UserId = student2.Id,
+                    CourseId = course2.Id,
+                    Amount = 600.00m,
+                    AmountPaid = 600.00m,
+                    RemainingAmount = 0.00m,
+                    Currency = "EGP",
+                    PaymentMethod = "CreditCard",
+                    TransactionId = "TXN202409050004",
+                    PaymentStatus = "Completed",
+                    InstallmentsCount = 1,
+                    CurrentInstallment = 1,
+                    PaymentDate = DateTime.UtcNow
+                };
+
+                context.Payments.Add(payment4);
+                context.SaveChanges();
+            }
+
+            if (!context.Users.Any(u => u.Email == "omar.youssef@example.com"))
+            {
+                var student3Password = "Student3@123";
+                PasswordHasher.CreatePasswordHash(student3Password, out byte[] student3Hash, out byte[] student3Salt);
+
+                var student3 = new User
+                {
+                    FirstName = "Omar",
+                    LastName = "Youssef",
+                    Email = "omar.youssef@example.com",
+                    PasswordHash = student3Hash,
+                    PasswordSalt = student3Salt,
+                    Role = "Student",
+                    PaymentId = "STU003",
+                    CreatedAt = DateTime.UtcNow,
+                    IsActive = true
+                };
+
+                context.Users.Add(student3);
+                context.SaveChanges();
+
+                var student3Profile = new StudentProfile
+                {
+                    UserId = student3.Id,
+                    PhoneNumber = "+201334455667",
+                    DateOfBirth = new DateTime(1998, 3, 22),
+                    Address = "Giza, Egypt",
+                    EducationLevel = "Diploma",
+                    CareerGoals = "Healthcare administration career",
+                    Skills = "Organizational skills, Communication"
+                };
+
+                context.StudentProfiles.Add(student3Profile);
+                context.SaveChanges();
+
+                // ---------- ENROLLMENT ----------
+                var course3 = context.Courses.First(c => c.Title == "إدارة الرعاية الصحية");
+
+                var enrollment3 = new CourseEnrollment
+                {
+                    StudentId = student3.Id,
+                    CourseId = course3.Id,
+                    EnrollmentDate = DateTime.UtcNow,
+                    ProgressPercentage = 0,
+                    Status = "Enrolled"
+                };
+
+                context.CourseEnrollments.Add(enrollment3);
+
+                // ---------- PAYMENT ----------
+                var payment5 = new Payment
+                {
+                    UserId = student3.Id,
+                    CourseId = course3.Id,
+                    Amount = 800.00m,
+                    AmountPaid = 400.00m,
+                    RemainingAmount = 400.00m,
+                    Currency = "EGP",
+                    PaymentMethod = "BankTransfer",
+                    TransactionId = "TXN202409050005",
+                    PaymentStatus = "Pending",
+                    InstallmentsCount = 2,
+                    CurrentInstallment = 1,
+                    PaymentDate = DateTime.UtcNow,
+                    NextPaymentDate = DateTime.UtcNow.AddDays(30)
+                };
+
+                context.Payments.Add(payment5);
+                context.SaveChanges();
+            }
+
+            Console.WriteLine("Extra courses, students, enrollments, and payments seeded (only if missing)!");
         }
     }
 }
