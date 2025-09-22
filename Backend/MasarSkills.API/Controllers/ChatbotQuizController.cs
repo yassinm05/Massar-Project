@@ -40,7 +40,7 @@ namespace MasarSkills.API.Controllers
 
             // Step 1: Get the overall score
             var overallScore = analysisResult.OverallScore;
-            
+
             // Step 2: Categorize topics into strengths and weaknesses
             var strengths = analysisResult.TopicAnalysis
                                           .Where(t => t.Score >= 85) // Define your strength threshold
@@ -62,6 +62,31 @@ namespace MasarSkills.API.Controllers
             };
 
             return Ok(formattedResult);
+        }
+        [HttpGet("analyze/last/{studentId}")]
+        public async Task<ActionResult<object>> AnalyzeLastQuiz(int studentId)
+        {
+            // 1. Validate studentId.
+            if (studentId <= 0)
+             {
+                 return BadRequest(new { message = "Invalid student ID." });
+             }
+
+             // 2. Find the most recent quiz attempt for the student.
+             // Assuming you have a table or model for quiz attempts with a timestamp.
+             var lastQuizAttempt = await _context.QuizAttempts
+                 .Where(a => a.StudentId == studentId)
+                 .OrderByDescending(a => a.AttemptDate) // Or a similar timestamp field
+                 .FirstOrDefaultAsync();
+
+             if (lastQuizAttempt == null)
+             {
+                 return NotFound(new { message = "No quiz attempts found for this student." });
+             }
+
+             // 3. Call the existing analysis logic with the found quizId.
+             // You can reuse the logic from your AnalyzeQuiz method, or call it directly.
+             return await AnalyzeQuiz(studentId, lastQuizAttempt.QuizId);
         }
     }
 }

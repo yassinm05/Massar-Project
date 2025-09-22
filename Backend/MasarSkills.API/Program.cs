@@ -75,6 +75,7 @@ builder.Services.AddScoped<IJwtHelper, JwtHelper>();
 //Updated upstream
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<ILearningMaterialService, LearningMaterialService>();
+builder.Services.AddScoped<IJobService, JobService>();
 
 
 builder.Services.AddScoped<INotificationService, NotificationService>(); 
