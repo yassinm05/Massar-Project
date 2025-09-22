@@ -251,7 +251,8 @@ using (var scope = app.Services.CreateScope())
     try
     {
         var context = services.GetRequiredService<ApplicationDbContext>();
-        DbInitializer.Initialize(context);
+        DbInitializer.Initialize(context);     // 🔹 base seed (only if empty)
+        DbInitializer.SeedExtraData(context);  // 🔹 extra seed (idempotent)
     }
     catch (Exception ex)
     {
@@ -259,6 +260,7 @@ using (var scope = app.Services.CreateScope())
         logger.LogError(ex, "Error seeding database");
     }
 }
+
 
 app.Run();
 
