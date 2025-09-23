@@ -73,6 +73,8 @@ namespace MasarSkills.API.Controllers
             var userDto = new UserDto
             {
                 Id = user.Id,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
                 FullName = $"{user.FirstName} {user.LastName}",
                 Email = user.Email,
                 Role = user.Role
