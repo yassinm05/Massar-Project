@@ -253,8 +253,8 @@ app.MapHealthChecks("/health");
 // This means the application will not attempt to seed data on startup.
 using (var scope = app.Services.CreateScope())
 {
-    var services = scope.ServiceProvider;
-    try
+   var services = scope.ServiceProvider;
+   try
     {
         var context = services.GetRequiredService<ApplicationDbContext>();
         DbInitializer.Initialize(context);     // 🔹 base seed (only if empty)
