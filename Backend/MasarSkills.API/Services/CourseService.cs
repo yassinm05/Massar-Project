@@ -29,6 +29,7 @@ namespace MasarSkills.API.Services
                 Description = c.Description,
                 Price = c.Price,
                 DurationHours = c.DurationHours,
+                Difficulty = c.Difficulty,
                 ThumbnailUrl = c.ThumbnailUrl,
                 InstructorName = $"{c.Instructor.User.FirstName} {c.Instructor.User.LastName}",
                 CreatedAt = c.CreatedAt
@@ -50,6 +51,7 @@ namespace MasarSkills.API.Services
                 Title = course.Title,
                 Description = course.Description,
                 Price = course.Price,
+                Difficulty = course.Difficulty,
                 DurationHours = course.DurationHours,
                 ThumbnailUrl = course.ThumbnailUrl,
                 InstructorName = $"{course.Instructor.User.FirstName} {course.Instructor.User.LastName}",
@@ -66,6 +68,7 @@ namespace MasarSkills.API.Services
                 Price = courseDto.Price,
                 DurationHours = courseDto.DurationHours,
                 ThumbnailUrl = courseDto.ThumbnailUrl,
+                Difficulty = courseDto.Difficulty,
                 InstructorId = courseDto.InstructorId,
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow
@@ -87,6 +90,7 @@ namespace MasarSkills.API.Services
             course.Price = courseDto.Price;
             course.DurationHours = courseDto.DurationHours;
             course.ThumbnailUrl = courseDto.ThumbnailUrl;
+            course.Difficulty = courseDto.Difficulty;
             course.InstructorId = courseDto.InstructorId;
             course.UpdatedAt = DateTime.UtcNow;
 

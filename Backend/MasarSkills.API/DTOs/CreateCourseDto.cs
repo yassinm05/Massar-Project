@@ -8,5 +8,6 @@
         public int DurationHours { get; set; }
         public string ThumbnailUrl { get; set; }
         public int InstructorId { get; set; }
+        public string Difficulty { get; set; }
     }
 }

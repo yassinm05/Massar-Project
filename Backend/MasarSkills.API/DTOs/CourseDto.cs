@@ -8,6 +8,7 @@
         public decimal Price { get; set; }
         public int DurationHours { get; set; }
         public string ThumbnailUrl { get; set; }
+        public string Difficulty { get; set; }
         public string InstructorName { get; set; }
         public DateTime CreatedAt { get; set; }
     }

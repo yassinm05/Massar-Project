@@ -15,6 +15,7 @@ namespace MasarSkills.API.Controllers
             _courseService = courseService;
         }
 
+        // GET: api/courses
         [HttpGet]
         public async Task<IActionResult> GetAllCourses()
         {
@@ -22,6 +23,7 @@ namespace MasarSkills.API.Controllers
             return Ok(courses);
         }
 
+        // GET: api/courses/{id}
         [HttpGet("{id}")]
         public async Task<IActionResult> GetCourse(int id)
         {
@@ -33,16 +35,19 @@ namespace MasarSkills.API.Controllers
             return Ok(course);
         }
 
+        // POST: api/courses
         [HttpPost]
         public async Task<IActionResult> CreateCourse([FromBody] CreateCourseDto courseDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
+            // ✅ هتكون فيها Difficulty دلوقتي
             var course = await _courseService.CreateCourseAsync(courseDto);
             return CreatedAtAction(nameof(GetCourse), new { id = course.Id }, course);
         }
 
+        // PUT: api/courses/{id}
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateCourse(int id, [FromBody] CreateCourseDto courseDto)
         {
@@ -57,6 +62,7 @@ namespace MasarSkills.API.Controllers
             return NoContent();
         }
 
+        // DELETE: api/courses/{id}
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCourse(int id)
         {
