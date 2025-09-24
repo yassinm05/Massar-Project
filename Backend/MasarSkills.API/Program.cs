@@ -251,8 +251,8 @@ app.MapHealthChecks("/health");
 
 // The code block that was initializing the database has been removed.
 // This means the application will not attempt to seed data on startup.
-//using (var scope = app.Services.CreateScope())
-/*{
+using (var scope = app.Services.CreateScope())
+{
    var services = scope.ServiceProvider;
    try
     {
@@ -265,7 +265,7 @@ app.MapHealthChecks("/health");
         var logger = services.GetRequiredService<ILogger<Program>>();
         logger.LogError(ex, "Error seeding database");
     }
-}*/
+}
 
 
 app.Run();
