@@ -29,6 +29,16 @@ namespace MasarSkills.API.Services
                 // Create password hash
                 PasswordHasher.CreatePasswordHash(registerDto.Password, out byte[] passwordHash, out byte[] passwordSalt);
 
+                // 🔹 Generate PaymentId based on role
+                int count = await _context.Users.CountAsync(u => u.Role == registerDto.Role);
+                string paymentId = registerDto.Role switch
+                {
+                    "Student" => $"STU{(count + 1):D3}",
+                    "Instructor" => $"INST{(count + 1):D3}",
+                    "Admin" => $"ADM{(count + 1):D3}",
+                    _ => $"USR{(count + 1):D3}"
+                };
+
                 // Create user
                 var user = new User
                 {
@@ -39,7 +49,9 @@ namespace MasarSkills.API.Services
                     PasswordSalt = passwordSalt,
                     Role = registerDto.Role,
                     CreatedAt = DateTime.UtcNow,
-                    IsActive = true
+                    UpdatedAt = DateTime.UtcNow,
+                    IsActive = true,
+                    PaymentId = paymentId   // ✅ added
                 };
 
                 _context.Users.Add(user);
@@ -51,7 +63,7 @@ namespace MasarSkills.API.Services
                     var studentProfile = new StudentProfile
                     {
                         UserId = user.Id,
-                        PhoneNumber = registerDto.PhoneNumber
+                        PhoneNumber = registerDto.PhoneNumber,
                     };
                     _context.StudentProfiles.Add(studentProfile);
                 }

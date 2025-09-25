@@ -1,13 +1,17 @@
-﻿namespace MasarSkills.API.DTOs
+﻿using System.Text.Json.Serialization;
+
+namespace MasarSkills.API.DTOs
 {
     public class UserDto
     {
         public int Id { get; set; }
         public string FirstName { get; set; }    
         public string LastName { get; set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string FullName { get; set; }
         public string Email { get; set; }
         public string Role { get; set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public object Profile { get; set; }
     }
 
@@ -25,8 +29,11 @@
     {
         public string PhoneNumber { get; set; }
         public string Specialization { get; set; }
-        public int YearsOfExperience { get; set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public int?  YearsOfExperience { get; set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string Bio { get; set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string Qualifications { get; set; }
     }
 

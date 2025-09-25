@@ -15,13 +15,13 @@ namespace MasarSkills.API.Models
         public DateTime? DateOfBirth { get; set; }
 
         [MaxLength(200)]
-        public string Address { get; set; }
+        public string? Address { get; set; }
 
         [MaxLength(100)]
-        public string EducationLevel { get; set; }
+        public string? EducationLevel { get; set; }
 
-        public string CareerGoals { get; set; }
-        public string Skills { get; set; }
+        public string? CareerGoals { get; set; }
+        public string? Skills { get; set; }
         #endregion
         #region Navigation Property
         public virtual User User { get; set; }
