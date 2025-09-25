@@ -10,6 +10,7 @@
         public int EnrollmentId { get; set; }
         public int CourseId { get; set; }
         public string CourseTitle { get; set; }
+        public string Difficulty { get; set; }
         public string InstructorName { get; set; }
         public DateTime EnrollmentDate { get; set; }
         public decimal ProgressPercentage { get; set; }

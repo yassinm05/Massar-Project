@@ -253,12 +253,13 @@ app.MapHealthChecks("/health");
 // This means the application will not attempt to seed data on startup.
 using (var scope = app.Services.CreateScope())
 {
-    var services = scope.ServiceProvider;
+   var services = scope.ServiceProvider;
     try
     {
         var context = services.GetRequiredService<ApplicationDbContext>();
         DbInitializer.Initialize(context);     // 🔹 base seed (only if empty)
-        DbInitializer.SeedExtraData(context);  // 🔹 extra seed (idempotent)
+        DbInitializer.SeedExtraData(context);  // 🔹 extra seed for student
+        DbInitializer.SeedExtraQuizzes(context);   // 🔹 extra seed for quizes
     }
     catch (Exception ex)
     {
