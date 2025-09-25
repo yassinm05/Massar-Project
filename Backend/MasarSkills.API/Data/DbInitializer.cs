@@ -566,5 +566,202 @@ namespace MasarSkills.API.Data
 
             Console.WriteLine("Extra courses, students, enrollments, and payments seeded (only if missing)!");
         }
+        public static void SeedExtraQuizzes(ApplicationDbContext context)
+        {
+        // Removed EnsureCreated() ✅
+        
+            if (!context.Quizzes.Any(q => q.Title == "اختبار الإسعافات الأولية"))
+            {
+                var course2 = context.Courses.First(c => c.Title == "أساسيات الإسعافات الأولية");
+                var course3 = context.Courses.First(c => c.Title == "إدارة الرعاية الصحية");
+                var saraUser = context.Users.First(u => u.Email == "sara.hassan@example.com");
+                var omarUser = context.Users.First(u => u.Email == "omar.youssef@example.com");
+                var saraEnrollment = context.CourseEnrollments.First(e => e.StudentId == saraUser.Id && e.CourseId == course2.Id);
+                var omarEnrollment = context.CourseEnrollments.First(e => e.StudentId == omarUser.Id && e.CourseId == course3.Id);
+
+                // Quiz 1 for Course 2
+                var quiz1 = new Quiz
+                {
+                    ModuleId = context.CourseModules.First(m => m.CourseId == course2.Id).Id,
+                    Title = "اختبار الإسعافات الأولية",
+                    Description = "اختبار لتقييم معرفتك بأساسيات الإسعافات الأولية",
+                    TimeLimitMinutes = 25,
+                    PassingScore = 60,
+                    MaxAttempts = 2
+                };
+
+                context.Quizzes.Add(quiz1);
+                context.SaveChanges();
+
+                // ✅ Add Questions for Quiz 1 only if missing
+                if (!context.QuizQuestions.Any(q => q.QuizId == quiz1.Id))
+                {
+                    var question1_1 = new QuizQuestion
+                    {
+                        QuizId = quiz1.Id,
+                        QuestionText = "ما هي الخطوة الأولى في تقديم الإسعافات الأولية؟",
+                        QuestionType = "MultipleChoice",
+                        Points = 5,
+                        Order = 1,
+                        TopicId = 1
+                    };
+
+                    var question1_2 = new QuizQuestion
+                    {
+                        QuizId = quiz1.Id,
+                        QuestionText = "كيف تعالج حروق الدرجة الأولى؟",
+                        QuestionType = "MultipleChoice",
+                        Points = 5,
+                        Order = 2,
+                        TopicId = 1
+                    };
+
+                    context.QuizQuestions.AddRange(question1_1, question1_2);
+                    context.SaveChanges();
+                }
+
+                // ✅ Quiz Attempt for Sara only if missing
+                if (!context.QuizAttempts.Any(qa => qa.StudentId == saraUser.Id && qa.QuizId == quiz1.Id))
+                {
+                    var quizAttempt1 = new QuizAttempt
+                    {
+                        EnrollmentId = saraEnrollment.Id,
+                        StudentId = 2,
+                        QuizId = quiz1.Id,
+                        AttemptDate = DateTime.UtcNow,
+                        StartTime = DateTime.UtcNow,
+                        EndTime = DateTime.UtcNow.AddMinutes(25),
+                        Score = 10.00m,
+                        AttemptNumber = 1,
+                        Status = "Completed"
+                    };
+
+                    context.QuizAttempts.Add(quizAttempt1);
+                    context.SaveChanges();
+
+                    // ✅ Answers only if missing
+                    if (!context.QuizAnswers.Any(a => a.QuizAttemptId == quizAttempt1.Id))
+                    {
+                        var answer1_1 = new QuizAnswer
+                        {
+                            QuizAttemptId = quizAttempt1.Id,
+                            QuestionId = context.QuizQuestions.First(q => q.QuizId == quiz1.Id && q.Order == 1).Id,
+                            SelectedOptionId = 1,
+                            IsCorrect = true,
+                            PointsEarned = 5,
+                            AnsweredAt = DateTime.UtcNow,
+                            TextAnswer = "object"
+                        };
+
+                        var answer1_2 = new QuizAnswer
+                        {
+                            QuizAttemptId = quizAttempt1.Id,
+                            QuestionId = context.QuizQuestions.First(q => q.QuizId == quiz1.Id && q.Order == 2).Id,
+                            SelectedOptionId = 2,
+                            IsCorrect = true,
+                            PointsEarned = 5,
+                            AnsweredAt = DateTime.UtcNow,
+                            TextAnswer = "Base"
+                        };
+
+                        context.QuizAnswers.AddRange(answer1_1, answer1_2);
+                        context.SaveChanges();
+                    }
+                }
+
+                // Quiz 2 for Course 3
+                var quiz2 = new Quiz
+                {
+                    ModuleId = context.CourseModules.First(m => m.CourseId == course3.Id).Id,
+                    Title = "اختبار إدارة الرعاية الصحية",
+                    Description = "اختبار لتقييم معرفتك بإدارة الرعاية الصحية",
+                    TimeLimitMinutes = 30,
+                    PassingScore = 70,
+                    MaxAttempts = 3
+                };
+
+                context.Quizzes.Add(quiz2);
+                context.SaveChanges();
+
+                // ✅ Add Questions for Quiz 2 only if missing
+                if (!context.QuizQuestions.Any(q => q.QuizId == quiz2.Id))
+                {
+                    var question2_1 = new QuizQuestion
+                    {
+                        QuizId = quiz2.Id,
+                        QuestionText = "ما هي أهمية السياسات الصحية؟",
+                        QuestionType = "MultipleChoice",
+                        Points = 5,
+                        Order = 1,
+                        TopicId = 2
+                    };
+
+                    var question2_2 = new QuizQuestion
+                    {
+                        QuizId = quiz2.Id,
+                        QuestionText = "ما هي خطوات إدارة جودة الرعاية الصحية؟",
+                        QuestionType = "MultipleChoice",
+                        Points = 5,
+                        Order = 2,
+                        TopicId = 2
+                    };
+
+                    context.QuizQuestions.AddRange(question2_1, question2_2);
+                    context.SaveChanges();
+                }
+
+                // ✅ Quiz Attempt for Omar only if missing
+                if (!context.QuizAttempts.Any(qa => qa.StudentId == omarUser.Id && qa.QuizId == quiz2.Id))
+                {
+                    var quizAttempt2 = new QuizAttempt
+                    {
+                        EnrollmentId = omarEnrollment.Id,
+                        StudentId = omarUser.Id,
+                        QuizId = quiz2.Id,
+                        AttemptDate = DateTime.UtcNow,
+                        StartTime = DateTime.UtcNow,
+                        EndTime = DateTime.UtcNow.AddMinutes(30),
+                        Score = 10.00m,
+                        AttemptNumber = 1,
+                        Status = "Completed"
+                    };
+
+                    context.QuizAttempts.Add(quizAttempt2);
+                    context.SaveChanges();
+
+                    // ✅ Answers only if missing
+                    if (!context.QuizAnswers.Any(a => a.QuizAttemptId == quizAttempt2.Id))
+                    {
+                        var answer2_1 = new QuizAnswer
+                        {
+                            QuizAttemptId = quizAttempt2.Id,
+                            QuestionId = context.QuizQuestions.First(q => q.QuizId == quiz2.Id && q.Order == 1).Id,
+                            SelectedOptionId = 3,
+                            IsCorrect = true,
+                            PointsEarned = 5,
+                            AnsweredAt = DateTime.UtcNow,
+                            TextAnswer = "object"
+                        };
+
+                        var answer2_2 = new QuizAnswer
+                        {
+                            QuizAttemptId = quizAttempt2.Id,
+                            QuestionId = context.QuizQuestions.First(q => q.QuizId == quiz2.Id && q.Order == 2).Id,
+                            SelectedOptionId = 4,
+                            IsCorrect = true,
+                            PointsEarned = 5,
+                            AnsweredAt = DateTime.UtcNow,
+                            TextAnswer = "Base"
+                        };
+
+                        context.QuizAnswers.AddRange(answer2_1, answer2_2);
+                        context.SaveChanges();
+                    }
+                }
+            }
+
+            Console.WriteLine("Extra quizzes, questions, attempts, and answers seeded (only if missing)!");
+            }
+
     }
 }
