@@ -15,12 +15,12 @@ namespace MasarSkills.API.Models
         [MaxLength(200)]
         public string Specialization { get; set; }
 
-        public int YearsOfExperience { get; set; }
+        public int? YearsOfExperience { get; set; }
 
         [MaxLength(500)]
-        public string Bio { get; set; }
+        public string? Bio { get; set; }
 
-        public string Qualifications { get; set; }
+        public string? Qualifications { get; set; }
         #endregion
         #region Navigation Property
         public virtual User User { get; set; }
