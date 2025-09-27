@@ -18,7 +18,7 @@ namespace MasarSkills.API.Controllers
             _context = context;
         }
 
-        // POST: api/quiz/start/{quizId}
+        // POST: api/quiz/start/{quizId} this is to start a quiz attempt
         [HttpPost("start/{quizId}")]
         public async Task<IActionResult> StartQuiz(int quizId)
         {
