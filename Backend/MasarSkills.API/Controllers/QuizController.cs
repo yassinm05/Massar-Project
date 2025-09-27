@@ -206,7 +206,42 @@ namespace MasarSkills.API.Controllers
 
             return Ok(results);
         }
+        [HttpGet("available")]
+        public async Task<IActionResult> GetAvailableQuizzes()
+        {
+            // 1. Get the current student's ID from the token
+            if (!int.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var userId))
+            {
+                return Unauthorized();
+            }
+
+            // 2. Find all quizzes for the courses the student is enrolled in
+            var availableQuizzes = await _context.CourseEnrollments
+                .Where(ce => ce.StudentId == userId) // Filter enrollments for the current student
+                .SelectMany(ce => ce.Course.Modules.SelectMany(m => m.Quizzes)) // Get all quizzes from their courses
+                .Select(q => new 
+                {
+                    Quiz = q,
+                    // Count how many times this student has attempted this specific quiz
+                    AttemptsTaken = q.Attempts.Count(a => a.StudentId == userId)
+                })
+                // 3. Filter the list to only include quizzes with remaining attempts
+                .Where(x => x.AttemptsTaken < x.Quiz.MaxAttempts)
+                .Select(x => new AvailableQuizDto
+                {
+                    QuizId = x.Quiz.Id,
+                    QuizTitle = x.Quiz.Title,
+                    CourseName = x.Quiz.Module.Course.Title, // Assuming Course has a Title
+                    TimeLimitMinutes = x.Quiz.TimeLimitMinutes,
+                    MaxAttempts = x.Quiz.MaxAttempts,
+                    AttemptsTaken = x.AttemptsTaken
+                })
+                .ToListAsync();
+
+            return Ok(availableQuizzes);
+        }
     }
+    
 
     public class QuizStartDto
     {
