@@ -1,8 +1,10 @@
 "use server";
 
-import { hashUserPassword } from "@/lib/hash";
-import createUser from "@/lib/user";
+import { createAuthSession } from "@/lib/auth";
+import { hashUserPassword, verifyPassword } from "@/lib/hash";
+import createUser, { getUser } from "@/lib/user";
 import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
 
 interface SignupErrors {
   firstName?: string;
@@ -16,6 +18,11 @@ interface SignupErrors {
 interface FormState {
   errors: SignupErrors;
 }
+const COOKIE_NAME = 'auth-token';
+const COOKIE_OPTIONS = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',
+};
 
 export async function signup(prevState: FormState, formData: FormData) {
   const firstName = formData.get("firstName") as string;
@@ -35,7 +42,8 @@ export async function signup(prevState: FormState, formData: FormData) {
   } else if (firstName.trim().length > 50) {
     errors.firstName = "First name must be less than 50 characters";
   } else if (!/^[a-zA-Z\s'-]+$/.test(firstName.trim())) {
-    errors.firstName = "First name can only contain letters, spaces, hyphens, and apostrophes";
+    errors.firstName =
+      "First name can only contain letters, spaces, hyphens, and apostrophes";
   }
 
   // Last Name validation
@@ -46,13 +54,14 @@ export async function signup(prevState: FormState, formData: FormData) {
   } else if (lastName.trim().length > 50) {
     errors.lastName = "Last name must be less than 50 characters";
   } else if (!/^[a-zA-Z\s'-]+$/.test(lastName.trim())) {
-    errors.lastName = "Last name can only contain letters, spaces, hyphens, and apostrophes";
+    errors.lastName =
+      "Last name can only contain letters, spaces, hyphens, and apostrophes";
   }
 
   // Email validation
   if (!email || email.trim().length === 0) {
     errors.email = "Email address is required";
-  } else if (!email.includes('@')) {
+  } else if (!email.includes("@")) {
     errors.email = "Please enter a valid email address";
   } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
     errors.email = "Please enter a valid email address";
@@ -70,7 +79,7 @@ export async function signup(prevState: FormState, formData: FormData) {
     errors.phoneNumber = "Phone number is required";
   } else {
     // Remove all non-digit characters for validation
-    const cleanPhone = phoneNumber.replace(/\D/g, '');
+    const cleanPhone = phoneNumber.replace(/\D/g, "");
     if (cleanPhone.length < 10) {
       errors.phoneNumber = "Phone number must be at least 10 digits";
     } else if (cleanPhone.length > 15) {
@@ -104,7 +113,7 @@ export async function signup(prevState: FormState, formData: FormData) {
   }
 
   const hashedPassword = hashUserPassword(password);
-  
+
   try {
     createUser({
       firstName: firstName.trim(),
@@ -114,16 +123,39 @@ export async function signup(prevState: FormState, formData: FormData) {
       role: role.toLowerCase(),
       phoneNumber: phoneNumber.trim(),
     });
+    redirect("/login");
   } catch (error: any) {
-    if (error.code === 'SQLITE_CONSTRAINT_UNIQUE') {
+    if (error.code === "SQLITE_CONSTRAINT_UNIQUE") {
       return {
         errors: {
-          email: 'It seems like an account for the chosen email already exists.'
-        }
+          email:
+            "It seems like an account for the chosen email already exists.",
+        },
       };
     }
-    throw error;
   }
+}
+export async function login(prevState, formData: FormData) {
+  const email = formData.get("email") as string;
+  const password = formData.get("password") as string;
 
-  redirect('/login');
+  const existingUser = await getUser(email, password);
+
+  if (!existingUser) {
+    return {
+      errors: {
+        email: "could not authenticate user. please check your credentials.",
+      },
+    };
+  }
+  if (existingUser.success && existingUser.token && existingUser.user) {
+    await cookies().set(COOKIE_NAME, existingUser.token, COOKIE_OPTIONS);
+    redirect("/dashboard");
+  } else {
+    return {
+      errors: {
+        email: "Authentication failed. Please try again.",
+      },
+    };
+  }
 }

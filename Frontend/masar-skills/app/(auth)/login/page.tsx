@@ -1,9 +1,16 @@
 import Image from "next/image";
-import nurse from "@/public/assets/signup/smilling nurse.png";
-import Logo from "@/public/assets/signup/logo.png";
-import SignupForm from "@/components/signup/SignupForm";
+import nurse from "@/public/assets/login/Nursing assistant students in a training session.png";
+import Logo from "@/public/assets/login/logo.png";
+import LoginForm from "@/components/login/LoginForm";
+import { redirect } from "next/navigation";
+import { verifyAuth } from "@/lib/auth";
 
-export default function page() {
+export default async function page() {
+  const result = await verifyAuth();
+    if(result.user){
+      return redirect('/');
+    }
+  
   return (
     <div className="w-full h-screen flex">
       <div className="w-[736px] py-12 px-28 flex flex-col gap-8">
@@ -15,10 +22,12 @@ export default function page() {
         </div>
         <div className="flex flex-col gap-5">
           <p className="font-bold text-4xl">Create your account</p>
-          <p className="text-[16px] text-[#4C809A]">Join our community of learners and educators.</p>
+          <p className="text-[16px] text-[#4C809A]">
+            Join our community of learners and educators.
+          </p>
         </div>
         {/* THE FORM */}
-        <SignupForm/>
+        <LoginForm />
       </div>
       <div className="w-full relative">
         <Image src={nurse} alt="nurse" fill />

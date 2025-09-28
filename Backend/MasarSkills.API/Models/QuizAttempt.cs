@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-
+//fafafaf
 namespace MasarSkills.API.Models
 {
     public class QuizAttempt

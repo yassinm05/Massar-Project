@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MasarSkills.API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250924173259_Add Difficulity for Course")]
-    partial class AddDifficulityforCourse
+    [Migration("20250925152920_difficulty")]
+    partial class difficulty
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
