@@ -74,6 +74,7 @@ namespace MasarSkills.API.Controllers
                 .Where(q => q.Id == quizId)
                 .Select(q => new QuizStartDto
                 {
+                    AttemptId = attempt.Id,
                     QuizId = q.Id,
                     QuizTitle = q.Title,
                     QuizDescription = q.Description,
@@ -96,9 +97,73 @@ namespace MasarSkills.API.Controllers
 
             return Ok(quizDetails);
         }
+        // POST: api/quiz/submit-answer this is to submit each answer and get immediate feedback
+        [HttpPost("submit-answer")]
+        public async Task<IActionResult> SubmitAnswer([FromBody] SubmitAnswerDto submission)
+        {
+            // 1. Find the quiz attempt and ensure it's in progress
+            var attempt = await _context.QuizAttempts.FirstOrDefaultAsync(qa => qa.Id == submission.AttemptId);
 
-        // POST: api/quiz/submit
-        [HttpPost("submit")]
+            if (attempt == null || attempt.Status != "InProgress")
+            {
+                return BadRequest("This quiz attempt is not valid or has already been completed.");
+            }
+
+            // 2. Find the question and its options
+            var question = await _context.QuizQuestions
+                .Include(q => q.Options)
+                .FirstOrDefaultAsync(q => q.Id == submission.QuestionId);
+
+            if (question == null)
+            {
+                return NotFound("Question not found.");
+            }
+
+            // 3. Determine if the selected answer is correct
+            var correctOption = question.Options.FirstOrDefault(o => o.IsCorrect);
+            if (correctOption == null)
+            {
+                // This indicates a data integrity issue; every question should have a correct answer.
+                return StatusCode(500, "Question is missing a correct answer configuration.");
+            }
+
+            bool isCorrect = submission.SelectedOptionId == correctOption.Id;
+
+            // 4. Create and save the answer record
+            var quizAnswer = new QuizAnswer
+            {
+                QuizAttemptId = submission.AttemptId,
+                QuestionId = submission.QuestionId,
+                SelectedOptionId = submission.SelectedOptionId,
+                TextAnswer = string.Empty,
+                IsCorrect = isCorrect,
+                PointsEarned = isCorrect ? question.Points : 0,
+                AnsweredAt = DateTime.UtcNow
+            };
+            _context.QuizAnswers.Add(quizAnswer);
+
+            // 5. Update the total score on the attempt record
+            if (isCorrect)
+            {
+                attempt.Score += question.Points; // We will store raw points and calculate percentage later
+            }
+
+            await _context.SaveChangesAsync();
+
+            // 6. Create the feedback response and send it back
+            var feedback = new AnswerFeedbackDto
+            {
+                IsCorrect = isCorrect,
+                CorrectOptionId = correctOption.Id,
+                //Rationale = null, // You need to add this field to your Question model if you want to provide explanations
+                UpdatedScore = attempt.Score
+            };
+
+            return Ok(feedback);
+        }
+
+        // POST: api/quiz/submit This is to submit the entire quiz at once we comment it for now
+        /*[HttpPost("submit")]
         public async Task<IActionResult> SubmitQuiz([FromBody] QuizSubmissionDto submission)
         {
             var attempt = await _context.QuizAttempts
@@ -168,10 +233,10 @@ namespace MasarSkills.API.Controllers
                 CorrectAnswers = (int)(totalScore / (maxScore > 0 ? maxScore / submission.Answers.Count : 1)),
                 IsPassed = attempt.Score >= attempt.Quiz.PassingScore
             });
-        }
+        }*/
 
         // GET: api/quiz/results/{attemptId}
-        [HttpGet("results/{attemptId}")]
+        /*[HttpGet("results/{attemptId}")]
         public async Task<IActionResult> GetQuizResults(int attemptId)
         {
             var results = await _context.QuizAttempts
@@ -205,6 +270,50 @@ namespace MasarSkills.API.Controllers
             }
 
             return Ok(results);
+        }*/
+
+        // POST: api/quiz/finish/{attemptId} this is to finalize the quiz attempt
+        [HttpPost("finish/{attemptId}")]
+        public async Task<IActionResult> FinishQuiz(int attemptId)
+        {
+            // 1. Find the quiz attempt
+            var attempt = await _context.QuizAttempts
+                .Include(a => a.Quiz) // Include Quiz to get PassingScore
+                .FirstOrDefaultAsync(qa => qa.Id == attemptId);
+
+            if (attempt == null || attempt.Status != "InProgress")
+            {
+                return BadRequest("This quiz attempt is not valid or has already been completed.");
+            }
+
+            // 2. Finalize the attempt
+            attempt.EndTime = DateTime.UtcNow;
+            attempt.Status = "Completed";
+
+            await _context.SaveChangesAsync();
+
+            // 3. Calculate final results and return a summary
+            // First, get the total possible points for this quiz
+            decimal maxScore = await _context.QuizQuestions
+                .Where(q => q.QuizId == attempt.QuizId)
+                .SumAsync(q => q.Points);
+
+            // Calculate the score as a percentage
+            decimal finalPercentage = (maxScore > 0) ? (attempt.Score / maxScore) * 100 : 0;
+            attempt.Score = finalPercentage; // Update the score to be the percentage
+
+            await _context.SaveChangesAsync();
+
+
+            var result = new QuizResultDto
+            {
+                AttemptId = attempt.Id,
+                Score = attempt.Score,
+                IsPassed = attempt.Score >= attempt.Quiz.PassingScore,
+                // You can add more summary details here if needed
+            };
+
+            return Ok(result);
         }
         [HttpGet("available")]
         public async Task<IActionResult> GetAvailableQuizzes()
@@ -219,7 +328,7 @@ namespace MasarSkills.API.Controllers
             var availableQuizzes = await _context.CourseEnrollments
                 .Where(ce => ce.StudentId == userId) // Filter enrollments for the current student
                 .SelectMany(ce => ce.Course.Modules.SelectMany(m => m.Quizzes)) // Get all quizzes from their courses
-                .Select(q => new 
+                .Select(q => new
                 {
                     Quiz = q,
                     // Count how many times this student has attempted this specific quiz
@@ -240,11 +349,12 @@ namespace MasarSkills.API.Controllers
 
             return Ok(availableQuizzes);
         }
-    }
-    
+        }
+
 
     public class QuizStartDto
     {
+        public int AttemptId { get; set; }
         public int QuizId { get; set; }
         public string QuizTitle { get; set; }
         public string QuizDescription { get; set; }
@@ -310,4 +420,21 @@ namespace MasarSkills.API.Controllers
         public bool IsCorrect { get; set; }
         public decimal PointsEarned { get; set; }
     }
+    // DTO for receiving an answer from the client
+    public class SubmitAnswerDto
+    {
+        public int AttemptId { get; set; }
+        public int QuestionId { get; set; }
+        public int SelectedOptionId { get; set; }
+    }
+
+// DTO for sending feedback back to the client
+    public class AnswerFeedbackDto
+    {
+        public bool IsCorrect { get; set; }
+        public int CorrectOptionId { get; set; }
+        //public string Rationale { get; set; } // The explanation for the answer
+        public decimal UpdatedScore { get; set; } // The new cumulative score
+    }
+    
 }
