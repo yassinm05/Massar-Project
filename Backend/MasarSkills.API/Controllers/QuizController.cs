@@ -22,78 +22,76 @@ namespace MasarSkills.API.Controllers
         [HttpPost("start/{quizId}")]
         public async Task<IActionResult> StartQuiz(int quizId)
         {
-            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+          var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
 
-            // Check if user is enrolled in the course
-            var quiz = await _context.Quizzes
-                .Include(q => q.Module)
-                .ThenInclude(m => m.Course)
-                .FirstOrDefaultAsync(q => q.Id == quizId);
+          // Check if user is enrolled in the course
+          var quiz = await _context.Quizzes
+              .Include(q => q.Module.Course)
+              .FirstOrDefaultAsync(q => q.Id == quizId);
 
-            if (quiz == null)
-            {
-                return NotFound("Quiz not found");
-            }
+          if (quiz == null)
+          {
+              return NotFound("Quiz not found");
+          }
 
-            var enrollment = await _context.CourseEnrollments
-                .FirstOrDefaultAsync(ce => ce.StudentId == userId && ce.CourseId == quiz.Module.CourseId);
+          var enrollment = await _context.CourseEnrollments
+              .FirstOrDefaultAsync(ce => ce.StudentId == userId && ce.CourseId == quiz.Module.CourseId);
 
-            if (enrollment == null)
-            {
-                return BadRequest("You are not enrolled in this course");
-            }
+          if (enrollment == null)
+          {
+              return BadRequest("You are not enrolled in this course");
+          }
 
-            // Check previous attempts
-            var previousAttempts = await _context.QuizAttempts
-                .Where(qa => qa.EnrollmentId == enrollment.Id && qa.QuizId == quizId)
-                .CountAsync();
+          // Check previous attempts
+          var previousAttempts = await _context.QuizAttempts
+              .Where(qa => qa.EnrollmentId == enrollment.Id && qa.QuizId == quizId)
+              .CountAsync();
 
-            if (previousAttempts >= quiz.MaxAttempts)
-            {
-                return BadRequest("You have exceeded the maximum number of attempts");
-            }
+          if (previousAttempts >= quiz.MaxAttempts)
+          {
+              return BadRequest("You have exceeded the maximum number of attempts");
+          }
 
-            // Create new quiz attempt
-            var attempt = new QuizAttempt
-            {
-                EnrollmentId = enrollment.Id,
-                QuizId = quizId,
-                StartTime = DateTime.UtcNow,
-                Score = 0,
-                AttemptNumber = previousAttempts + 1,
-                Status = "InProgress"
-            };
+          // Create new quiz attempt
+          var attempt = new QuizAttempt
+          {
+              EnrollmentId = enrollment.Id,
+              QuizId = quizId,
+              StartTime = DateTime.UtcNow,
+              Score = 0,
+              AttemptNumber = previousAttempts + 1,
+              Status = "InProgress"
+          };
 
-            _context.QuizAttempts.Add(attempt);
-            await _context.SaveChangesAsync();
+          _context.QuizAttempts.Add(attempt);
+          await _context.SaveChangesAsync();
 
-            // Get quiz questions with options
-            var quizDetails = await _context.Quizzes
-                .Include(q => q.Questions)
-                .ThenInclude(q => q.Options)
-                .Where(q => q.Id == quizId)
-                .Select(q => new QuizStartDto
-                {
-                    AttemptId = attempt.Id,
-                    QuizId = q.Id,
-                    QuizTitle = q.Title,
-                    QuizDescription = q.Description,
-                    TimeLimitMinutes = q.TimeLimitMinutes,
-                    AttemptNumber = attempt.AttemptNumber,
-                    Questions = q.Questions.OrderBy(qq => qq.Order).Select(qq => new QuizQuestionDto
-                    {
-                        QuestionId = qq.Id,
-                        QuestionText = qq.QuestionText,
-                        QuestionType = qq.QuestionType,
-                        Points = qq.Points,
-                        Options = qq.Options.OrderBy(o => o.Order).Select(o => new QuestionOptionDto
-                        {
-                            OptionId = o.Id,
-                            OptionText = o.OptionText
-                        }).ToList()
-                    }).ToList()
-                })
-                .FirstOrDefaultAsync();
+          // Get quiz questions with options
+          var quizDetails = await _context.Quizzes
+              .Where(q => q.Id == quizId)
+              .Select(q => new QuizStartDto
+              {
+                  AttemptId = attempt.Id,
+                  QuizId = q.Id,
+                  QuizTitle = q.Title,
+                  QuizDescription = q.Description,
+                  PassingScore = q.PassingScore, 
+                  TimeLimitMinutes = q.TimeLimitMinutes,
+                  AttemptNumber = attempt.AttemptNumber,
+                  Questions = q.Questions.OrderBy(qq => qq.Order).Select(qq => new QuizQuestionDto
+                  {
+                      QuestionId = qq.Id,
+                      QuestionText = qq.QuestionText,
+                      QuestionType = qq.QuestionType,
+                      Points = qq.Points,
+                      Options = qq.Options.OrderBy(o => o.Order).Select(o => new QuestionOptionDto
+                      {
+                          OptionId = o.Id,
+                          OptionText = o.OptionText
+                      }).ToList()
+                  }).ToList()
+              })
+              .FirstOrDefaultAsync();
 
             return Ok(quizDetails);
         }
@@ -325,29 +323,36 @@ namespace MasarSkills.API.Controllers
             }
 
             // 2. Find all quizzes for the courses the student is enrolled in
-            var availableQuizzes = await _context.CourseEnrollments
-                .Where(ce => ce.StudentId == userId) // Filter enrollments for the current student
-                .SelectMany(ce => ce.Course.Modules.SelectMany(m => m.Quizzes)) // Get all quizzes from their courses
-                .Select(q => new
-                {
-                    Quiz = q,
-                    // Count how many times this student has attempted this specific quiz
-                    AttemptsTaken = q.Attempts.Count(a => a.StudentId == userId)
-                })
-                // 3. Filter the list to only include quizzes with remaining attempts
-                .Where(x => x.AttemptsTaken < x.Quiz.MaxAttempts)
-                .Select(x => new AvailableQuizDto
-                {
-                    QuizId = x.Quiz.Id,
-                    QuizTitle = x.Quiz.Title,
-                    CourseName = x.Quiz.Module.Course.Title, // Assuming Course has a Title
-                    TimeLimitMinutes = x.Quiz.TimeLimitMinutes,
-                    MaxAttempts = x.Quiz.MaxAttempts,
-                    AttemptsTaken = x.AttemptsTaken
-                })
-                .ToListAsync();
+            var studentQuizzes = await _context.CourseEnrollments
+                 .Where(ce => ce.StudentId == userId)
+                 .SelectMany(ce => ce.Course.Modules.SelectMany(m => m.Quizzes))
+                 .Select(q => new
+                 {
+                     Quiz = q,
+                     CourseName = q.Module.Course.Title,
+                     // Find the most recent attempt for this specific quiz by this student
+            LatestAttempt = _context.QuizAttempts
+                .Where(qa => qa.QuizId == q.Id && qa.Enrollment.StudentId == userId)
+                .OrderByDescending(qa => qa.AttemptNumber)
+                         .FirstOrDefault()
+                 })
+                 .ToListAsync();
 
-            return Ok(availableQuizzes);
+             // 3. Project the final DTO with the calculated status
+             var availableQuizzes = studentQuizzes.Select(x => new AvailableQuizDto
+             {
+                 QuizId = x.Quiz.Id,
+                 QuizTitle = x.Quiz.Title,
+                 CourseName = x.CourseName,
+                 TimeLimitMinutes = x.Quiz.TimeLimitMinutes,
+                 MaxAttempts = x.Quiz.MaxAttempts,
+                 // Calculate attempts taken from the latest attempt number, or 0 if no attempts
+                 AttemptsTaken = x.LatestAttempt != null ? x.LatestAttempt.AttemptNumber : 0,
+                 // Determine the status based on the latest attempt
+                 Status = x.LatestAttempt == null ? "Not Started" : x.LatestAttempt.Status
+              }).ToList();
+
+             return Ok(availableQuizzes);
         }
         }
 
@@ -358,6 +363,7 @@ namespace MasarSkills.API.Controllers
         public int QuizId { get; set; }
         public string QuizTitle { get; set; }
         public string QuizDescription { get; set; }
+        public decimal PassingScore { get; set; } 
         public int TimeLimitMinutes { get; set; }
         public int AttemptNumber { get; set; }
         public List<QuizQuestionDto> Questions { get; set; }
@@ -428,7 +434,7 @@ namespace MasarSkills.API.Controllers
         public int SelectedOptionId { get; set; }
     }
 
-// DTO for sending feedback back to the client
+    // DTO for sending feedback back to the client
     public class AnswerFeedbackDto
     {
         public bool IsCorrect { get; set; }
