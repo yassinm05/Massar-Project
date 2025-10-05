@@ -236,18 +236,34 @@ namespace MasarSkills.API.Controllers
             });
         }*/
 
-        // GET: api/quiz/results/{attemptId}
-       [HttpGet("results/{attemptId}")] // Make sure this line is uncommented
-        public async Task<IActionResult> GetQuizResults(int attemptId)
-        {
-           // Ensure the current user owns this attempt to prevent viewing others' results
-           var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+        // GET: api/quiz/results/{quizId}
+[HttpGet("results/{quizId}")]
+public async Task<IActionResult> GetQuizResults(int quizId)
+{
+    // 1. Get the current user's ID
+    var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
 
-           var results = await _context.QuizAttempts
-               .Include(qa => qa.Quiz)
-               .Include(qa => qa.Answers)
+    // 2. Find the latest COMPLETED attempt for this quiz by the current user
+    var latestCompletedAttempt = await _context.QuizAttempts
+        .Where(qa => qa.QuizId == quizId 
+                     && qa.Enrollment.StudentId == userId 
+                     && qa.Status == "Completed")
+        .OrderByDescending(qa => qa.AttemptNumber) // Order to get the most recent attempt first
+        .FirstOrDefaultAsync();
+
+    // 3. If no completed attempt is found, return NotFound
+    if (latestCompletedAttempt == null)
+    {
+        return NotFound("No completed quiz attempt found for this quiz.");
+    }
+
+    // 4. Now that we have the specific attempt, fetch its full details
+    //    (This is the same logic as your original method, just using the ID we found)
+    var results = await _context.QuizAttempts
+        .Include(qa => qa.Quiz)
+        .Include(qa => qa.Answers)
         .ThenInclude(a => a.Question)
-        .Where(qa => qa.Id == attemptId && qa.Enrollment.StudentId == userId) // Security check
+        .Where(qa => qa.Id == latestCompletedAttempt.Id) // Use the ID of the attempt we found
         .Select(qa => new QuizDetailedResultDto
         {
             AttemptId = qa.Id,
@@ -264,19 +280,12 @@ namespace MasarSkills.API.Controllers
                 QuestionText = a.Question.QuestionText,
                 IsCorrect = a.IsCorrect,
                 PointsEarned = a.PointsEarned
-                       // You could also include the user's selected answer and the correct answer here
             }).ToList()
-               })
-               .FirstOrDefaultAsync();
-
-           if (results == null)
-           {
-               // Returns NotFound if the attempt doesn't exist or doesn't belong to the user
-               return NotFound();
-           }
-
-           return Ok(results);
-        }
+        })
+        .FirstOrDefaultAsync();
+    
+    return Ok(results);
+}
 
         // POST: api/quiz/finish/{attemptId} this is to finalize the quiz attempt
         [HttpPost("finish/{attemptId}")]
