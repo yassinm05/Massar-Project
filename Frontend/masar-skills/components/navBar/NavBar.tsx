@@ -27,8 +27,8 @@ export default function NavBar() {
         <li className={` `}>
           <Link href={"#"}>Job Board</Link>
         </li>
-        <li className={``}>
-          <Link href={"#"}>Exams & Feedback</Link>
+        <li className={`${pathName === "/quizzes"?"text-[#0083AD]":"text-black"}`}>
+          <Link href={"/quizzes"}>Exams & Feedback</Link>
         </li>
       </ul>
       <div className="flex gap-4">
