@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace MasarSkills.API.Migrations
 {
     /// <inheritdoc />
-    public partial class difficulty : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -97,9 +97,9 @@ namespace MasarSkills.API.Migrations
                     UserId = table.Column<int>(type: "int", nullable: false),
                     PhoneNumber = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     Specialization = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    YearsOfExperience = table.Column<int>(type: "int", nullable: false),
-                    Bio = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
-                    Qualifications = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    YearsOfExperience = table.Column<int>(type: "int", nullable: true),
+                    Bio = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
+                    Qualifications = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -177,10 +177,10 @@ namespace MasarSkills.API.Migrations
                     UserId = table.Column<int>(type: "int", nullable: false),
                     PhoneNumber = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     DateOfBirth = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Address = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    EducationLevel = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    CareerGoals = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Skills = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Address = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
+                    EducationLevel = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    CareerGoals = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Skills = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {

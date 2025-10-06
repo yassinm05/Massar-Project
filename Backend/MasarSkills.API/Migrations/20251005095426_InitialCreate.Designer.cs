@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MasarSkills.API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250925200415_studentprofileupdate")]
-    partial class studentprofileupdate
+    [Migration("20251005095426_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -201,7 +201,6 @@ namespace MasarSkills.API.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Bio")
-                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
@@ -211,7 +210,6 @@ namespace MasarSkills.API.Migrations
                         .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("Qualifications")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Specialization")
@@ -222,7 +220,7 @@ namespace MasarSkills.API.Migrations
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
-                    b.Property<int>("YearsOfExperience")
+                    b.Property<int?>("YearsOfExperience")
                         .HasColumnType("int");
 
                     b.HasKey("Id");

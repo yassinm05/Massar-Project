@@ -124,6 +124,7 @@ namespace MasarSkills.API.Services
                 {
                     Success = true,
                     Token = token,
+                    StudentId = user.Role == "Student" ? user.Id : (int?)null,
                     User = new UserDto
                     {
                         Id = user.Id,
