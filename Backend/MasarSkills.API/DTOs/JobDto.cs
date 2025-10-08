@@ -10,5 +10,13 @@
         public decimal Salary { get; set; }
         public DateTime PostedAt { get; set; }
     }
+
+    public class JobListDto
+    {
+        public int Id { get; set; }
+        public string Title { get; set; }
+        public string CompanyName { get; set; }
+        public string Location { get; set; }
+    }
 }
 

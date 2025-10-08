@@ -7,7 +7,7 @@ namespace MasarSkills.API.Services
 {
     public interface IJobService
     {
-        Task<IEnumerable<JobDto>> GetAllJobsAsync();
+        Task<IEnumerable<JobListDto>> GetAllJobsAsync();
         Task<JobDto> GetJobByIdAsync(int id);
         Task<JobDto> CreateJobAsync(CreateJobDto jobDto);
         Task<bool> DeleteJobAsync(int id);
@@ -22,21 +22,19 @@ namespace MasarSkills.API.Services
             _context = context;
         }
 
-        public async Task<IEnumerable<JobDto>> GetAllJobsAsync()
+        public async Task<IEnumerable<JobListDto>> GetAllJobsAsync()
         {
             var jobs = await _context.Jobs
                 .Where(j => j.IsActive)
                 .ToListAsync();
 
-            return jobs.Select(j => new JobDto
+            // Now, we select only the three required properties into our new DTO
+            return jobs.Select(j => new JobListDto
             {
                 Id = j.Id,
                 Title = j.Title,
-                Description = j.Description,
                 CompanyName = j.CompanyName,
-                Location = j.Location,
-                Salary = j.Salary,
-                PostedAt = j.PostedAt
+                Location = j.Location
             });
         }
 
