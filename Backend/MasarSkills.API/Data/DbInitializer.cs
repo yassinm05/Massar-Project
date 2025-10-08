@@ -154,9 +154,9 @@ namespace MasarSkills.API.Data
             {
                 Title = "مقدمة في مساعدة التمريض",
                 Description = "هذه دورة تمهيدية شاملة تغطي الأساسيات والمبادئ الأساسية لمساعد التمريض.",
+                Difficulty = "Beginner",
                 Price = 500.00m,
                 DurationHours = 40,
-                Difficulty = "Beginner",
                 ThumbnailUrl = "/images/nursing-course.jpg",
                 IsActive = true,
                 InstructorId = instructorProfile.Id,
@@ -234,7 +234,8 @@ namespace MasarSkills.API.Data
                 QuestionText = "ما هو الدور الرئيسي لمساعد التمريض؟",
                 QuestionType = "MultipleChoice",
                 Points = 5,
-                Order = 1
+                Order = 1,
+                TopicId = 1
             };
 
             context.QuizQuestions.Add(question1);
@@ -360,8 +361,8 @@ namespace MasarSkills.API.Data
                 {
                     Title = "أساسيات الإسعافات الأولية",
                     Description = "دورة شاملة حول تقنيات الإسعافات الأولية للتعامل مع الحالات الطارئة.",
-                    Price = 600.00m,
                     Difficulty = "Beginner",
+                    Price = 600.00m,
                     DurationHours = 30,
                     ThumbnailUrl = "/images/first-aid.jpg",
                     IsActive = true,
@@ -373,9 +374,9 @@ namespace MasarSkills.API.Data
                 {
                     Title = "إدارة الرعاية الصحية",
                     Description = "مقدمة في إدارة أنظمة الرعاية الصحية والسياسات الطبية.",
+                    Difficulty = "Beginner",
                     Price = 800.00m,
                     DurationHours = 50,
-                    Difficulty = "Beginner",
                     ThumbnailUrl = "/images/healthcare-management.jpg",
                     IsActive = true,
                     InstructorId = context.InstructorProfiles.First().Id,

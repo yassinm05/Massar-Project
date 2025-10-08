@@ -17,3 +17,4 @@ export async function submitAnswerAction(
 
   return await submitAnswer(attemptId, questionId, optionId, tokenCookie.value);
 }
+

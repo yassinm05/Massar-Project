@@ -18,10 +18,10 @@ interface SignupErrors {
 interface FormState {
   errors: SignupErrors;
 }
-const COOKIE_NAME = 'auth-token';
+const COOKIE_NAME = "auth-token";
 const COOKIE_OPTIONS = {
   httpOnly: true,
-  secure: process.env.NODE_ENV === 'production',
+  secure: process.env.NODE_ENV === "production",
 };
 
 export async function signup(prevState: FormState, formData: FormData) {
@@ -156,6 +156,55 @@ export async function login(prevState, formData: FormData) {
       errors: {
         email: "Authentication failed. Please try again.",
       },
+    };
+  }
+}
+export async function verifyAuthAction() {
+  const cookieStore = await cookies(); // wait for it
+  const tokenCookie = cookieStore.get("auth-token");
+
+  if (!tokenCookie || !tokenCookie.value) {
+    return {
+      user: null,
+      session: null,
+    };
+  }
+
+  try {
+    const response = await fetch(
+      "http://localhost:5236/api/auth/validate-token",
+      {
+        method: "POST",
+        headers: {
+          Accept: "*/*",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          token: tokenCookie.value,
+        }),
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok || !data.success || !data.user) {
+      // Token is invalid, clear the cookie
+      const cookieStore = await cookies(); // wait for it
+      cookieStore.delete("auth-token");
+      return {
+        user: null,
+        session: null,
+      };
+    }
+
+    return {
+      user: data.user,
+      session: { token: tokenCookie.value },
+    };
+  } catch (error) {
+    return {
+      user: null,
+      session: null,
     };
   }
 }

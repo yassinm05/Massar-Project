@@ -9,5 +9,7 @@ namespace MasarSkills.API.DTOs
         public UserDto User { get; set; }
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string Message { get; set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public int? StudentId { get; set; }
     }
 }

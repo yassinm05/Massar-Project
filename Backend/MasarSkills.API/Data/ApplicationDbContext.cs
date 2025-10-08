@@ -10,11 +10,7 @@ namespace MasarSkills.API.Data
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
         }
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseSqlServer("Server= .;Database=MasarSkillsDB;Trusted_Connection=True;TrustServerCertificate=True");
-
-        }
+        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             var cascadeFKs = modelBuilder.Model.GetEntityTypes()
