@@ -1,4 +1,6 @@
-﻿using MasarSkills.API.Data;
+﻿using System.Security.Claims;
+using MasarSkills.API.Data;
+using MasarSkills.API.DTOs;
 using MasarSkills.API.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -17,13 +19,69 @@ namespace MasarSkills.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Apply([FromBody] JobApplication application)
+        [HttpPost]
+        public async Task<IActionResult> Apply([FromForm] JobApplicationCreateDto applicationDto)
         {
-            _context.JobApplications.Add(application);
-            await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetApplicationById), new { id = application.Id }, application);
-        }
+            // --- Step 1: Get the authenticated user's ID from the token ---
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdString))
+            {
+                return Unauthorized("User is not authenticated or token is invalid.");
+            }
+            var userId = int.Parse(userIdString);
 
+            // --- Step 2: Handle the File Upload ---
+            if (applicationDto.ResumeFile == null || applicationDto.ResumeFile.Length == 0)
+            {
+                return BadRequest("A resume file is required.");
+            }
+
+            var uploadsFolderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "resumes");
+            if (!Directory.Exists(uploadsFolderPath))
+            {
+                Directory.CreateDirectory(uploadsFolderPath);
+            }
+
+            var uniqueFileName = $"{Guid.NewGuid()}_{applicationDto.ResumeFile.FileName}";
+            var filePath = Path.Combine(uploadsFolderPath, uniqueFileName);
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await applicationDto.ResumeFile.CopyToAsync(stream);
+            }
+
+            // --- Step 3: Map the DTO to your database model ---
+            var newApplication = new JobApplication
+            {
+                JobId = applicationDto.JobId,
+                UserId = userId,
+                CoverLetter = applicationDto.CoverLetter,
+                PreviousWorkExperience = applicationDto.PreviousWorkExperience,
+                NursingCompetencies = applicationDto.NursingCompetencies,
+                PreferredShift = applicationDto.PreferredShift,
+                LicenseCertificationNumber = applicationDto.LicenseCertificationNumber,
+                ResumeUrl = $"/resumes/{uniqueFileName}",
+            };
+
+            // --- Step 4: Save, Generate Confirmation, Save Again, and Return ---
+
+            // First Save: Persist the application to the database to generate its unique Id.
+            _context.JobApplications.Add(newApplication);
+            await _context.SaveChangesAsync();
+
+            // Generate a unique, user-friendly confirmation number.
+            // Using the new Id makes it traceable.
+            var confirmationNumber = $"#{new Random().Next(100, 999)}-{newApplication.Id}";
+
+            // Update the object with the new confirmation number.
+            newApplication.ConfirmationNumber = confirmationNumber;
+            
+            // Second Save: Persist the confirmation number to the database.
+            await _context.SaveChangesAsync();
+
+            // Final Step: Return ONLY the confirmation number in a simple object.
+            return Ok(new { confirmationNumber = newApplication.ConfirmationNumber });
+        }
         [HttpGet("{id}")]
         public async Task<IActionResult> GetApplicationById(int id)
         {

@@ -21,11 +21,11 @@ export default function NavBar() {
         <li className={` ${pathName === "/"?"text-[#0083AD]":"text-black"} `}>
           <Link href={"/"}>Home Page</Link>
         </li>
-        <li className={`  `}>
+        <li className={` ${(pathName === "/course-catalog"|| pathName==="/course-details")?"text-[#0083AD]":"text-black"} `}>
           <Link href={"/course-catalog"}>Course Catalog</Link>
         </li>
-        <li className={` `}>
-          <Link href={"#"}>Job Board</Link>
+        <li className={`${pathName === "/jobs"?"text-[#0083AD]":"text-black"} `}>
+          <Link href={"/jobs"}>Job Board</Link>
         </li>
         <li className={`${pathName === "/quizzes"?"text-[#0083AD]":"text-black"}`}>
           <Link href={"/quizzes"}>Exams & Feedback</Link>
