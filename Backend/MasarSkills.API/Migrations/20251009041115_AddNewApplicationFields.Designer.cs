@@ -4,6 +4,7 @@ using MasarSkills.API.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MasarSkills.API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251009041115_AddNewApplicationFields")]
+    partial class AddNewApplicationFields
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -281,10 +284,6 @@ namespace MasarSkills.API.Migrations
                     b.Property<DateTime>("AppliedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("ConfirmationNumber")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
                     b.Property<string>("CoverLetter")
                         .IsRequired()
                         .HasMaxLength(500)
@@ -294,7 +293,8 @@ namespace MasarSkills.API.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("LicenseCertificationNumber")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("NursingCompetencies")
                         .IsRequired()
@@ -312,7 +312,6 @@ namespace MasarSkills.API.Migrations
                         .HasColumnType("nvarchar(2000)");
 
                     b.Property<string>("ResumeUrl")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("UserId")
