@@ -1,6 +1,9 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+from pydub import AudioSegment
 import speech_recognition as sr
+import io
+
 
 # Import the main function from your chatbot logic file
 from chatbot_logic import main_chatbot_flow
@@ -46,32 +49,61 @@ def chat():
 
 @app.route("/api/transcribe", methods=['POST'])
 def transcribe_audio():
+    # --- 1. GET TOKEN AND STUDENT ID (NEW) ---
+    # When sending a file, other data comes from request.form
+    # The Authorization header is retrieved the same way as before.
+    auth_header = request.headers.get('Authorization')
+    if not auth_header or not auth_header.startswith('Bearer '):
+        return jsonify({"error": "Authorization header with Bearer token is required"}), 401
+    token = auth_header.split(' ')[1]
     
-    # The frontend calls this first, then uses the resulting text to call /api/chat.
+    # Get studentId from form data, not JSON
+    student_id = request.form.get('studentId')
+
+    # --- 2. VERIFY AND CONVERT AUDIO (EXISTING LOGIC) ---
     if 'audio' not in request.files:
         return jsonify({"error": "No audio file found in the request"}), 400
 
     audio_file = request.files['audio']
-    recognizer = sr.Recognizer()
-
+    
     try:
-        with sr.AudioFile(audio_file) as source:
-            audio_data = recognizer.record(source)
+        webm_audio = AudioSegment.from_file(audio_file, format="webm")
+        wav_io = io.BytesIO()
+        webm_audio.export(wav_io, format="wav")
+        wav_io.seek(0)
+    except Exception as e:
+        return jsonify({"error": f"Audio conversion failed: {e}"}), 500
+
+    # --- 3. TRANSCRIBE AND CALL CHATBOT (MODIFIED) ---
+    recognizer = sr.Recognizer()
+    with sr.AudioFile(wav_io) as source:
+        audio_data = recognizer.record(source)
+
+    text = None
+    try:
+        # First, try to recognize the text without returning
+        text = recognizer.recognize_google(audio_data, language='en-US')
+    except sr.UnknownValueError:
         try:
-            text = recognizer.recognize_google(audio_data, language='en-US')
-            lang = 'en'
-            return jsonify({"transcribed_text": text, "language": lang})
+            text = recognizer.recognize_google(audio_data, language='ar-EG')
         except sr.UnknownValueError:
-            try:
-                text = recognizer.recognize_google(audio_data, language='ar-EG')
-                lang = 'ar'
-                return jsonify({"transcribed_text": text, "language": lang})
-            except sr.UnknownValueError:
-                return jsonify({"error": "Could not understand the audio"}), 400
+            return jsonify({"error": "Could not understand the audio"}), 400
     except sr.RequestError as e:
         return jsonify({"error": f"Could not request results; {e}"}), 503
-    except Exception as e:
-        return jsonify({"error": f"Error processing audio file: {e}"}), 500
+    
+    # If transcription was successful, 'text' will have a value
+    if text:
+        # Now, call the chatbot logic with the transcribed text
+        bot_response = main_chatbot_flow(
+            user_query=text,
+            token=token,
+            student_id=student_id
+        )
+        # Return the chatbot's final answer
+        return jsonify({"response": bot_response})
+    else:
+        # This is a fallback, though it's unlikely to be reached
+        return jsonify({"error": "Transcription failed for an unknown reason"}), 500
 
 
 # --- RUN THE APP ---

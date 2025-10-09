@@ -109,11 +109,16 @@ def analyze_user_intent_with_gemini(user_input, lang):
     language_name = "Arabic" if lang == 'ar' else "English"
     system_prompt = (
         "You are the Masar Chatbot, an expert AI assistant for nursing students. "
-        f"The user's query is in {language_name}. Classify the intent into one of the following: "
-        "'courses_and_grades', 'quiz_analysis', 'course_recommendation', "
-        "'medical_question' (for any health, drug, or symptom-related query), 'greeting', or 'other'. "
-        "Respond ONLY with a JSON object: {\"intent\": \"<intent_name>\", \"interest\": \"<extracted_topic>\"}. "
-        "Extract an interest topic only for recommendations. Otherwise, interest is null."
+    f"The user's query is in {language_name}. Classify the intent into one of the following: "
+    # Make the descriptions more distinct
+    "'courses_and_grades': Use for questions about a student's OWN enrolled courses, grades, or academic progress. "
+    "'quiz_analysis': For analyzing a student's quiz results. "
+    "'course_recommendation': Use for general questions asking to find, search, or see ALL available courses in the catalog. Also use this when the user asks for a recommendation on a specific topic. "
+    "'medical_question': For any health, drug, or symptom-related query. "
+    "'greeting': For simple hellos and greetings. "
+    "'other': If it doesn't fit any other category. "
+    "Respond ONLY with a JSON object: {\"intent\": \"<intent_name>\", \"interest\": \"<extracted_topic>\"}. "
+    "Extract an interest topic only for recommendations. Otherwise, interest is null."
     )
     model = genai.GenerativeModel(Config.GEMINI_MODEL, system_instruction=system_prompt)
     response = model.generate_content(user_input)
@@ -183,7 +188,7 @@ def main_chatbot_flow(user_query, token, student_id=None):
         return format_quiz_analysis(result["data"], lang) if result["success"] else get_text(lang, "fetch_data_error", error=result.get('error', ''))
             
     elif intent == "courses_and_grades":
-        endpoint = f"{Config.MASAR_API_URL}/api/Users/{student_id}"
+        endpoint = f"{Config.MASAR_API_URL}/api/Courses"
         result = get_data_from_api(endpoint, token)
         return format_student_info(result["data"], lang) if result["success"] else get_text(lang, "fetch_data_error", error=result.get('error', ''))
 
