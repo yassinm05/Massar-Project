@@ -55,7 +55,7 @@ namespace MasarSkills.API.Controllers
             {
                 JobId = applicationDto.JobId,
                 UserId = userId,
-                CoverLetter = applicationDto.CoverLetter,
+                CoverLetter = "no cover letter",
                 PreviousWorkExperience = applicationDto.PreviousWorkExperience,
                 NursingCompetencies = applicationDto.NursingCompetencies,
                 PreferredShift = applicationDto.PreferredShift,
