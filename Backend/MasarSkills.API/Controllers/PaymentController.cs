@@ -19,40 +19,81 @@ namespace MasarSkills.API.Controllers
         }
 
         // POST: api/payment/process
-        [HttpPost("process")]
-        public async Task<IActionResult> ProcessPayment([FromBody] ProcessPaymentDto paymentDto)
-        {
-            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+        // POST: api/payment/process
+[HttpPost("process")]
+public async Task<IActionResult> ProcessPayment([FromBody] ProcessPaymentDto paymentDto)
+{
+    // === Step 1: Get the authenticated user ===
+    var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+    if (!int.TryParse(userIdString, out var userId))
+    {
+        return Unauthorized();
+    }
 
-            // Generate unique transaction ID
-            var transactionId = $"TXN{DateTime.UtcNow:yyyyMMddHHmmssfff}";
+    // === Step 2: Validate the course and get its price ===
+    var course = await _context.Courses.FindAsync(paymentDto.CourseId);
+    if (course == null)
+    {
+        return NotFound(new { message = "Course not found." });
+    }
+    
+    // **CRITICAL**: Recalculate the price on the server.
+    decimal amountToCharge = course.Price - 20.00m; // Example
+    if (amountToCharge < 0) amountToCharge = 0;
 
-            var payment = new Payment
-            {
-                UserId = userId,
-                CourseId = paymentDto.CourseId,
-                Amount = paymentDto.Amount,
-                AmountPaid = paymentDto.Amount,
-                RemainingAmount = 0,
-                Currency = "EGP",
-                PaymentMethod = paymentDto.PaymentMethod,
-                TransactionId = transactionId,
-                PaymentStatus = "Completed",
-                InstallmentsCount = 1,
-                CurrentInstallment = 1,
-                PaymentDate = DateTime.UtcNow
-            };
+    // === Step 3: (CORRECTED) Find the Student Profile ===
+    var studentProfile = await _context.StudentProfiles
+                                       .FirstOrDefaultAsync(p => p.UserId == userId);
 
-            _context.Payments.Add(payment);
-            await _context.SaveChangesAsync();
+    if (studentProfile == null)
+    {
+        // This means a user exists but doesn't have a student profile.
+        // You need to decide how to handle this error.
+        return BadRequest(new { message = "Student profile not found." });
+    }
 
-            return Ok(new
-            {
-                message = "Payment processed successfully",
-                transactionId = payment.TransactionId,
-                paymentId = payment.Id
-            });
-        }
+    // === Step 4: Process the charge with a payment gateway (Simulation) ===
+    string transactionId = $"SIM_TXN_{Guid.NewGuid()}";
+    // In a real app, the code to charge the 'PaymentMethodToken' would go here.
+    // If it failed, you would return BadRequest().
+
+    // === Step 5: (CORRECTED) Save the transaction and create the enrollment ===
+    var payment = new Payment
+    {
+        UserId = userId,
+        CourseId = course.Id,
+        Amount = amountToCharge,
+        AmountPaid = amountToCharge,
+        Currency = "USD",
+        TransactionId = transactionId,
+        PaymentStatus = "Completed",
+        PaymentDate = DateTime.UtcNow,
+        PaymentMethod = paymentDto.PaymentMethod
+    };
+
+    // Create the enrollment using the correct field names from your table
+    var enrollment = new CourseEnrollment 
+    {
+        StudentId = userId, // The UserId
+        CourseId = course.Id,
+        StudentProfileId = studentProfile.Id, // The ID from the StudentProfiles table
+        EnrollmentDate = DateTime.UtcNow,
+        Status = "Enrolled", // Set a default status
+        ProgressPercentage = 0 // Start progress at 0
+    };
+
+    _context.Payments.Add(payment);
+    _context.CourseEnrollments.Add(enrollment); // Add to the correct DbSet
+    await _context.SaveChangesAsync();
+
+    // === Step 6: Return a success response ===
+    return Ok(new 
+    { 
+        message = "Payment successful!",
+        enrollmentId = enrollment.Id,
+        transactionId = payment.TransactionId
+    });
+}
 
         // GET: api/payment/history
         [HttpGet("history")]
@@ -116,6 +157,55 @@ namespace MasarSkills.API.Controllers
 
             return Ok(paymentDetails);
         }
+        // GET: api/checkout/{courseId}
+        [HttpGet("course/{courseId}")]
+        public async Task<ActionResult<CheckoutDto>> GetCheckoutDetails(int courseId)
+        {
+            // Step 1: Find the course and its related data.
+            // The query now goes one level deeper to get the User from the InstructorProfile.
+            var course = await _context.Courses
+                                       .Include(c => c.Instructor)
+                                           .ThenInclude(instructorProfile => instructorProfile.User)
+                                       .FirstOrDefaultAsync(c => c.Id == courseId);
+
+            if (course == null)
+            {
+                return NotFound(new { message = "Course not found." });
+            }
+
+            // Step 2: Calculate pricing securely on the server.
+            decimal originalPrice = course.Price;
+            decimal discount = 20.00m; // Example discount logic.
+            decimal finalPrice = originalPrice - discount;
+
+            if (finalPrice < 0)
+            {
+                finalPrice = 0;
+            }
+
+            // Step 3: Map the data to the DTO.
+            var checkoutDetails = new CheckoutDto
+            {
+                CourseId = course.Id,
+                CourseTitle = course.Title,
+                // The path to the name is now longer, going through Instructor -> User.
+                InstructorName = $"{course.Instructor?.User?.FirstName} {course.Instructor?.User?.LastName}".Trim(),
+                OriginalPrice = originalPrice,
+                Discount = discount,
+                FinalPrice = finalPrice
+            };
+
+            // Handle cases where the instructor or user might be missing.
+            if (string.IsNullOrWhiteSpace(checkoutDetails.InstructorName))
+            {
+                checkoutDetails.InstructorName = "N/A";
+            }
+
+            // Step 4: Return the DTO to the frontend.
+            return Ok(checkoutDetails);
+        }
+        
+        
     }
 
     public class ProcessPaymentDto

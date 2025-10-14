@@ -10,6 +10,8 @@ namespace MasarSkills.API.Models
             public int StudentId { get; set; }
             public int CourseId { get; set; }
 
+            public int StudentProfileId { get; set; }
+
             public DateTime EnrollmentDate { get; set; } = DateTime.UtcNow;
             public DateTime? CompletionDate { get; set; }
 
