@@ -35,4 +35,15 @@
         public string PaymentStatus { get; set; }
         public string TransactionId { get; set; }
     }
+
+    //Dto for checkout the course and it's payment
+    public class CheckoutDto
+    {
+        public int CourseId { get; set; }
+        public string CourseTitle { get; set; }
+        public string InstructorName { get; set; }
+        public decimal OriginalPrice { get; set; }
+        public decimal Discount { get; set; }
+        public decimal FinalPrice { get; set; }
+    }
 }
