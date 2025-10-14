@@ -203,6 +203,18 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
     });
 
+builder.Services.AddScoped<ILearningMaterialQAService, LearningMaterialQAService>();
+builder.Services.AddScoped<IAiQueryService, AiQueryService>();
+
+// Configure a named HttpClient that our service will use.
+// This is the modern, recommended way to use HttpClient in ASP.NET Core.
+builder.Services.AddHttpClient("MasarSkillsAPI", client =>
+{
+    // This should be the base address of your OWN API.
+    // We get it from appsettings.json for flexibility.
+    client.BaseAddress = new Uri(builder.Configuration["ApiBaseAddress"] ?? "http://localhost:5236");
+});
+
 var app = builder.Build();
 
 

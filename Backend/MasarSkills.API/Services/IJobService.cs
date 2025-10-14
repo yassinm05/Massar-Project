@@ -51,7 +51,9 @@ namespace MasarSkills.API.Services
                 CompanyName = job.CompanyName,
                 Location = job.Location,
                 Salary = job.Salary,
-                PostedAt = job.PostedAt
+                PostedAt = job.PostedAt,
+                Qualifications = job.Qualifications,
+                Responsibilities = job.Responsibilities
             };
         }
 

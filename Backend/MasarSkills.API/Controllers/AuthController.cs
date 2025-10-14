@@ -20,11 +20,6 @@ namespace MasarSkills.API.Controllers
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-            if ((registerDto.Role == "User" || registerDto.Role == "Instructor")
-                && string.IsNullOrWhiteSpace(registerDto.Specialization))
-            {
-                return BadRequest("Specialization is required for Users and Instructors.");
-            }
 
             var result = await _authService.Register(registerDto);
 

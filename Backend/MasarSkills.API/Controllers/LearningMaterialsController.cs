@@ -16,7 +16,7 @@ namespace MasarSkills.API.Controllers
         }
 
         [HttpGet("{id}")]
-        //[Authorize] // محتاج JWT
+        //[Authorize] // JWT
         public async Task<IActionResult> GetMaterial(int id)
         {
             var material = await _service.GetMaterialAsync(id);
