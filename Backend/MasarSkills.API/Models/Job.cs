@@ -31,5 +31,10 @@ namespace MasarSkills.API.Models
         public bool IsActive { get; set; } = true;
 
         public DateTime PostedAt { get; set; } = DateTime.UtcNow;
+        [MaxLength(200)]
+        public string Qualifications { get; set; }
+
+        [MaxLength(200)]
+        public string Responsibilities { get; set; }
     }
 }

@@ -11,6 +11,8 @@ namespace MasarSkills.API.DTOs
         public string Location { get; set; }
         public decimal Salary { get; set; }
         public DateTime PostedAt { get; set; }
+        public string Qualifications { get; set; }
+        public string Responsibilities { get; set; }
     }
 
     public class JobListDto
@@ -24,10 +26,6 @@ namespace MasarSkills.API.DTOs
     {
         [Required]
         public int JobId { get; set; }
-
-       [Required(ErrorMessage = "A cover letter is required.")]
-        [MaxLength(500)]
-        public string CoverLetter { get; set; }
 
         [Required(ErrorMessage = "Previous work experience is required.")]
         [MaxLength(2000)]

@@ -51,7 +51,7 @@ namespace MasarSkills.API.Services
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow,
                     IsActive = true,
-                    PaymentId = paymentId   // ✅ added
+                    PaymentId = paymentId   
                 };
 
                 _context.Users.Add(user);
@@ -64,6 +64,7 @@ namespace MasarSkills.API.Services
                     {
                         UserId = user.Id,
                         PhoneNumber = registerDto.PhoneNumber,
+                        
                     };
                     _context.StudentProfiles.Add(studentProfile);
                 }
@@ -73,7 +74,7 @@ namespace MasarSkills.API.Services
                     {
                         UserId = user.Id,
                         PhoneNumber = registerDto.PhoneNumber,
-                        Specialization = registerDto.Specialization
+                        Specialization = "Not Specified"
                     };
                     _context.InstructorProfiles.Add(instructorProfile);
                 }
