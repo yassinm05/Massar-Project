@@ -23,78 +23,78 @@ namespace MasarSkills.API.Controllers
         [HttpPost("start/{quizId}")]
         public async Task<IActionResult> StartQuiz(int quizId)
         {
-          var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
 
-          // Check if user is enrolled in the course
-          var quiz = await _context.Quizzes
-              .Include(q => q.Module.Course)
-              .FirstOrDefaultAsync(q => q.Id == quizId);
+            // Check if user is enrolled in the course
+            var quiz = await _context.Quizzes
+                .Include(q => q.Module.Course)
+                .FirstOrDefaultAsync(q => q.Id == quizId);
 
-          if (quiz == null)
-          {
-              return NotFound("Quiz not found");
-          }
+            if (quiz == null)
+            {
+                return NotFound("Quiz not found");
+            }
 
-          var enrollment = await _context.CourseEnrollments
-              .FirstOrDefaultAsync(ce => ce.StudentId == userId && ce.CourseId == quiz.Module.CourseId);
+            var enrollment = await _context.CourseEnrollments
+                .FirstOrDefaultAsync(ce => ce.StudentId == userId && ce.CourseId == quiz.Module.CourseId);
 
-          if (enrollment == null)
-          {
-              return BadRequest("You are not enrolled in this course");
-          }
+            if (enrollment == null)
+            {
+                return BadRequest("You are not enrolled in this course");
+            }
 
-          // Check previous attempts
-          var previousAttempts = await _context.QuizAttempts
-              .Where(qa => qa.EnrollmentId == enrollment.Id && qa.QuizId == quizId)
-              .CountAsync();
+            // Check previous attempts
+            var previousAttempts = await _context.QuizAttempts
+                .Where(qa => qa.EnrollmentId == enrollment.Id && qa.QuizId == quizId)
+                .CountAsync();
 
-          if (previousAttempts >= quiz.MaxAttempts)
-          {
-              return BadRequest("You have exceeded the maximum number of attempts");
-          }
+            if (previousAttempts >= quiz.MaxAttempts)
+            {
+                return BadRequest("You have exceeded the maximum number of attempts");
+            }
 
-          // Create new quiz attempt
-          var attempt = new QuizAttempt
-          {
-              EnrollmentId = enrollment.Id,
-              QuizId = quizId,
-              StartTime = DateTime.UtcNow,
-              Score = 0,
-              AttemptNumber = previousAttempts + 1,
-              Status = "InProgress"
-          };
+            // Create new quiz attempt
+            var attempt = new QuizAttempt
+            {
+                EnrollmentId = enrollment.Id,
+                QuizId = quizId,
+                StartTime = DateTime.UtcNow,
+                Score = 0,
+                AttemptNumber = previousAttempts + 1,
+                Status = "InProgress"
+            };
 
-          _context.QuizAttempts.Add(attempt);
-          await _context.SaveChangesAsync();
+            _context.QuizAttempts.Add(attempt);
+            await _context.SaveChangesAsync();
 
-          // Get quiz questions with options
-          var quizDetails = await _context.Quizzes
-              .Include(q => q.Questions)
-              .Where(q => q.Id == quizId)
-              .Select(q => new QuizStartDto
-              {
-                  AttemptId = attempt.Id,
-                  QuizId = q.Id,
-                  QuizTitle = q.Title,
-                  QuizDescription = q.Description,
-                  PassingScore = q.PassingScore,
-                  TotalScore = q.Questions.Sum(qq => qq.Points),
-                  TimeLimitMinutes = q.TimeLimitMinutes,
-                  AttemptNumber = attempt.AttemptNumber,
-                  Questions = q.Questions.OrderBy(qq => qq.Order).Select(qq => new QuizQuestionDto
-                  {
-                      QuestionId = qq.Id,
-                      QuestionText = qq.QuestionText,
-                      QuestionType = qq.QuestionType,
-                      Points = qq.Points,
-                      Options = qq.Options.OrderBy(o => o.Order).Select(o => new QuestionOptionDto
-                      {
-                          OptionId = o.Id,
-                          OptionText = o.OptionText
-                      }).ToList()
-                  }).ToList()
-              })
-              .FirstOrDefaultAsync();
+            // Get quiz questions with options
+            var quizDetails = await _context.Quizzes
+                .Include(q => q.Questions)
+                .Where(q => q.Id == quizId)
+                .Select(q => new QuizStartDto
+                {
+                    AttemptId = attempt.Id,
+                    QuizId = q.Id,
+                    QuizTitle = q.Title,
+                    QuizDescription = q.Description,
+                    PassingScore = q.PassingScore,
+                    TotalScore = q.Questions.Sum(qq => qq.Points),
+                    TimeLimitMinutes = q.TimeLimitMinutes,
+                    AttemptNumber = attempt.AttemptNumber,
+                    Questions = q.Questions.OrderBy(qq => qq.Order).Select(qq => new QuizQuestionDto
+                    {
+                        QuestionId = qq.Id,
+                        QuestionText = qq.QuestionText,
+                        QuestionType = qq.QuestionType,
+                        Points = qq.Points,
+                        Options = qq.Options.OrderBy(o => o.Order).Select(o => new QuestionOptionDto
+                        {
+                            OptionId = o.Id,
+                            OptionText = o.OptionText
+                        }).ToList()
+                    }).ToList()
+                })
+                .FirstOrDefaultAsync();
 
             return Ok(quizDetails);
         }
@@ -237,55 +237,55 @@ namespace MasarSkills.API.Controllers
         }*/
 
         // GET: api/quiz/results/{quizId}
-[HttpGet("results/{quizId}")]
-public async Task<IActionResult> GetQuizResults(int quizId)
-{
-    // 1. Get the current user's ID
-    var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
-
-    // 2. Find the latest COMPLETED attempt for this quiz by the current user
-    var latestCompletedAttempt = await _context.QuizAttempts
-        .Where(qa => qa.QuizId == quizId 
-                     && qa.Enrollment.StudentId == userId 
-                     && qa.Status == "Completed")
-        .OrderByDescending(qa => qa.AttemptNumber) // Order to get the most recent attempt first
-        .FirstOrDefaultAsync();
-
-    // 3. If no completed attempt is found, return NotFound
-    if (latestCompletedAttempt == null)
-    {
-        return NotFound("No completed quiz attempt found for this quiz.");
-    }
-
-    // 4. Now that we have the specific attempt, fetch its full details
-    //    (This is the same logic as your original method, just using the ID we found)
-    var results = await _context.QuizAttempts
-        .Include(qa => qa.Quiz)
-        .Include(qa => qa.Answers)
-        .ThenInclude(a => a.Question)
-        .Where(qa => qa.Id == latestCompletedAttempt.Id) // Use the ID of the attempt we found
-        .Select(qa => new QuizDetailedResultDto
+        [HttpGet("results/{quizId}")]
+        public async Task<IActionResult> GetQuizResults(int quizId)
         {
-            AttemptId = qa.Id,
-            QuizTitle = qa.Quiz.Title,
-            Score = qa.Score,
-            PassingScore = qa.Quiz.PassingScore,
-            IsPassed = qa.Score >= qa.Quiz.PassingScore,
-            StartTime = qa.StartTime,
-            EndTime = qa.EndTime,
-            TimeTaken = qa.EndTime.HasValue ? (qa.EndTime.Value - qa.StartTime).TotalMinutes : 0,
-            Questions = qa.Answers.Select(a => new QuestionResultDto
+            // 1. Get the current user's ID
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+
+            // 2. Find the latest COMPLETED attempt for this quiz by the current user
+            var latestCompletedAttempt = await _context.QuizAttempts
+                .Where(qa => qa.QuizId == quizId
+                             && qa.Enrollment.StudentId == userId
+                             && qa.Status == "Completed")
+                .OrderByDescending(qa => qa.AttemptNumber) // Order to get the most recent attempt first
+                .FirstOrDefaultAsync();
+
+            // 3. If no completed attempt is found, return NotFound
+            if (latestCompletedAttempt == null)
             {
-                QuestionId = a.QuestionId,
-                QuestionText = a.Question.QuestionText,
-                IsCorrect = a.IsCorrect,
-                PointsEarned = a.PointsEarned
-            }).ToList()
-        })
-        .FirstOrDefaultAsync();
-    
-    return Ok(results);
-}
+                return NotFound("No completed quiz attempt found for this quiz.");
+            }
+
+            // 4. Now that we have the specific attempt, fetch its full details
+            //    (This is the same logic as your original method, just using the ID we found)
+            var results = await _context.QuizAttempts
+                .Include(qa => qa.Quiz)
+                .Include(qa => qa.Answers)
+                .ThenInclude(a => a.Question)
+                .Where(qa => qa.Id == latestCompletedAttempt.Id) // Use the ID of the attempt we found
+                .Select(qa => new QuizDetailedResultDto
+                {
+                    AttemptId = qa.Id,
+                    QuizTitle = qa.Quiz.Title,
+                    Score = qa.Score,
+                    PassingScore = qa.Quiz.PassingScore,
+                    IsPassed = qa.Score >= qa.Quiz.PassingScore,
+                    StartTime = qa.StartTime,
+                    EndTime = qa.EndTime,
+                    TimeTaken = qa.EndTime.HasValue ? (qa.EndTime.Value - qa.StartTime).TotalMinutes : 0,
+                    Questions = qa.Answers.Select(a => new QuestionResultDto
+                    {
+                        QuestionId = a.QuestionId,
+                        QuestionText = a.Question.QuestionText,
+                        IsCorrect = a.IsCorrect,
+                        PointsEarned = a.PointsEarned
+                    }).ToList()
+                })
+                .FirstOrDefaultAsync();
+
+            return Ok(results);
+        }
 
         // POST: api/quiz/finish/{attemptId} this is to finalize the quiz attempt
         [HttpPost("finish/{attemptId}")]
@@ -333,41 +333,41 @@ public async Task<IActionResult> GetQuizResults(int quizId)
         [HttpGet("available")]
         public async Task<IActionResult> GetAvailableQuizzes()
         {
-           if (!int.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var userId))
-           {
-               return Unauthorized();
-           }
+            if (!int.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var userId))
+            {
+                return Unauthorized();
+            }
 
-           var studentQuizzes = await _context.CourseEnrollments
-        .Where(ce => ce.StudentId == userId)
-        .SelectMany(ce => ce.Course.Modules.SelectMany(m => m.Quizzes))
-               .Select(q => new
-               {
-                   Quiz = q,
-                   CourseName = q.Module.Course.Title,
-                   LatestAttempt = _context.QuizAttempts
-                       .Where(qa => qa.QuizId == q.Id && qa.Enrollment.StudentId == userId)
-                       .OrderByDescending(qa => qa.AttemptNumber)
-                       .FirstOrDefault()
-               })
-               .ToListAsync();
+            var studentQuizzes = await _context.CourseEnrollments
+         .Where(ce => ce.StudentId == userId)
+         .SelectMany(ce => ce.Course.Modules.SelectMany(m => m.Quizzes))
+                .Select(q => new
+                {
+                    Quiz = q,
+                    CourseName = q.Module.Course.Title,
+                    LatestAttempt = _context.QuizAttempts
+                        .Where(qa => qa.QuizId == q.Id && qa.Enrollment.StudentId == userId)
+                        .OrderByDescending(qa => qa.AttemptNumber)
+                        .FirstOrDefault()
+                })
+                .ToListAsync();
 
-           var availableQuizzes = studentQuizzes.Select(x => new AvailableQuizDto
-           {
-               QuizId = x.Quiz.Id,
-               // If LatestAttempt is null, its Id is null. The '?? 0' replaces that null with 0.
-               LatestAttemptId = x.LatestAttempt?.Id ?? 0, // <-- MODIFIED THIS LINE
-               QuizTitle = x.Quiz.Title,
-               CourseName = x.CourseName,
-               TimeLimitMinutes = x.Quiz.TimeLimitMinutes,
-               MaxAttempts = x.Quiz.MaxAttempts,
-               AttemptsTaken = x.LatestAttempt?.AttemptNumber ?? 0,
-               Status = x.LatestAttempt?.Status ?? "Not Started"
-           }).ToList();
+            var availableQuizzes = studentQuizzes.Select(x => new AvailableQuizDto
+            {
+                QuizId = x.Quiz.Id,
+                // If LatestAttempt is null, its Id is null. The '?? 0' replaces that null with 0.
+                LatestAttemptId = x.LatestAttempt?.Id ?? 0, // <-- MODIFIED THIS LINE
+                QuizTitle = x.Quiz.Title,
+                CourseName = x.CourseName,
+                TimeLimitMinutes = x.Quiz.TimeLimitMinutes,
+                MaxAttempts = x.Quiz.MaxAttempts,
+                AttemptsTaken = x.LatestAttempt?.AttemptNumber ?? 0,
+                Status = x.LatestAttempt?.Status ?? "Not Started"
+            }).ToList();
 
-           return Ok(availableQuizzes);
+            return Ok(availableQuizzes);
         }
-        }
+    }
 
 
     public class QuizStartDto
@@ -376,7 +376,7 @@ public async Task<IActionResult> GetQuizResults(int quizId)
         public int QuizId { get; set; }
         public string QuizTitle { get; set; }
         public string QuizDescription { get; set; }
-        public decimal PassingScore { get; set; } 
+        public decimal PassingScore { get; set; }
         public int TotalScore { get; set; }
         public int TimeLimitMinutes { get; set; }
         public int AttemptNumber { get; set; }
@@ -456,5 +456,5 @@ public async Task<IActionResult> GetQuizResults(int quizId)
         //public string Rationale { get; set; } // The explanation for the answer
         public decimal UpdatedScore { get; set; } // The new cumulative score
     }
-    
+
 }
