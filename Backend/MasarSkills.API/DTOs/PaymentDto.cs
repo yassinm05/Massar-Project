@@ -1,4 +1,6 @@
-﻿namespace MasarSkills.API.DTOs
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace MasarSkills.API.DTOs
 {
     public class PaymentDto
     {
@@ -45,5 +47,30 @@
         public decimal OriginalPrice { get; set; }
         public decimal Discount { get; set; }
         public decimal FinalPrice { get; set; }
+    }
+
+    public class PayInstallmentDto
+    {
+        [Required]
+        public int PaymentId { get; set; } // The ID of the original payment record we need to update
+
+        [Required]
+        public string PaymentMethodToken { get; set; } // The new token for this specific transaction
+    }
+    // Describes a single payment option (e.g., "One-time" or "Installment")
+    public class PaymentOptionDto
+    {
+        public string Type { get; set; } // "onetime" or "installment"
+        public string DisplayText { get; set; }
+        public decimal TotalAmount { get; set; }
+        public int InstallmentsCount { get; set; }
+        public decimal AmountPerInstallment { get; set; }
+    }
+    // The main object the API returns, containing all options for a course
+    public class PaymentPlanDto
+    {
+        public int CourseId { get; set; }
+        public string CourseTitle { get; set; }
+        public List<PaymentOptionDto> Options { get; set; } = new List<PaymentOptionDto>();
     }
 }

@@ -18,83 +18,224 @@ namespace MasarSkills.API.Controllers
             _context = context;
         }
 
+        [HttpGet("{courseId}/payment-plans")]
+        public async Task<ActionResult<PaymentPlanDto>> GetPaymentPlans(int courseId)
+        {
+            // Step 1: Find the course in the database
+            var course = await _context.Courses.FindAsync(courseId);
+            if (course == null)
+            {
+                return NotFound(new { message = "Course not found." });
+            }
+
+            // Step 2: Create the main DTO to hold the response
+            var paymentPlan = new PaymentPlanDto
+            {
+                CourseId = course.Id,
+                CourseTitle = course.Title
+            };
+
+            // Step 3: Define the payment options with server-side logic
+
+            // Option A: One-Time Payment (based on the course's actual price)
+            paymentPlan.Options.Add(new PaymentOptionDto
+            {
+                Type = "onetime",
+                DisplayText = $"One-time payment",
+                TotalAmount = course.Price, // e.g., 199.00
+                InstallmentsCount = 1,
+                AmountPerInstallment = course.Price
+            });
+
+            // Option B: Installment Plan (Business rule example)
+            // Let's say you only offer installments for courses over $150
+            if (course.Price > 150.00m)
+            {
+                // These values are defined securely on the backend
+                int count = 4;
+                decimal installmentPrice = 55.00m; // This can be a fixed price or calculated
+                decimal totalInstallmentAmount = count * installmentPrice; // e.g., 220.00
+
+                paymentPlan.Options.Add(new PaymentOptionDto
+                {
+                    Type = "installment",
+                    DisplayText = $"{count} payments of ${installmentPrice}",
+                    TotalAmount = totalInstallmentAmount,
+                    InstallmentsCount = count,
+                    AmountPerInstallment = installmentPrice
+                });
+            }
+
+            // Step 4: Return the complete plan to the frontend
+            return Ok(paymentPlan);
+        }
         // POST: api/payment/process
-        // POST: api/payment/process
-[HttpPost("process")]
-public async Task<IActionResult> ProcessPayment([FromBody] ProcessPaymentDto paymentDto)
-{
-    // === Step 1: Get the authenticated user ===
-    var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-    if (!int.TryParse(userIdString, out var userId))
-    {
-        return Unauthorized();
-    }
+        [HttpPost("process")]
+        public async Task<IActionResult> ProcessPayment([FromBody] ProcessPaymentDto paymentDto)
+        {
+            // === Step 1: Get User and Course ===
+            var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (!int.TryParse(userIdString, out var userId)) return Unauthorized();
 
-    // === Step 2: Validate the course and get its price ===
-    var course = await _context.Courses.FindAsync(paymentDto.CourseId);
-    if (course == null)
-    {
-        return NotFound(new { message = "Course not found." });
-    }
-    
-    // **CRITICAL**: Recalculate the price on the server.
-    decimal amountToCharge = course.Price - 20.00m; // Example
-    if (amountToCharge < 0) amountToCharge = 0;
+            var course = await _context.Courses.FindAsync(paymentDto.CourseId);
+            if (course == null) return NotFound(new { message = "Course not found." });
 
-    // === Step 3: (CORRECTED) Find the Student Profile ===
-    var studentProfile = await _context.StudentProfiles
-                                       .FirstOrDefaultAsync(p => p.UserId == userId);
+            var studentProfile = await _context.StudentProfiles.FirstOrDefaultAsync(p => p.UserId == userId);
+            if (studentProfile == null) return BadRequest(new { message = "Student profile not found." });
 
-    if (studentProfile == null)
-    {
-        // This means a user exists but doesn't have a student profile.
-        // You need to decide how to handle this error.
-        return BadRequest(new { message = "Student profile not found." });
-    }
 
-    // === Step 4: Process the charge with a payment gateway (Simulation) ===
-    string transactionId = $"SIM_TXN_{Guid.NewGuid()}";
-    // In a real app, the code to charge the 'PaymentMethodToken' would go here.
-    // If it failed, you would return BadRequest().
+            // === Step 2: SECURELY Get Payment Plan Details ===
 
-    // === Step 5: (CORRECTED) Save the transaction and create the enrollment ===
-    var payment = new Payment
-    {
-        UserId = userId,
-        CourseId = course.Id,
-        Amount = amountToCharge,
-        AmountPaid = amountToCharge,
-        Currency = "USD",
-        TransactionId = transactionId,
-        PaymentStatus = "Completed",
-        PaymentDate = DateTime.UtcNow,
-        PaymentMethod = paymentDto.PaymentMethod
-    };
+            // First, calculate the final price after discount. This is the base for all plans.
+            decimal finalPriceAfterDiscount = course.Price - 20.00m; // Example: 500 - 20 = 480
 
-    // Create the enrollment using the correct field names from your table
-    var enrollment = new CourseEnrollment 
-    {
-        StudentId = userId, // The UserId
-        CourseId = course.Id,
-        StudentProfileId = studentProfile.Id, // The ID from the StudentProfiles table
-        EnrollmentDate = DateTime.UtcNow,
-        Status = "Enrolled", // Set a default status
-        ProgressPercentage = 0 // Start progress at 0
-    };
+            // Define the one-time plan based on the final price
+            var oneTimePlan = new { Type = "onetime", TotalAmount = finalPriceAfterDiscount, InstallmentAmount = finalPriceAfterDiscount, Count = 1 };
 
-    _context.Payments.Add(payment);
-    _context.CourseEnrollments.Add(enrollment); // Add to the correct DbSet
-    await _context.SaveChangesAsync();
+            // Define the installment plan dynamically based on the final price
+            int installmentCount = 4;
+            var installmentPlan = new
+            {
+                Type = "installment",
+                TotalAmount = finalPriceAfterDiscount,
+                InstallmentAmount = finalPriceAfterDiscount / installmentCount,
+                Count = installmentCount
+            };
 
-    // === Step 6: Return a success response ===
-    return Ok(new 
-    { 
-        message = "Payment successful!",
-        enrollmentId = enrollment.Id,
-        transactionId = payment.TransactionId
-    });
-}
 
+            // === Step 3: Determine which plan the user chose (Same as before) ===
+            decimal totalAmount;
+            decimal amountToChargeNow;
+            int installmentsCount;
+
+            if (paymentDto.PaymentPlanType == "onetime")
+            {
+                totalAmount = oneTimePlan.TotalAmount;
+                amountToChargeNow = oneTimePlan.InstallmentAmount;
+                installmentsCount = oneTimePlan.Count;
+            }
+            else if (paymentDto.PaymentPlanType == "installment") // Simplified the rule for this example
+            {
+                totalAmount = installmentPlan.TotalAmount;
+                amountToChargeNow = installmentPlan.InstallmentAmount;
+                installmentsCount = installmentPlan.Count;
+            }
+            else
+            {
+                return BadRequest(new { message = "Invalid payment plan selected." });
+            }
+
+            // For clarity, here is the corrected Payment record creation again:
+            string transactionId = $"SIM_TXN_{Guid.NewGuid()}"; // Simulation
+
+            var payment = new Payment
+            {
+                UserId = userId,
+                CourseId = course.Id,
+                Amount = totalAmount,
+                AmountPaid = amountToChargeNow,
+                RemainingAmount = totalAmount - amountToChargeNow,
+                Currency = "USD",
+                PaymentMethod = "Card",
+                TransactionId = transactionId,
+                PaymentStatus = (totalAmount - amountToChargeNow > 0) ? "Pending" : "Completed",
+                InstallmentsCount = installmentsCount,
+                CurrentInstallment = 1,
+                PaymentDate = DateTime.UtcNow,
+                NextPaymentDate = (installmentsCount > 1) ? DateTime.UtcNow.AddMonths(1) : (DateTime?)null
+            };
+
+            // ... (the enrollment and save changes code) ...
+            var enrollment = new CourseEnrollment
+            {
+                StudentId = userId,
+                CourseId = course.Id,
+                StudentProfileId = studentProfile.Id,
+                EnrollmentDate = DateTime.UtcNow,
+                Status = "Enrolled",
+                ProgressPercentage = 0
+            };
+
+            _context.Payments.Add(payment);
+            _context.CourseEnrollments.Add(enrollment);
+            await _context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                message = "Payment successful!",
+                enrollmentId = enrollment.Id,
+                transactionId = payment.TransactionId
+            });
+        }
+
+        // POST: api/payment/installment
+        [HttpPost("installment")]
+        public async Task<IActionResult> PayNextInstallment([FromBody] PayInstallmentDto installmentDto)
+        {
+            // === Step 1: Find the original payment record ===
+            var payment = await _context.Payments
+                                        .FirstOrDefaultAsync(p => p.Id == installmentDto.PaymentId);
+
+            // === Step 2: Validate the payment record ===
+            if (payment == null)
+            {
+                return NotFound(new { message = "Original payment record not found." });
+            }
+
+            if (payment.PaymentStatus != "Pending" || payment.RemainingAmount <= 0)
+            {
+                return BadRequest(new { message = "This payment is already completed or not an active installment plan." });
+            }
+
+            // === Step 3: Calculate the amount for this installment ===
+            // Recalculate server-side to ensure accuracy
+            decimal installmentAmount = payment.Amount / payment.InstallmentsCount;
+
+
+            // === Step 4: Process the charge with the payment gateway (Simulation) ===
+            try
+            {
+                // In a real gateway, this would be a simple "charge", not creating a new subscription.
+                string transactionId = $"SIM_INST_{Guid.NewGuid()}";
+                // You could also log this new transactionId somewhere if needed.
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = "Payment processing failed for this installment." });
+            }
+
+            // === Step 5: UPDATE the original payment record ===
+            payment.AmountPaid += installmentAmount;
+            payment.RemainingAmount -= installmentAmount;
+            payment.CurrentInstallment++;
+
+            // Check if this is the final payment
+            if (payment.RemainingAmount <= 0)
+            {
+                payment.PaymentStatus = "Completed";
+                payment.NextPaymentDate = null; // No more payments are due
+                payment.RemainingAmount = 0; // Clean up any tiny remainder from division
+            }
+            else
+            {
+                // Set the date for the next installment
+                payment.NextPaymentDate = DateTime.UtcNow.AddMonths(1);
+            }
+
+
+            // === Step 6: Save the changes ===
+            // Notice we are NOT creating a new Payment or a new Enrollment. We are only saving changes.
+            await _context.SaveChangesAsync();
+
+
+            // === Step 7: Return a success response ===
+            return Ok(new
+            {
+                message = $"Successfully paid installment {payment.CurrentInstallment - 1}.",
+                paymentStatus = payment.PaymentStatus,
+                remainingAmount = payment.RemainingAmount
+            });
+        }
         // GET: api/payment/history
         [HttpGet("history")]
         public async Task<IActionResult> GetPaymentHistory()
@@ -123,40 +264,40 @@ public async Task<IActionResult> ProcessPayment([FromBody] ProcessPaymentDto pay
             return Ok(payments);
         }
 
-        // GET: api/payment/{id}
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetPaymentDetails(int id)
-        {
-            var payment = await _context.Payments
-                .Include(p => p.Course)
-                .Include(p => p.User)
-                .FirstOrDefaultAsync(p => p.Id == id);
+        // // GET: api/payment/{id}
+        // [HttpGet("{id}")]
+        // public async Task<IActionResult> GetPaymentDetails(int id)
+        // {
+        //     var payment = await _context.Payments
+        //         .Include(p => p.Course)
+        //         .Include(p => p.User)
+        //         .FirstOrDefaultAsync(p => p.Id == id);
 
-            if (payment == null)
-            {
-                return NotFound();
-            }
+        //     if (payment == null)
+        //     {
+        //         return NotFound();
+        //     }
 
-            var paymentDetails = new PaymentDetailsDto
-            {
-                Id = payment.Id,
-                Amount = payment.Amount,
-                AmountPaid = payment.AmountPaid,
-                RemainingAmount = payment.RemainingAmount,
-                Currency = payment.Currency,
-                PaymentMethod = payment.PaymentMethod,
-                TransactionId = payment.TransactionId,
-                PaymentStatus = payment.PaymentStatus,
-                InstallmentsCount = payment.InstallmentsCount,
-                CurrentInstallment = payment.CurrentInstallment,
-                PaymentDate = payment.PaymentDate,
-                NextPaymentDate = payment.NextPaymentDate,
-                UserName = $"{payment.User.FirstName} {payment.User.LastName}",
-                CourseTitle = payment.Course?.Title
-            };
+        //     var paymentDetails = new PaymentDetailsDto
+        //     {
+        //         Id = payment.Id,
+        //         Amount = payment.Amount,
+        //         AmountPaid = payment.AmountPaid,
+        //         RemainingAmount = payment.RemainingAmount,
+        //         Currency = payment.Currency,
+        //         PaymentMethod = payment.PaymentMethod,
+        //         TransactionId = payment.TransactionId,
+        //         PaymentStatus = payment.PaymentStatus,
+        //         InstallmentsCount = payment.InstallmentsCount,
+        //         CurrentInstallment = payment.CurrentInstallment,
+        //         PaymentDate = payment.PaymentDate,
+        //         NextPaymentDate = payment.NextPaymentDate,
+        //         UserName = $"{payment.User.FirstName} {payment.User.LastName}",
+        //         CourseTitle = payment.Course?.Title
+        //     };
 
-            return Ok(paymentDetails);
-        }
+        //     return Ok(paymentDetails);
+        // }
         // GET: api/checkout/{courseId}
         [HttpGet("course/{courseId}")]
         public async Task<ActionResult<CheckoutDto>> GetCheckoutDetails(int courseId)
@@ -204,8 +345,8 @@ public async Task<IActionResult> ProcessPayment([FromBody] ProcessPaymentDto pay
             // Step 4: Return the DTO to the frontend.
             return Ok(checkoutDetails);
         }
-        
-        
+
+
     }
 
     public class ProcessPaymentDto
@@ -213,6 +354,7 @@ public async Task<IActionResult> ProcessPayment([FromBody] ProcessPaymentDto pay
         public int? CourseId { get; set; }
         public decimal Amount { get; set; }
         public string PaymentMethod { get; set; }
+        public string PaymentPlanType { get; set; }
     }
 
     public class PaymentHistoryDto
