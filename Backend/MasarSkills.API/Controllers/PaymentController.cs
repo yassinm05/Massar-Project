@@ -22,18 +22,29 @@ namespace MasarSkills.API.Controllers
         public async Task<ActionResult<PaymentPlanDto>> GetPaymentPlans(int courseId)
         {
             // Step 1: Find the course in the database
-            var course = await _context.Courses.FindAsync(courseId);
+            var course = await _context.Courses
+                                .Include(c => c.Instructor)
+                                    .ThenInclude(instructorProfile => instructorProfile.User)
+                                .FirstOrDefaultAsync(c => c.Id == courseId);
+
             if (course == null)
             {
                 return NotFound(new { message = "Course not found." });
             }
 
-            // Step 2: Create the main DTO to hold the response
+            // Step 2: Create the DTO and map the instructor's name (MAPPING UPDATED)
             var paymentPlan = new PaymentPlanDto
             {
                 CourseId = course.Id,
-                CourseTitle = course.Title
+                CourseTitle = course.Title,
+                InstructorName = $"{course.Instructor?.User?.FirstName} {course.Instructor?.User?.LastName}".Trim()
             };
+
+            // Handle cases where the instructor or user might be missing
+            if (string.IsNullOrWhiteSpace(paymentPlan.InstructorName))
+            {
+                paymentPlan.InstructorName = "N/A";
+            }
 
             // Step 3: Define the payment options with server-side logic
 
@@ -42,7 +53,7 @@ namespace MasarSkills.API.Controllers
             {
                 Type = "onetime",
                 DisplayText = $"One-time payment",
-                TotalAmount = course.Price, // e.g., 199.00
+                TotalAmount = course.Price,
                 InstallmentsCount = 1,
                 AmountPerInstallment = course.Price
             });
@@ -53,8 +64,8 @@ namespace MasarSkills.API.Controllers
             {
                 // These values are defined securely on the backend
                 int count = 4;
-                decimal installmentPrice = 55.00m; // This can be a fixed price or calculated
-                decimal totalInstallmentAmount = count * installmentPrice; // e.g., 220.00
+                decimal installmentPrice = course.Price / 4; // This can be a fixed price or calculated
+                decimal totalInstallmentAmount = count * installmentPrice;
 
                 paymentPlan.Options.Add(new PaymentOptionDto
                 {

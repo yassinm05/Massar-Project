@@ -1,12 +1,12 @@
 import os
 from flask import Flask, request, jsonify
-from dotenv import load_dotenv
 from langchain_google_genai import ChatGoogleGenerativeAI
+import google.generativeai as genai
 
-load_dotenv()
-api_key = os.getenv("GOOGLE_API_KEY")
-if not api_key:
-    raise ValueError("GOOGLE_API_KEY not found. Please ensure it's set in your .env file.")
+from config import Config
+
+
+genai.configure(api_key=Config.GEMINI_API_KEY)
 
 app = Flask(__name__)
 
@@ -40,7 +40,7 @@ def generate_from_template():
     """
 
     try:
-        llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", google_api_key=api_key)
+        llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", google_api_key=Config.GEMINI_API_KEY)
         
         response = llm.invoke(template_prompt)
 

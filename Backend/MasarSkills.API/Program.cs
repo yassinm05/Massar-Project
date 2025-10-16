@@ -214,6 +214,11 @@ builder.Services.AddHttpClient("MasarSkillsAPI", client =>
     // We get it from appsettings.json for flexibility.
     client.BaseAddress = new Uri(builder.Configuration["ApiBaseAddress"] ?? "http://localhost:5236");
 });
+builder.Services.AddHttpClient("FlaskAI", client =>
+{
+    // Make sure this is the correct address for your Python app
+    client.BaseAddress = new Uri("http://localhost:8000/"); 
+});
 
 var app = builder.Build();
 

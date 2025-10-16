@@ -71,6 +71,8 @@ namespace MasarSkills.API.DTOs
     {
         public int CourseId { get; set; }
         public string CourseTitle { get; set; }
+
+        public string InstructorName { get; set; }
         public List<PaymentOptionDto> Options { get; set; } = new List<PaymentOptionDto>();
     }
 }
