@@ -180,11 +180,15 @@ namespace MasarSkills.API.Controllers
             _context.CourseEnrollments.Add(enrollment);
             await _context.SaveChangesAsync();
 
-            return Ok(new
+           return Ok(new
             {
                 message = "Payment successful!",
                 enrollmentId = enrollment.Id,
-                transactionId = payment.TransactionId
+                transactionId = payment.TransactionId,
+                // Add the next payment date, formatted as requested
+                nextPaymentDate = payment.NextPaymentDate.HasValue
+                                    ? payment.NextPaymentDate.Value.ToString("MMMM dd, yyyy")
+                                    : "None"
             });
         }
 
