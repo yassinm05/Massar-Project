@@ -1,6 +1,7 @@
 ﻿using MasarSkills.API.DTOs;
 using MasarSkills.API.Services;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace MasarSkills.API.Controllers
 {
@@ -19,7 +20,9 @@ namespace MasarSkills.API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllCourses()
         {
-            var courses = await _courseService.GetAllCoursesAsync();
+            var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            int? userId = int.TryParse(userIdString, out var id) ? id : (int?)null;
+            var courses = await _courseService.GetAllCoursesAsync(userId);
             return Ok(courses);
         }
 

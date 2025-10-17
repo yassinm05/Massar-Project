@@ -11,5 +11,6 @@
         public string Difficulty { get; set; }
         public string InstructorName { get; set; }
         public DateTime CreatedAt { get; set; }
+        public bool IsEnrolled { get; set; }
     }
 }

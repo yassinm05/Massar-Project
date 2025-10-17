@@ -14,27 +14,40 @@ namespace MasarSkills.API.Services
             _context = context;
         }
 
-        public async Task<IEnumerable<CourseDto>> GetAllCoursesAsync()
-        {
-            var courses = await _context.Courses
-                .Include(c => c.Instructor)
-                .ThenInclude(i => i.User)
-                .Where(c => c.IsActive)
-                .ToListAsync();
+       public async Task<IEnumerable<CourseDto>> GetAllCoursesAsync(int? userId)
+{
+    // If no user is logged in, the set will be empty.
+    var enrolledCourseIds = new HashSet<int>();
+    if (userId.HasValue)
+    {
+        enrolledCourseIds = await _context.CourseEnrollments
+            .Where(e => e.StudentId == userId.Value)
+            .Select(e => e.CourseId)
+            .ToHashSetAsync();
+    }
 
-            return courses.Select(c => new CourseDto
-            {
-                Id = c.Id,
-                Title = c.Title,
-                Description = c.Description,
-                Price = c.Price,
-                DurationHours = c.DurationHours,
-                Difficulty = c.Difficulty,
-                ThumbnailUrl = c.ThumbnailUrl,
-                InstructorName = $"{c.Instructor.User.FirstName} {c.Instructor.User.LastName}",
-                CreatedAt = c.CreatedAt
-            });
-        }
+    var courses = await _context.Courses
+        .Include(c => c.Instructor)
+            .ThenInclude(i => i.User)
+        .Where(c => c.IsActive)
+        .ToListAsync();
+
+    // Step 4: Map to DTO and set the 'IsEnrolled' flag.
+    return courses.Select(c => new CourseDto
+    {
+        Id = c.Id,
+        Title = c.Title,
+        Description = c.Description,
+        Price = c.Price,
+        DurationHours = c.DurationHours,
+        Difficulty = c.Difficulty,
+        ThumbnailUrl = c.ThumbnailUrl,
+        InstructorName = $"{c.Instructor.User.FirstName} {c.Instructor.User.LastName}",
+        CreatedAt = c.CreatedAt,
+        // Check if the course's ID is in the user's enrollment set.
+        IsEnrolled = enrolledCourseIds.Contains(c.Id) 
+    });
+}
 
         public async Task<CourseDto> GetCourseByIdAsync(int id)
         {
