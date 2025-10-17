@@ -94,6 +94,15 @@ namespace MasarSkills.API.Controllers
             var studentProfile = await _context.StudentProfiles.FirstOrDefaultAsync(p => p.UserId == userId);
             if (studentProfile == null) return BadRequest(new { message = "Student profile not found." });
 
+            var isAlreadyEnrolled = await _context.CourseEnrollments
+            .AnyAsync(e => e.StudentId == userId && e.CourseId == course.Id);
+
+            if (isAlreadyEnrolled)
+            {
+                // If the user is already enrolled, stop the process immediately.
+                return BadRequest(new { message = "You are already enrolled in this course." });
+            }
+
 
             // === Step 2: SECURELY Get Payment Plan Details ===
 
