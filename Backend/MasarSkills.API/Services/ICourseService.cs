@@ -4,7 +4,7 @@ namespace MasarSkills.API.Services
 {
     public interface ICourseService
     {
-        Task<IEnumerable<CourseDto>> GetAllCoursesAsync();
+        Task<IEnumerable<CourseDto>> GetAllCoursesAsync(int? userId);
         Task<CourseDto> GetCourseByIdAsync(int id);
         Task<CourseDto> CreateCourseAsync(CreateCourseDto courseDto);
         Task<bool> UpdateCourseAsync(int id, CreateCourseDto courseDto);
