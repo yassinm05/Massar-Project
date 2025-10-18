@@ -64,38 +64,50 @@ export default function Chatbot() {
     }
     checkAuth();
   }, []);
-   async function handleSendMessage (text?: string)  {
-    const messageText = text || inputText.trim();
-    if (!messageText) return;
+   async function handleSendMessage(text?: string) {
+     const messageText = text || inputText.trim();
+     if (!messageText) return;
 
-    setMessages(prev => [...prev, {
-      source: "question",
-      body: messageText,
-      typeOfMessage: "string"
-    }]);
-    const result = await chatbotResponse(messageText,studentId);
-    setMessages(prev => [...prev, {
-      source: "bot",
-      body: result.response,
-      typeOfMessage: "string"
-    }]);
-    setInputText("");
-
-  };
-  const sendAudioToAPI= async(audioBlob:Blob)=>{
-    try{
+     setMessages((prev) => [
+       ...prev,
+       {
+         source: "question",
+         body: messageText,
+         typeOfMessage: "string",
+       },
+     ]);
+     const result = await chatbotResponse(messageText, studentId);
+     setMessages((prev) => [
+       ...prev,
+       {
+         source: "bot",
+         body: result.response,
+         typeOfMessage: "string",
+       },
+     ]);
+     setInputText("");
+   }
+   const sendAudioToAPI = async (audioBlob: Blob) => {
+     try {
        const formData = new FormData();
-     formData.append("audio", audioBlob, "recording.webm");
-  formData.append("studentId", studentId);
-    const response = await transcriptVoice(formData);
-    if(response){
-      handleSendMessage(response.message);
-    }
-    }catch(err){
-      alert("Failed to process voice recording. Please try again.");
-    }
-
-  }
+       formData.append("audio", audioBlob, "recording.webm");
+       formData.append("studentId", studentId);
+       const response = await transcriptVoice(formData);
+       console.log("abfbabga", response.response);
+       if (response.response) {
+         setMessages((prev) => [
+           ...prev,
+           {
+             source: "bot",
+             body: response.response,
+             typeOfMessage: "string",
+           },
+         ]);
+       }
+     } catch (err) {
+       alert("Failed to process voice recording. Please try again.");
+     }
+   };
   // Start recording
   const startRecording = async () => {
     try {

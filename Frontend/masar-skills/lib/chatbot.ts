@@ -53,24 +53,21 @@ try {
 }
 export async function transcriptVoice(formData){
   try {
- const cookieStore = await cookies();
-   const tokenCookie = cookieStore.get("auth-token");
-   
-   if (!tokenCookie?.value) {
-     throw new Error('Not authenticated');
-   }
+    const cookieStore = await cookies();
+    const tokenCookie = cookieStore.get("auth-token");
+
+    if (!tokenCookie?.value) {
+      throw new Error("Not authenticated");
+    }
     const response = await fetch(`http://127.0.0.1:5000/api/transcribe`, {
       method: "POST",
       headers: {
-        Authorization:`Bearer ${tokenCookie.value}`,
+        Authorization: `Bearer ${tokenCookie.value}`,
       },
       body: formData,
     });
 
-      const text = await response.text();
-  console.log("Raw API response:", text);
     const result = await response.json();
-  
 
     // Check if the result indicates success
     if (!result) {
@@ -80,7 +77,7 @@ export async function transcriptVoice(formData){
         },
       };
     }
-    console.log(result)
+    console.log(result);
     return result;
   } catch (error: any) {
     console.error("Error fetching chatbot response", error);

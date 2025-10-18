@@ -83,7 +83,7 @@ export default function JobApply({
           type="text"
           name="LicenseCertificateNumber"
           placeholder="e.g. RN123456"
-          value={formData.license}
+          value={formData.LicenseCertificateNumber}
           onChange={handleInputChange}
           className="w-full bg-[#F0F9FF] rounded-xl p-3.5  border border-[#D1E9F6]  focus:outline-none placeholder:text-[#9CA3AF] leading-none"
         />

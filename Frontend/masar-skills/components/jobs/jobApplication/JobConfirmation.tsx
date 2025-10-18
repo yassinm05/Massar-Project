@@ -1,14 +1,32 @@
+import Image from "next/image";
+import Confirm from "@/public/assets/jobs/confirm.png";
 
-export default function JobConfirmation() {
+export default function JobConfirmation({ confirmationNumber }) {
   return (
-    <div className="bg-white rounded-lg shadow p-8 text-center">
-            <div className="mb-6">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-3xl">✓</span>
-              </div>
-              <h2 className="text-2xl font-bold text-gray-900">Application Submitted!</h2>
-              <p className="text-gray-600 mt-2">Thank you for applying. We will review your application and contact you soon.</p>
-            </div>
+    <div className="w-[670px] h-[670px] bg-white rounded-lg shadow p-8 text-center flex justify-center items-center">
+      <div className="flex flex-col gap-4 justify-center items-center">
+        <div className="flex flex-col gap-6 justify-center items-center">
+          <div className="relative w-[120px] h-[120px] rounded-full">
+            <Image src={Confirm} alt="" fill />
           </div>
-  )
+          <p className="font-extrabold text-2xl">Thank You For Applying!</p>
+          <p className="text-[#565D6D] max-w-[45ch] text-center">
+            Your application has been successfully submitted. We appreciate your
+            interest in joining our team
+          </p>
+        </div>
+        <div className="w-[457px] h-[110px] flex flex-col justify-center items-center gap-4 bg-[#F8FAFC] border border-[#EAEEF4]">
+          <p className="text-[#576474]">Confirmation Number</p>
+          <p className="font-bold text-[#1F2937] text-2xl">
+            {confirmationNumber}
+          </p>
+        </div>
+        <p className="text-[#576474]">
+          We&apos;ll review your application and contact you within{" "}
+          <span className="text-[#1F2937] font-semibold">5 business days</span>{" "}
+          with the next steps
+        </p>
+      </div>
+    </div>
+  );
 }

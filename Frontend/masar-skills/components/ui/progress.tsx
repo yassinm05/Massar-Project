@@ -25,14 +25,11 @@ function Progress({
     >
       <ProgressPrimitive.Indicator
         data-slot="progress-indicator"
-        className={cn(
-          "h-full transition-all rounded-full", // make bar rounded
-          className2
-        )}
+        className={cn("h-full transition-all rounded-full", className2)}
         style={{ transform: `translateX(-${100 - (value || 0)}%)` }}
       />
     </ProgressPrimitive.Root>
-  )
+  );
 }
 
 export { Progress }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Search from "@/public/assets/jobs/search.png";
 import Jobs from "@/components/jobs/Jobs";
@@ -15,57 +15,75 @@ interface Job {
 
 export default function JobsPage() {
   const [jobs, setJobs] = useState<Job[]>([]);
+  const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [activeJobId , setActiveJobId]=useState<number>()
-  const [activeJob,setActiveJob]=useState<Job>();
+  const [activeJobId, setActiveJobId] = useState<number>();
+  const [activeJob, setActiveJob] = useState<Job>();
   const [isLoading, setIsLoading] = useState(false);
-  
 
+  // Fetch all jobs on mount
   useEffect(() => {
-  const fetchJobs = async () => {
-    try {
-      const result = await getJobsAction();
-      
-      if (result?.errors) {
-        setError(result.errors.user);
-        setJobs([]);
-      } else {
-        setJobs(result);
-        setActiveJobId(result[0].id)
-        setError(null);
+    const fetchJobs = async () => {
+      try {
+        const result = await getJobsAction();
+
+        if (result?.errors) {
+          setError(result.errors.user);
+          setJobs([]);
+        } else {
+          setJobs(result);
+          setFilteredJobs(result);
+          setActiveJobId(result[0].id);
+          setError(null);
+        }
+      } catch (err) {
+        setError("An unexpected error occurred");
       }
-    } catch (err) {
-      setError('An unexpected error occurred');
+    };
+
+    fetchJobs();
+  }, []);
+
+  // Filter jobs based on search term
+  useEffect(() => {
+    if (searchTerm.trim() === "") {
+      setFilteredJobs(jobs);
+    } else {
+      const filtered = jobs.filter(
+        (job) =>
+          job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          job.description.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setFilteredJobs(filtered);
     }
-  };
+  }, [searchTerm, jobs]);
 
-  fetchJobs();
-}, []);
-  
+  // Fetch active job details
+  useEffect(() => {
+    const fetchActiveJob = async (jobId: number) => {
+      setIsLoading(true);
+      try {
+        const result = await getJobByIdAction(jobId);
 
-useEffect(() => {
-  const fetchActiveJob = async (jobId: number) => {
-    setIsLoading(true);
-    try {
-      const result = await getJobByIdAction(jobId);
-      
-      if (result?.errors) {
-        setError(result.errors.user);
-      } else {
-        setActiveJob(result);
-        setError(null);
+        if (result?.errors) {
+          setError(result.errors.user);
+        } else {
+          setActiveJob(result);
+          setError(null);
+        }
+      } catch (err) {
+        setError("An unexpected error occurred");
+      } finally {
+        setIsLoading(false);
       }
-    } catch (err) {
-      setError('An unexpected error occurred');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    };
 
-  if (activeJobId) {
-    fetchActiveJob(activeJobId);
-  }
-}, [activeJobId]);
+    if (activeJobId) {
+      fetchActiveJob(activeJobId);
+    }
+  }, [activeJobId]);
+
   return (
     <div className="bg-[#F9FAFB] p-6 flex gap-6">
       {/* LEFT SIDE: job list */}
@@ -78,9 +96,9 @@ useEffect(() => {
             <input
               type="text"
               placeholder="Search for jobs, hospitals"
-              // value={searchTerm}
-              // onChange={(e) => setSearchTerm(e.target.value)}
-              className="focus:outline-none bg-transparent"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="focus:outline-none bg-transparent w-full"
             />
           </div>
         </div>
@@ -88,7 +106,7 @@ useEffect(() => {
         <div className="h-0 w-full border-b border-[#E5E7EB]" />
 
         <Jobs
-          jobs={jobs}
+          jobs={filteredJobs}
           activeJob={activeJobId}
           onSelectJob={setActiveJobId}
         />

@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MasarSkills.API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251009163035_addingjobapplications")]
+    [Migration("20251010161744_addingjobapplications")]
     partial class addingjobapplications
     {
         /// <inheritdoc />

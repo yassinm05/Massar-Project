@@ -153,6 +153,7 @@ export async function getUserById(id: number) {
     });
 
     const result = await response.json();
+    console.log(result);
 
     if (!response.ok) {
       if (response.status === 404) {
@@ -269,7 +270,7 @@ export async function getCourseByID(id: number) {
       };
     }
 
-    console.log("User fetched successfully:", result);
+    console.log("User fetched successfullyyyyyyy:", result);
     return result;
   } catch (error: any) {
     console.error("Error fetching user by ID:", error);

@@ -107,21 +107,21 @@ export async function submitJobApplication({formData}) {
 console.log(formData)
     // Create FormData for file + text fields
     const formDataToSend = new FormData();
-    if (formData.resume) formDataToSend.append("ResumeFile", formData.ResumeFile);
-    if (formData.coverLetter) formDataToSend.append("CoverLetter", formData);
-    formDataToSend.append("PreferredShift", formData.preferredShift || "");
-    formDataToSend.append("NursingCompetencies", formData.competencies || "");
-    formDataToSend.append("PreviousWorkExperience", formData.workExperience || "");
-    formDataToSend.append("LicenseNumber", formData.license || "");
-    formDataToSend.append("JobId", formData.jobId?.toString() || "");
+    if (formData.ResumeFile) formDataToSend.append("ResumeFile", formData.ResumeFile);
+    if (formData.CoverLetter) formDataToSend.append("CoverLetter", formData.CoverLetter);
+    formDataToSend.append("PreferredShift", formData.PreferredShift || "");
+    formDataToSend.append("NursingCompetencies", formData.NursingCompetencies || "");
+    formDataToSend.append("PreviousWorkExperience", formData.PreviousWorkExperience || "");
+    formDataToSend.append("LicenseCertificateNumber", formData.LicenseCertificateNumber || "");
+    formDataToSend.append("JobId", formData.jobId || "");
     
-
+console.log(` ${formDataToSend}`);
     const response = await fetch(`http://localhost:5236/api/jobApplications/`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${tokenCookie.value}`,
       },
-      body: formDataToSend, // ✅ no need to set Content-Type manually
+      body: formDataToSend, 
     });
 
     const result = await response.json();

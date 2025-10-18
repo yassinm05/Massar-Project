@@ -5,6 +5,7 @@ import { signIn } from "next-auth/react";
 import Facebook from '@/public/assets/signup/facebook.png'
 import Google from '@/public/assets/signup/google.png'
 import Image from "next/image";
+import { Spinner } from "../ui/spinner";
 
 interface FormState {
   errors: {
@@ -19,7 +20,10 @@ interface FormState {
 
 export default function SignupForm() {
   const initialState: FormState = { errors: {} };
-  const [formState, formAction] = useActionState(signup, initialState);
+  const [formState, formAction, isPending] = useActionState(
+    signup,
+    initialState
+  );
 
   return (
     <form id="auth-form" className="flex flex-col gap-4" action={formAction}>
@@ -113,26 +117,41 @@ export default function SignupForm() {
         </ul>
       )}
 
-      <button
-        className="w-full px-3 py-2.5 rounded-[8px] bg-[#0083AD] text-white flex justify-center items-center font-bold text-sm font-sans cursor-pointer hover:opacity-80"
-        type="submit"
-      >
-        Sign Up
-      </button>
+      {isPending ? (
+        <button
+          className="w-full opacity-60 px-3 py-2.5 rounded-[8px] bg-[#0083AD] text-white flex justify-center items-center font-bold text-sm font-sans cursor-pointer hover:opacity-80"
+          type="submit"
+        >
+          <Spinner />
+        </button>
+      ) : (
+        <button
+          className="w-full px-3 py-2.5 rounded-[8px] bg-[#0083AD] text-white flex justify-center items-center font-bold text-sm font-sans cursor-pointer hover:opacity-80"
+          type="submit"
+        >
+          Sign Up
+        </button>
+      )}
       <div className="flex gap-8">
-          <div onClick={()=>signIn("facebook")} className="flex-1 flex justify-center items-center rounded-xl gap-3 border border-[#F3F4F6] py-2 cursor-pointer">
-            <div className="relative w-5 h-5">
-              <Image src={Facebook} alt="" fill />
-            </div>
-            <p className="font-bold text-sm text-[#6B7280]">Facebook</p>
+        <div
+          onClick={() => signIn("facebook")}
+          className="flex-1 flex justify-center items-center rounded-xl gap-3 border border-[#F3F4F6] py-2 cursor-pointer"
+        >
+          <div className="relative w-5 h-5">
+            <Image src={Facebook} alt="" fill />
           </div>
-          <div onClick={()=>signIn("google")} className="flex-1 flex justify-center items-center rounded-xl gap-3 border border-[#F3F4F6] py-2 cursor-pointer">
-            <div className="relative w-5 h-5">
-              <Image src={Google} alt="" fill />
-            </div>
-            <p className="font-bold text-sm text-[#6B7280]">Google</p>
-          </div>
+          <p className="font-bold text-sm text-[#6B7280]">Facebook</p>
         </div>
+        <div
+          onClick={() => signIn("google")}
+          className="flex-1 flex justify-center items-center rounded-xl gap-3 border border-[#F3F4F6] py-2 cursor-pointer"
+        >
+          <div className="relative w-5 h-5">
+            <Image src={Google} alt="" fill />
+          </div>
+          <p className="font-bold text-sm text-[#6B7280]">Google</p>
+        </div>
+      </div>
     </form>
   );
 }
