@@ -1,12 +1,11 @@
 "use client";
-import { redirect } from "next/navigation";
 import ChatbotBody from "./ChatbotBody";
 import ChatbotHeader from "./ChatbotHeader";
 import { verifyAuthAction } from "@/actions/auth-actions";
-import { useEffect,  useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import Mic from '@/public/assets/chatbot/Mic.png';
-import Send from '@/public/assets/chatbot/send.png';
+import Mic from "@/public/assets/chatbot/Mic.png";
+import Send from "@/public/assets/chatbot/send.png";
 import chatbotResponse from "@/actions/chatbot-actions";
 import { transcriptVoice } from "@/lib/chatbot";
 
@@ -17,14 +16,14 @@ interface VoiceData {
   mimeType?: string;
 }
 
-type Message = 
+type Message =
   | {
-      source: string;
+      source: "bot" | "user";
       body: string;
       typeOfMessage: "string";
     }
   | {
-      source: string;
+      source: "bot" | "user";
       body: VoiceData;
       typeOfMessage: "voice";
     };
@@ -35,18 +34,17 @@ export default function Chatbot() {
   const [messages, setMessages] = useState<Message[]>([
     {
       source: "bot",
-      body:
-        "Hi there! I'm your virtual study assistant. I can help you find quizzes, explain nursing concepts, and more. What would you like to do?",
-      typeOfMessage:"string",
+      body: "Hi there! I'm your virtual study assistant. I can help you find quizzes, explain nursing concepts, and more. What would you like to do?",
+      typeOfMessage: "string",
     },
     {
-      source: "question",
-      body:"Can you explain the concept of pharmacology?",
-      typeOfMessage:"string",
-   },
+      source: "user",
+      body: "Can you explain the concept of pharmacology?",
+      typeOfMessage: "string",
+    },
   ]);
   const [inputText, setInputText] = useState("");
-  const [studentId,setStudentID]=useState<number>();
+  const [studentId, setStudentID] = useState<number>();
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const [isRecording, setIsRecording] = useState(false);
@@ -64,50 +62,60 @@ export default function Chatbot() {
     }
     checkAuth();
   }, []);
-   async function handleSendMessage(text?: string) {
-     const messageText = text || inputText.trim();
-     if (!messageText) return;
+  async function handleSendMessage(text?: string) {
+    const messageText = text || inputText.trim();
+    if (!messageText) return;
 
-     setMessages((prev) => [
-       ...prev,
-       {
-         source: "question",
-         body: messageText,
-         typeOfMessage: "string",
-       },
-     ]);
-     const result = await chatbotResponse(messageText, studentId);
-     setMessages((prev) => [
-       ...prev,
-       {
-         source: "bot",
-         body: result.response,
-         typeOfMessage: "string",
-       },
-     ]);
-     setInputText("");
-   }
-   const sendAudioToAPI = async (audioBlob: Blob) => {
-     try {
-       const formData = new FormData();
-       formData.append("audio", audioBlob, "recording.webm");
-       formData.append("studentId", studentId);
-       const response = await transcriptVoice(formData);
-       console.log("abfbabga", response.response);
-       if (response.response) {
-         setMessages((prev) => [
-           ...prev,
-           {
-             source: "bot",
-             body: response.response,
-             typeOfMessage: "string",
-           },
-         ]);
-       }
-     } catch (err) {
-       alert("Failed to process voice recording. Please try again.");
-     }
-   };
+    setMessages((prev) => [
+      ...prev,
+      {
+        source: "user",
+        body: messageText,
+        typeOfMessage: "string",
+      },
+    ]);
+    if (studentId === undefined) {
+      console.error("Student ID is missing.");
+      return;
+    }
+    const result = await chatbotResponse(messageText, studentId);
+    setMessages((prev) => [
+      ...prev,
+      {
+        source: "bot",
+        body: result.response,
+        typeOfMessage: "string",
+      },
+    ]);
+    setInputText("");
+  }
+  const sendAudioToAPI = async (audioBlob: Blob) => {
+    try {
+      if (!studentId) {
+        alert("You must be logged in to send a message.");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("audio", audioBlob, "recording.webm");
+      formData.append("studentId", studentId.toString()); // ✅ fixed
+
+      const response = await transcriptVoice(formData);
+      if (response.response) {
+        setMessages((prev) => [
+          ...prev,
+          {
+            source: "bot",
+            body: response.response,
+            typeOfMessage: "string",
+          },
+        ]);
+      }
+    } catch (err) {
+      alert(`Failed to process voice recording. Please try again. ${err}`);
+    }
+  };
+
   // Start recording
   const startRecording = async () => {
     try {
@@ -123,11 +131,13 @@ export default function Chatbot() {
       };
 
       mediaRecorder.onstop = async () => {
-        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        const audioBlob = new Blob(audioChunksRef.current, {
+          type: "audio/webm",
+        });
         await sendAudioToAPI(audioBlob);
-        
+
         // Stop all tracks to release microphone
-        stream.getTracks().forEach(track => track.stop());
+        stream.getTracks().forEach((track) => track.stop());
       };
 
       mediaRecorder.start();
@@ -154,7 +164,6 @@ export default function Chatbot() {
     }
   };
 
-
   // Don't render anything if not authenticated
   if (!isAuthenticated) return null;
   if (!show) {
@@ -175,20 +184,34 @@ export default function Chatbot() {
       <div className="h-0 w-full border-b border-[#E5E7EB]"></div>
       <div className="flex items-center gap-4 py-3 px-7">
         <div className="w-full rounded-[20px] border border-[#DEE1E6]">
-          <input value={inputText} onChange={(e) => setInputText(e.target.value)} type="text" className="w-full placeholder:text-sm placeholder:text-[#565D6D] p-3 focus:outline-none " placeholder="Ask about nursing topics or quizzes..."/>
+          <input
+            value={inputText}
+            onChange={(e) => setInputText(e.target.value)}
+            type="text"
+            className="w-full placeholder:text-sm placeholder:text-[#565D6D] p-3 focus:outline-none "
+            placeholder="Ask about nursing topics or quizzes..."
+          />
         </div>
         {/* VOICE RECORDING */}
-        <div onClick={handleMicClick} className=" w-10 h-10  rounded-full bg-[#F3F4F6] flex justify-center items-center shrink-0 cursor-pointer">
+        <div
+          onClick={handleMicClick}
+          className=" w-10 h-10  rounded-full bg-[#F3F4F6] flex justify-center items-center shrink-0 cursor-pointer"
+        >
           <Image width={20} height={20} src={Mic} alt="" />
         </div>
-        <div onClick={()=>handleSendMessage()} className=" w-10 h-10 rounded-full bg-[#0083AD] flex justify-center items-center shrink-0 cursor-pointer">
-          <Image width={20} height={20} src={Send}  alt="" />
+        <div
+          onClick={() => handleSendMessage()}
+          className=" w-10 h-10 rounded-full bg-[#0083AD] flex justify-center items-center shrink-0 cursor-pointer"
+        >
+          <Image width={20} height={20} src={Send} alt="" />
         </div>
       </div>
       <div className="px-7 pb-5">
         <div className="p-4 rounded-2xl gap-2 bg-[#F3F4F6] font-medium leading-6 text-[#565D6D]">
-          Assistant is powered by AI, so check for mistakes and don&apos;t share sensitive info. Your data will be used in accordance with Masara Skills&apos;s Privacy Notice.
-      </div>
+          Assistant is powered by AI, so check for mistakes and don&apos;t share
+          sensitive info. Your data will be used in accordance with Masara
+          Skills&apos;s Privacy Notice.
+        </div>
       </div>
     </div>
   );

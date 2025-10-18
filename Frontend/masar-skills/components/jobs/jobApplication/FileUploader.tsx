@@ -1,28 +1,41 @@
 "use client";
-import { useState } from "react";
+import React, { useState } from "react";
 
-export default function FileUploader({ handleFileChange, resume }) {
+interface FileUploaderProps {
+  handleFileChange: (file: File) => void;
+  resume?: File | null;
+}
+
+export default function FileUploader({
+  handleFileChange,
+  resume,
+}: FileUploaderProps) {
   const [isDragging, setIsDragging] = useState(false);
 
-  const handleDrop = (e) => {
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
     setIsDragging(false);
 
     const file = e.dataTransfer.files?.[0];
-    if (file) handleFileChange(file); // <-- call parent handler
+    if (file) handleFileChange(file);
   };
 
-  const handleDragOver = (e) => {
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
     setIsDragging(true);
   };
 
-  const handleDragLeave = (e) => {
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
     setIsDragging(false);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) handleFileChange(file);
   };
 
   return (
@@ -36,7 +49,7 @@ export default function FileUploader({ handleFileChange, resume }) {
     >
       <input
         type="file"
-        onChange={(e) => handleFileChange(e.target.files[0])}
+        onChange={handleInputChange}
         className="hidden"
         id="resume-input"
         accept=".pdf,.doc,.docx"
@@ -48,11 +61,7 @@ export default function FileUploader({ handleFileChange, resume }) {
         <p className="text-sm text-gray-500">PDF, DOC, DOCX (Max 5MB)</p>
       </label>
 
-      {resume && (
-        <p className="text-sm text-teal-600 mt-2">
-          ✓ {resume.name}
-        </p>
-      )}
+      {resume && <p className="text-sm text-teal-600 mt-2">✓ {resume.name}</p>}
     </div>
   );
 }

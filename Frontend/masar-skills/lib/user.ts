@@ -62,7 +62,7 @@ export default async function createUser({
 
     console.log("User created successfully:", result);
     return { success: true, data: result };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error creating user:", error);
 
     // Check if it's a network error
@@ -122,7 +122,7 @@ export async function getUser(email: string, password: string) {
 
     console.log("User fetched successfully:", result);
     return result;
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching user by email:", error);
 
     if (error instanceof TypeError && error.message.includes("fetch")) {
@@ -133,7 +133,6 @@ export async function getUser(email: string, password: string) {
         },
       };
     }
-    ``;
 
     return {
       errors: {
@@ -181,7 +180,7 @@ export async function getUserById(id: number) {
 
     console.log("User fetched successfully:", result);
     return result;
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching user by ID:", error);
 
     if (error instanceof TypeError && error.message.includes("fetch")) {
@@ -231,7 +230,7 @@ export async function getCourseEnrollment() {
 
     console.log("User fetched successfully:", result);
     return result;
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching user by ID:", error);
 
     if (error instanceof TypeError && error.message.includes("fetch")) {
@@ -270,9 +269,9 @@ export async function getCourseByID(id: number) {
       };
     }
 
-    console.log("User fetched successfullyyyyyyy:", result);
+    console.log("User fetched successfully:", result);
     return result;
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching user by ID:", error);
 
     if (error instanceof TypeError && error.message.includes("fetch")) {

@@ -2,12 +2,12 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 export async function getCourses(){
-  try{
+  try {
     const cookieStore = await cookies(); // wait for it
-        const tokenCookie = cookieStore.get("auth-token");
-        if (!tokenCookie?.value) {
-          return redirect("/");
-        }
+    const tokenCookie = cookieStore.get("auth-token");
+    if (!tokenCookie?.value) {
+      return redirect("/");
+    }
     const response = await fetch(`http://localhost:5236/api/courses`, {
       method: "GET",
       headers: {
@@ -15,7 +15,7 @@ export async function getCourses(){
         Authorization: `Bearer ${tokenCookie.value}`,
       },
     });
-     const result = await response.json();
+    const result = await response.json();
 
     // Check if the result indicates success
     if (!result) {
@@ -28,7 +28,7 @@ export async function getCourses(){
 
     console.log("courses fetched successfully:", result);
     return result;
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching courses:", error);
 
     if (error instanceof TypeError && error.message.includes("fetch")) {
@@ -44,4 +44,5 @@ export async function getCourses(){
         user: "An unexpected error occurred. Please try again.",
       },
     };
+  }
 }

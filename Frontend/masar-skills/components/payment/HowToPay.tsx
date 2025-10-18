@@ -8,11 +8,13 @@ interface PaymentOption {
 }
 
 interface PaymentPlans {
+  courseId: number;
+  courseTitle: string;
   options: PaymentOption[];
 }
 
 interface HowToPayProps {
-  handleSelection: (key: string, value: any) => void;
+  handleSelection: (key: string, value: string | number | boolean) => void;
   handleNext: () => void;
   selectedValue: string;
   paymentPlans: PaymentPlans;
@@ -66,7 +68,6 @@ export default function HowToPay({
       <p className="text-[#0D141C] font-bold text-3xl">
         Choose a Payment Method
       </p>
-
       <div>
         <div className="flex flex-col gap-3">
           <RadioGroup
@@ -104,7 +105,6 @@ export default function HowToPay({
           </RadioGroup>
         </div>
       </div>
-
       <div className="w-full flex justify-end">
         <button
           onClick={handleConfirm}

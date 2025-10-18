@@ -3,7 +3,7 @@ import { PayPalButtons, usePayPalScriptReducer } from "@paypal/react-paypal-js";
 
 interface CustomPayPalButtonProps {
   createPayPalOrder: () => Promise<string>;
-  onPayPalApprove: (data: any) => Promise<void>;
+  onPayPalApprove: (data: unknown) => Promise<void>;
   processing: boolean;
 }
 

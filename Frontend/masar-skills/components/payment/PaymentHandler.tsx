@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, FormEvent, useCallback } from "react";
 import {
   useStripe,
   useElements,
@@ -8,16 +8,31 @@ import {
   CardExpiryElement,
   CardCvcElement,
 } from "@stripe/react-stripe-js";
+import type { PaymentRequest } from "@stripe/stripe-js";
+
 import { usePayPalScriptReducer } from "@paypal/react-paypal-js";
 import handlePaymentAction from "@/actions/payment-action";
+
+// --------------------
+// TYPE DEFINITIONS
+// --------------------
 
 interface PaymentHandlerProps {
   courseId: number;
   amount: number | string;
-  paymentMethod: string;
+  paymentMethod: "credit" | "paypal" | "apple";
   paymentPlanType?: string;
   onPaymentSuccess: (transactionId: string, renewDate: string) => void;
 }
+
+interface PaymentData {
+  transactionId: string;
+  nextPaymentDate: string;
+}
+
+// --------------------
+// COMPONENT
+// --------------------
 
 export default function PaymentHandler({
   courseId,
@@ -32,13 +47,18 @@ export default function PaymentHandler({
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
-  const [paymentRequest, setPaymentRequest] = useState<any>(null);
+  const [paymentRequest, setPaymentRequest] = useState<PaymentRequest | null>(
+    null
+  );
+
   const [canMakeApplePayment, setCanMakeApplePayment] = useState(false);
 
   // PayPal refs / guards
   const popupRef = useRef<Window | null>(null);
-  const checkStatusTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const isHandlingPayPalRef = useRef(false); // prevents re-entrancy
+  const checkStatusTimerRef = useRef<ReturnType<typeof setInterval> | null>(
+    null
+  );
+  const isHandlingPayPalRef = useRef(false);
 
   const [
     {
@@ -58,12 +78,15 @@ export default function PaymentHandler({
     invalid: { color: "#EF4444" },
   };
 
-  // Cleanup helper
-  const cleanupPayPal = () => {
+  // --------------------
+  // PAYPAL CLEANUP
+  // --------------------
+  const cleanupPayPal = useCallback(() => {
     try {
-      if (popupRef.current && !popupRef.current.closed)
+      if (popupRef.current && !popupRef.current.closed) {
         popupRef.current.close();
-    } catch (e) {
+      }
+    } catch {
       /* ignore */
     }
     popupRef.current = null;
@@ -75,29 +98,67 @@ export default function PaymentHandler({
 
     try {
       window.localStorage.removeItem("paypal_order_id");
-    } catch (e) {
+    } catch {
       /* ignore */
     }
 
     isHandlingPayPalRef.current = false;
-  };
-
-  // cleanup on unmount
-  useEffect(() => {
-    return () => cleanupPayPal();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // reset when switching payment methods
+  useEffect(() => {
+    return () => cleanupPayPal();
+  }, [cleanupPayPal]);
+
   useEffect(() => {
     setError(null);
     setSuccess(false);
     setProcessing(false);
     cleanupPayPal();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [paymentMethod]);
+  }, [paymentMethod, cleanupPayPal]);
 
-  // Apple Pay setup (kept same behavior)
+  // --------------------
+  // SERVER PAYMENT RECORDING (memoized)
+  // --------------------
+  const processPayment = useCallback(
+    async (method: string, paymentToken: string) => {
+      try {
+        setProcessing(true);
+        setError(null);
+
+        const response = await handlePaymentAction({
+          courseId,
+          amount: Number(amount),
+          paymentMethod: method,
+          paymentPlanType,
+          paymentToken,
+        });
+
+        if (!response.success || !response.data) {
+          throw new Error(response.message || "Payment processing failed");
+        }
+
+        const paymentData = response.data as PaymentData;
+
+        onPaymentSuccess(
+          paymentData.transactionId,
+          paymentData.nextPaymentDate
+        );
+        setSuccess(true);
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : "Payment failed";
+        setError(errorMessage);
+        throw err;
+      } finally {
+        setProcessing(false);
+      }
+    },
+    [courseId, amount, paymentPlanType, onPaymentSuccess]
+  );
+
+  // --------------------
+  // APPLE PAY
+  // --------------------
   useEffect(() => {
     if (!stripe || !amount) return;
 
@@ -132,7 +193,11 @@ export default function PaymentHandler({
           }),
         });
 
-        const data = await res.json();
+        const data = (await res.json()) as {
+          clientSecret: string;
+          error?: string;
+        };
+
         if (!res.ok) {
           event.complete("fail");
           setError(data.error || "Failed to create PaymentIntent");
@@ -158,46 +223,21 @@ export default function PaymentHandler({
         } else {
           setError("Payment did not complete successfully");
         }
-      } catch (err: any) {
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : "Apple Pay failed";
+        setError(errorMessage);
         event.complete("fail");
-        setError(err.message || "Apple Pay failed");
       } finally {
         setProcessing(false);
       }
     });
+  }, [stripe, amount, processPayment]);
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stripe, amount]);
-
-  // Common server-side recording of payment
-  const processPayment = async (method: string, paymentToken: string) => {
-    try {
-      setProcessing(true);
-      setError(null);
-
-      const response = await handlePaymentAction(
-          courseId,
-          amount,
-          method,
-          paymentPlanType,
-          paymentToken,
-      );
-      console.log(response);
-      if (!response.success) {
-        throw new Error(response.message || "Payment processing failed");
-      }
-      onPaymentSuccess(response.data.transactionId, response.data.nextPaymentDate);
-      setSuccess(true);
-    } catch (err: any) {
-      setError(err.message || "Payment failed");
-      throw err;
-    } finally {
-      setProcessing(false);
-    }
-  };
-
-  // Credit card handler (unchanged)
-  const handleCreditCardPayment = async (e: React.FormEvent) => {
+  // --------------------
+  // CREDIT CARD PAYMENT
+  // --------------------
+  const handleCreditCardPayment = async (e: FormEvent) => {
     e.preventDefault();
     if (!stripe || !elements) return;
 
@@ -211,13 +251,13 @@ export default function PaymentHandler({
       setProcessing(true);
       setError(null);
 
-      const { error: pmError, paymentMethod } =
+      const { error: pmError, paymentMethod: pm } =
         await stripe.createPaymentMethod({
           type: "card",
           card: cardNumberElement,
         });
 
-      if (pmError || !paymentMethod) {
+      if (pmError || !pm) {
         setError(pmError?.message || "Invalid card information");
         return;
       }
@@ -227,11 +267,15 @@ export default function PaymentHandler({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           amount: Math.round(Number(amount) * 100),
-          paymentMethodId: paymentMethod.id,
+          paymentMethodId: pm.id,
         }),
       });
 
-      const data = await response.json();
+      const data = (await response.json()) as {
+        clientSecret: string;
+        error?: string;
+      };
+
       if (!response.ok) {
         setError(data.error || "Server error creating payment intent");
         return;
@@ -239,7 +283,7 @@ export default function PaymentHandler({
 
       const { error: confirmError, paymentIntent } =
         await stripe.confirmCardPayment(data.clientSecret, {
-          payment_method: paymentMethod.id,
+          payment_method: pm.id,
         });
 
       if (confirmError) {
@@ -248,12 +292,14 @@ export default function PaymentHandler({
       }
 
       if (paymentIntent && paymentIntent.status === "succeeded") {
-        await processPayment("credit", paymentMethod.id);
+        await processPayment("credit", pm.id);
       } else {
         setError("Payment not completed");
       }
-    } catch (err: any) {
-      setError(err.message || "Payment failed");
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error ? err.message : "Payment failed";
+      setError(errorMessage);
     } finally {
       setProcessing(false);
     }
@@ -263,9 +309,10 @@ export default function PaymentHandler({
     if (paymentRequest) paymentRequest.show();
   };
 
-  // PayPal custom popup flow with polling & guards
+  // --------------------
+  // PAYPAL HANDLER
+  // --------------------
   const handleCustomPayPalPayment = async () => {
-    // Prevent duplicated flows
     if (isHandlingPayPalRef.current) return;
     isHandlingPayPalRef.current = true;
 
@@ -274,7 +321,6 @@ export default function PaymentHandler({
       setError(null);
       cleanupPayPal();
 
-      // 1) create order
       const createRes = await fetch("/api/paypal/create-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -285,7 +331,13 @@ export default function PaymentHandler({
         }),
       });
 
-      const createData = await createRes.json();
+      const createData = (await createRes.json()) as {
+        orderID: string;
+        approvalUrl?: string;
+        links?: { rel: string; href: string }[];
+        message?: string;
+      };
+
       if (!createRes.ok) {
         throw new Error(createData.message || "Failed to create PayPal order");
       }
@@ -293,34 +345,31 @@ export default function PaymentHandler({
       const orderID = createData.orderID;
       const approvalUrl =
         createData.approvalUrl ||
-        createData.links?.find((l: any) => l.rel === "approve")?.href;
+        createData.links?.find((l) => l.rel === "approve")?.href;
+
       if (!approvalUrl) throw new Error("No approval URL received from PayPal");
 
-      try {
-        window.localStorage.setItem("paypal_order_id", orderID);
-      } catch (e) {
-        /* ignore storage errors */
-      }
+      window.localStorage.setItem("paypal_order_id", orderID);
 
-      // open popup
       const width = 500;
       const height = 600;
       const left = (window.screen.width - width) / 2;
       const top = (window.screen.height - height) / 2;
+
       popupRef.current = window.open(
         approvalUrl,
         "PayPal",
         `width=${width},height=${height},left=${left},top=${top},scrollbars=yes,resizable=yes`
       );
 
-      if (!popupRef.current)
+      if (!popupRef.current) {
         throw new Error(
           "Failed to open PayPal popup. Please disable popup blocker."
         );
+      }
 
-      // 2) Poll status (every 3s) and handle transitions
       let checkCount = 0;
-      const maxChecks = 60; // ~3 minutes
+      const maxChecks = 60;
       const intervalMs = 3000;
 
       checkStatusTimerRef.current = setInterval(async () => {
@@ -332,115 +381,103 @@ export default function PaymentHandler({
           return;
         }
 
-        try {
-          // If popup closed -> stop and show message
-          if (popupRef.current && popupRef.current.closed) {
-            cleanupPayPal();
-            setError("Payment window closed");
-            setProcessing(false);
-            return;
-          }
+        if (popupRef.current && popupRef.current.closed) {
+          cleanupPayPal();
+          setError("Payment window closed");
+          setProcessing(false);
+          return;
+        }
 
-          const statusRes = await fetch(
-            `/api/paypal/check-order-status/${orderID}`
+        const statusRes = await fetch(
+          `/api/paypal/check-order-status/${orderID}`
+        );
+        if (!statusRes.ok) return;
+        const statusData = (await statusRes.json()) as {
+          status?: string;
+          details?: unknown[];
+        };
+
+        if (!statusData?.status) {
+          cleanupPayPal();
+          setError("Unable to verify payment status");
+          setProcessing(false);
+          return;
+        }
+
+        if (statusData.status === "APPROVED") {
+          cleanupPayPal();
+
+          const captureRes = await fetch(
+            `/api/paypal/capture-order/${orderID}`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                orderID,
+                courseId,
+                amount: Number(amount),
+                paymentPlanType,
+              }),
+            }
           );
-          if (!statusRes.ok) {
-            // keep polling; backend might be temporarily unavailable
-            console.log("check-order-status returned non-ok", statusRes.status);
-            return;
-          }
-          const statusData = await statusRes.json();
 
-          // if no status, break to avoid invisible infinite loop
-          if (!statusData?.status) {
-            cleanupPayPal();
-            setError("Unable to verify payment status");
+          const captureData = (await captureRes.json()) as {
+            id?: string;
+            status?: string;
+            success?: boolean;
+            message?: string;
+            details?: { issue?: string }[];
+          };
+
+          if (
+            captureRes.ok &&
+            (captureData.status === "COMPLETED" || captureData.success)
+          ) {
+            await processPayment("paypal", captureData.id || orderID);
+            setSuccess(true);
             setProcessing(false);
             return;
           }
 
-          // accepted statuses: APPROVED -> need capture, COMPLETED -> already captured
-          if (statusData.status === "APPROVED") {
-            // stop polling and attempt capture
-            cleanupPayPal();
-
-            const captureRes = await fetch(
-              `/api/paypal/capture-order/${orderID}`,
-              {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  orderID,
-                  courseId,
-                  amount,
-                  paymentPlanType,
-                }),
-              }
-            );
-
-            const captureData = await captureRes.json();
-
-            // If backend treats ORDER_ALREADY_CAPTURED as success it should return ok or success flag
-            if (
-              captureRes.ok &&
-              (captureData.status === "COMPLETED" || captureData.success)
-            ) {
-              await processPayment("paypal", captureData.id || orderID);
-              setSuccess(true);
-              setProcessing(false);
-              return;
-            }
-
-            // sometimes backend returns 422 with ORDER_ALREADY_CAPTURED details -> handle as success
-            if (
-              captureData?.details?.some?.(
-                (d: any) => d.issue === "ORDER_ALREADY_CAPTURED"
-              )
-            ) {
-              // interpret as successful (already captured)
-              await processPayment("paypal", orderID);
-              setSuccess(true);
-              setProcessing(false);
-              return;
-            }
-
-            // otherwise error
-            const msg = captureData?.message || JSON.stringify(captureData);
-            cleanupPayPal();
-            setError(msg || "Failed to capture PayPal order");
-            setProcessing(false);
-            return;
-          } else if (statusData.status === "COMPLETED") {
-            // already captured upstream — success
-            cleanupPayPal();
+          if (
+            captureData.details?.some?.(
+              (d) => d.issue === "ORDER_ALREADY_CAPTURED"
+            )
+          ) {
             await processPayment("paypal", orderID);
             setSuccess(true);
             setProcessing(false);
             return;
-          } else if (["VOIDED", "CANCELLED"].includes(statusData.status)) {
-            cleanupPayPal();
-            setError("Payment was cancelled");
-            setProcessing(false);
-            return;
-          } else {
-            // other statuses (CREATED, PENDING...) -> continue polling
-            console.log("PayPal order status:", statusData.status);
           }
-        } catch (err) {
-          console.log("Status check error:", err);
-          // keep polling on transient errors
+
+          cleanupPayPal();
+          setError(captureData.message || "Failed to capture PayPal order");
+          setProcessing(false);
+        } else if (statusData.status === "COMPLETED") {
+          cleanupPayPal();
+          await processPayment("paypal", orderID);
+          setSuccess(true);
+          setProcessing(false);
+        } else if (["VOIDED", "CANCELLED"].includes(statusData.status)) {
+          cleanupPayPal();
+          setError("Payment was cancelled");
+          setProcessing(false);
         }
       }, intervalMs);
-    } catch (err: any) {
-      setError(err.message || "PayPal payment failed");
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error ? err.message : "PayPal payment failed";
+      setError(errorMessage);
       setProcessing(false);
       cleanupPayPal();
     } finally {
-      // allow future flows (note: cleanupPayPal also clears this on success/timeouts)
       isHandlingPayPalRef.current = false;
     }
   };
 
+  // --------------------
+  // RENDER
+  // --------------------
   return (
     <div className="flex flex-col gap-4">
       {error && (
@@ -454,7 +491,7 @@ export default function PaymentHandler({
         </div>
       )}
 
-      {/* Credit Card UI */}
+      {/* Credit Card */}
       {paymentMethod === "credit" && (
         <div className="flex flex-col gap-3">
           <div className="flex flex-col gap-1">
@@ -464,10 +501,7 @@ export default function PaymentHandler({
             <div className="border border-[#CFDBE8] bg-[#F7FAFC] rounded-xl px-4 py-3">
               <CardNumberElement
                 id="cardNumber"
-                options={{
-                  style: stripeElementStyle,
-                  placeholder: "0000 0000 0000 0000",
-                }}
+                options={{ style: stripeElementStyle }}
               />
             </div>
           </div>

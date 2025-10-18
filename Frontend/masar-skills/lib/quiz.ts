@@ -2,7 +2,7 @@ export async function submitAnswer(
   attemptId: number,
   questionId: number,
   selectedOption: number,
-  token:string
+  token: string
 ) {
   try {
     const response = await fetch(
@@ -16,8 +16,8 @@ export async function submitAnswer(
         body: JSON.stringify({
           attemptId: attemptId,
           questionId: questionId,
-          selectedOptionId: selectedOption
-        })
+          selectedOptionId: selectedOption,
+        }),
       }
     );
 
@@ -34,7 +34,7 @@ export async function submitAnswer(
 
     console.log("User fetched successfully:", result);
     return result;
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching user by ID:", error);
 
     if (error instanceof TypeError && error.message.includes("fetch")) {
@@ -53,8 +53,7 @@ export async function submitAnswer(
   }
 }
 
-export async function getQuizByID(id: number,token:string) {
-
+export async function getQuizByID(id: number, token: string) {
   try {
     const response = await fetch(`http://localhost:5236/api/quiz/start/${id}`, {
       method: "POST",
@@ -77,7 +76,7 @@ export async function getQuizByID(id: number,token:string) {
 
     console.log("User fetched successfully:", result);
     return result;
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching user by ID:", error);
 
     if (error instanceof TypeError && error.message.includes("fetch")) {
@@ -95,9 +94,8 @@ export async function getQuizByID(id: number,token:string) {
     };
   }
 }
-export async function getAvailableQuizzes(token:string) {
+export async function getAvailableQuizzes(token: string) {
   try {
- 
     const response = await fetch(`http://localhost:5236/api/Quiz/available`, {
       method: "GET",
       headers: {
@@ -119,7 +117,7 @@ export async function getAvailableQuizzes(token:string) {
 
     console.log("User fetched successfully:", result);
     return result;
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching user by ID:", error);
 
     if (error instanceof TypeError && error.message.includes("fetch")) {
@@ -138,16 +136,19 @@ export async function getAvailableQuizzes(token:string) {
   }
 }
 
-export async function getResult(id:number,token:string){
-  try{
-    const response = await fetch(`http://localhost:5236/api/Quiz/results/${id}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
-     const result = await response.json();
+export async function getResult(id: number, token: string) {
+  try {
+    const response = await fetch(
+      `http://localhost:5236/api/Quiz/results/${id}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    const result = await response.json();
 
     // Check if the result indicates success
     if (!result) {
@@ -160,7 +161,7 @@ export async function getResult(id:number,token:string){
 
     console.log("result fetched successfully:", result);
     return result;
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching result by ID:", error);
 
     if (error instanceof TypeError && error.message.includes("fetch")) {
@@ -176,4 +177,5 @@ export async function getResult(id:number,token:string){
         user: "An unexpected error occurred. Please try again.",
       },
     };
+  }
 }

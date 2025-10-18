@@ -3,7 +3,11 @@ import Logo from "@/public/assets/chatbot/logo.png";
 import newChat from "@/public/assets/chatbot/new chat.png";
 import History from "@/public/assets/chatbot/history.png";
 import Close from "@/public/assets/chatbot/close.png";
-export default function ChatbotHeader({setShow}) {
+
+interface pageProps {
+  setShow: (value: boolean) => void;
+}
+export default function ChatbotHeader({ setShow }: pageProps) {
   return (
     <>
       <div className="h-[70px] bg-[#0083AD] flex justify-between items-center px-7">

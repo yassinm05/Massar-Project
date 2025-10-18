@@ -5,8 +5,8 @@ import { redirect } from "next/navigation";
 import User from "@/public/assets/course-details/user.png";
 import Clock from "@/public/assets/course-details/clock.png";
 import Download from "@/public/assets/course-details/download.png";
-import Certificate from "@/public/assets/course-details/certificate.png";
-import QR from "@/public/assets/course-details/qr.jpeg";
+// import Certificate from "@/public/assets/course-details/certificate.png";
+// import QR from "@/public/assets/course-details/qr.jpeg";
 import Link from "next/link";
 
 interface PageProps {
@@ -90,17 +90,17 @@ export default async function page({ params }: PageProps) {
       {/* ACCESS FINAL EXAM BUTTON */}
       <div className="w-full flex justify-center">
         <button className="w-96 h-11 rounded-lg bg-[#0083AD] text-white font-medium text-sm flex justify-center items-center cursor-pointer">
-        Access Final Exam
-      </button>
+          Access Final Exam
+        </button>
       </div>
       {/* CERTIFICATE PREVIEW */}
-      <div className="w-full flex flex-col items-center justify-center gap-5 p-5 rounded-xl border border-[#F3F4F6]">
+      {/* <div className="w-full flex flex-col items-center justify-center gap-5 p-5 rounded-xl border border-[#F3F4F6]">
         <p className="font-semibold text-xl">Certificate Preview</p>
         <div className="flex items-center justify-center gap-5">
           <div className="relative w-[600px] h-[400px] rounded-xl">
             <Image src={Certificate} alt="" fill />
           </div>
-          <div className="w-[320px]  flex flex-col justify-center items-center gap-5 gap-3">
+          <div className="w-[320px]  flex flex-col justify-center items-center gap-3">
             <div className="relative w-[150] h-[150px] rounded-sm">
               <Image src={QR} alt="" fill />
             </div>
@@ -109,9 +109,8 @@ export default async function page({ params }: PageProps) {
               certificate.
             </p>
           </div>
-
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }

@@ -1,13 +1,30 @@
+"use client";
 import React, { useState } from "react";
 import CourseCatalogFilter from "./CourseCatalogFilter";
 import Link from "next/link";
+
+// Define what a single course looks like
+interface Course {
+  id: number;
+  title: string;
+  description: string;
+  durationHours: number;
+  difficulty: string;
+}
+
+// Define the props for CourseCatalog
+interface CourseCatalogProps {
+  setDifficulty: (difficulty: string) => void;
+  filteredCourses: Course[];
+  isLoading: boolean;
+}
 
 export default function CourseCatalog({
   setDifficulty,
   filteredCourses,
   isLoading,
-}) {
-  const [selectedDifficulty, setSelectedDifficulty] = useState("");
+}: CourseCatalogProps) {
+  const [selectedDifficulty, setSelectedDifficulty] = useState<string>("");
 
   const handleApplyFilters = () => {
     setDifficulty(selectedDifficulty);
@@ -17,20 +34,22 @@ export default function CourseCatalog({
     <div className="px-16 py-6 flex flex-col gap-6">
       <div className="flex flex-col gap-7">
         <h1 className="font-bold text-3xl">Course Catalog</h1>
+
         <CourseCatalogFilter
           selectedDifficulty={selectedDifficulty}
           setSelectedDifficulty={setSelectedDifficulty}
           handleApplyFilters={handleApplyFilters}
         />
       </div>
+
       <div className="flex flex-wrap gap-6">
         {isLoading ? (
           <p>Loading...</p>
         ) : (
-          filteredCourses.map((course, index) => (
+          filteredCourses.map((course) => (
             <div
               className="border border-[#F3F4F6] flex flex-col rounded-2xl overflow-hidden w-[266px]"
-              key={index}
+              key={course.id}
             >
               <div className="w-[266px] h-[180px] bg-amber-200"></div>
               <div className="flex flex-col p-4 gap-4">
@@ -50,7 +69,10 @@ export default function CourseCatalog({
                     </div>
                   </div>
                 </div>
-                <Link href={`payment/${course.id}`} className="w-[230px] h-10 rounded-lg bg-[#0083AD] flex justify-center items-center font-semibold text-white">
+                <Link
+                  href={`payment/${course.id}`}
+                  className="w-[230px] h-10 rounded-lg bg-[#0083AD] flex justify-center items-center font-semibold text-white"
+                >
                   Enroll Now
                 </Link>
               </div>

@@ -1,7 +1,6 @@
 "use server";
 
-import { createAuthSession } from "@/lib/auth";
-import { hashUserPassword, verifyPassword } from "@/lib/hash";
+import { hashUserPassword } from "@/lib/hash";
 import createUser, { getUser } from "@/lib/user";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
@@ -124,23 +123,38 @@ export async function signup(prevState: FormState, formData: FormData) {
       phoneNumber: phoneNumber.trim(),
     });
     redirect("/login");
-  } catch (error: any) {
-    if (error.code === "SQLITE_CONSTRAINT_UNIQUE") {
-      return {
-        errors: {
-          email:
-            "It seems like an account for the chosen email already exists.",
-        },
-      };
+  } catch (error: unknown) {
+    if (error instanceof Error && "code" in error) {
+      const err = error as { code?: string };
+      if (err.code === "SQLITE_CONSTRAINT_UNIQUE") {
+        return {
+          errors: {
+            email:
+              "It seems like an account for the chosen email already exists.",
+          },
+        };
+      }
     }
   }
+
+  // fallback for other errors
+  console.error("Signup error:", errors);
+  return {
+    errors: {
+      email: "An unexpected error occurred. Please try again.",
+    },
+  };
 }
-export async function login(prevState, formData: FormData) {
+
+export async function login(
+  prevState: { errors: Record<string, string> },
+  formData: FormData
+) {
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
 
   const existingUser = await getUser(email, password);
-
+  console.log(existingUser);
   if (!existingUser) {
     return {
       errors: {
@@ -149,7 +163,8 @@ export async function login(prevState, formData: FormData) {
     };
   }
   if (existingUser.success && existingUser.token && existingUser.user) {
-    await cookies().set(COOKIE_NAME, existingUser.token, COOKIE_OPTIONS);
+    const cookieStore = await cookies();
+    await cookieStore.set(COOKIE_NAME, existingUser.token, COOKIE_OPTIONS);
     redirect("/dashboard");
   } else {
     return {
@@ -160,7 +175,7 @@ export async function login(prevState, formData: FormData) {
   }
 }
 export async function verifyAuthAction() {
-  const cookieStore = await cookies(); // wait for it
+  const cookieStore = await cookies();
   const tokenCookie = cookieStore.get("auth-token");
 
   if (!tokenCookie || !tokenCookie.value) {
@@ -186,10 +201,11 @@ export async function verifyAuthAction() {
     );
 
     const data = await response.json();
-
+    console.log(response);
+    
     if (!response.ok || !data.success || !data.user) {
       // Token is invalid, clear the cookie
-      const cookieStore = await cookies(); // wait for it
+      const cookieStore = await cookies();
       cookieStore.delete("auth-token");
       return {
         user: null,
@@ -201,7 +217,9 @@ export async function verifyAuthAction() {
       user: data.user,
       session: { token: tokenCookie.value },
     };
-  } catch (error) {
+  } catch (error: unknown) {
+    // Log the error and return null user/session
+    console.error("Token validation error:", error);
     return {
       user: null,
       session: null,

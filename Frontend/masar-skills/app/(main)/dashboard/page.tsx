@@ -3,7 +3,6 @@ import LearningJourney from "@/components/dashboard/LearningJourney";
 import { verifyAuth } from "@/lib/auth";
 import { getCourseEnrollment, getUserById } from "@/lib/user";
 import { redirect } from "next/navigation";
-import { cookies } from "next/headers";
 
 export default async function page() {
   const result = await verifyAuth();

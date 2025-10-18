@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { cookies } from 'next/headers';
+import { cookies } from "next/headers";
 
+// --- Constants ---
 const PAYPAL_API =
   process.env.NODE_ENV === "production"
     ? "https://api-m.paypal.com"
@@ -9,7 +10,54 @@ const PAYPAL_API =
 const PAYPAL_CLIENT_ID = process.env.PAYPAL_CLIENT_ID!;
 const PAYPAL_CLIENT_SECRET = process.env.PAYPAL_CLIENT_SECRET!;
 
-async function getAccessToken() {
+// --- Types ---
+interface PayPalAccessTokenResponse {
+  access_token: string;
+  token_type: string;
+  expires_in: number;
+}
+
+interface PayPalPayer {
+  name?: {
+    given_name?: string;
+    surname?: string;
+  };
+  email_address?: string;
+  payer_id?: string;
+}
+
+interface PayPalCapture {
+  id: string;
+  status: string;
+  amount?: {
+    currency_code: string;
+    value: string;
+  };
+}
+
+interface PayPalPurchaseUnit {
+  reference_id?: string;
+  amount?: {
+    currency_code: string;
+    value: string;
+  };
+  payments?: {
+    captures?: PayPalCapture[];
+  };
+}
+
+interface PayPalOrderResponse {
+  id: string;
+  status: string;
+  payer?: PayPalPayer;
+  purchase_units?: PayPalPurchaseUnit[];
+  create_time?: string;
+  update_time?: string;
+  [key: string]: unknown;
+}
+
+// --- Utility: Get Access Token ---
+async function getAccessToken(): Promise<string> {
   const credentials = Buffer.from(
     `${PAYPAL_CLIENT_ID}:${PAYPAL_CLIENT_SECRET}`
   ).toString("base64");
@@ -28,82 +76,80 @@ async function getAccessToken() {
     throw new Error(`PayPal auth failed: ${text}`);
   }
 
-  const data = await response.json();
+  const data: PayPalAccessTokenResponse = await response.json();
   return data.access_token;
 }
 
+// --- Route Handler ---
 export async function GET(
   request: NextRequest,
-  { params }: { params: { orderId: string } }  // Changed from orderID to orderId
+  context: { params: Promise<{ orderId: string }> } // ✅ FIXED: Promise type
 ) {
   try {
+    const { orderId: rawOrderId } = await context.params; // ✅ FIXED: await required
+    let orderId = rawOrderId;
+
     const accessToken = await getAccessToken();
-    let { orderId } = params;  // Changed from orderID to orderId
-    
+
     console.log("Received parameter:", orderId);
-    
-    // Check if this looks like a token (typically shorter) vs an order ID (typically starts with a number)
-    // If it's a token, try to get the actual order ID from the cookie
-    if (!orderId || !orderId.match(/^\d/)) {
-      console.log("Parameter appears to be a token, checking for stored order ID");
-      
-      // Try to get the order ID from cookie
-      const cookieStore = cookies();
-      const storedOrderId = cookieStore.get('paypal_order_id')?.value;
-      
+
+    // Try to detect invalid orderId format
+    if (!orderId || !/^\d/.test(orderId)) {
+      console.log(
+        "Parameter appears to be a token, checking for stored order ID..."
+      );
+
+      const cookieStore = await cookies();
+      const storedOrder = cookieStore.get("paypal_order_id");
+      const storedOrderId = storedOrder?.value;
+
       if (storedOrderId) {
         console.log("Found order ID in cookie:", storedOrderId);
         orderId = storedOrderId;
       } else {
-        // If no cookie, we can't proceed
         return NextResponse.json(
-          { 
-            message: "Order ID not found. The payment token cannot be used directly to check order status.",
-            help: "Please ensure the order ID is stored when creating the order.",
-            receivedParam: orderId
+          {
+            message:
+              "Order ID not found. The token cannot be used directly to check order status.",
+            help: "Ensure the order ID is stored when creating the order.",
+            receivedParam: orderId,
           },
           { status: 400 }
         );
       }
     }
-    
-    console.log("Checking order status for ID:", orderId);
-    
-    const response = await fetch(`${PAYPAL_API}/v2/checkout/orders/${orderId}`, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
 
-    const data = await response.json();
-    
-    // Log to see actual PayPal response
+    console.log("Checking PayPal order status for ID:", orderId);
+
+    const response = await fetch(
+      `${PAYPAL_API}/v2/checkout/orders/${orderId}`,
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      }
+    );
+
+    const data: PayPalOrderResponse = await response.json();
+
     console.log("Check-order response:", JSON.stringify(data, null, 2));
 
+    // Handle error response
     if (!response.ok) {
-      // If it's a not found error and we tried with a cookie value, clear the cookie
-      if (response.status === 404) {
-        const res = NextResponse.json(
-          { 
-            message: "PayPal order not found", 
-            details: data,
-            orderId: orderId 
-          },
-          { status: response.status }
-        );
-        
-        // Clear the invalid cookie
-        res.cookies.delete('paypal_order_id');
-        return res;
-      }
-      
-      return NextResponse.json(
-        { message: "Failed to get PayPal order status", details: data },
+      const res = NextResponse.json(
+        {
+          message: "Failed to get PayPal order status",
+          details: data,
+        },
         { status: response.status }
       );
+
+      if (response.status === 404) {
+        res.cookies.delete("paypal_order_id");
+      }
+
+      return res;
     }
 
-    // Successfully got order details
+    // ✅ Successful response
     const responseData = {
       id: data.id,
       status: data.status,
@@ -113,20 +159,20 @@ export async function GET(
       update_time: data.update_time,
     };
 
-    // Clear the cookie after successful retrieval (optional)
     const res = NextResponse.json(responseData);
-    
-    // Only clear cookie if the order is completed or cancelled
-    if (data.status === 'COMPLETED' || data.status === 'VOIDED') {
-      res.cookies.delete('paypal_order_id');
+
+    // Delete the cookie if completed or voided
+    if (data.status === "COMPLETED" || data.status === "VOIDED") {
+      res.cookies.delete("paypal_order_id");
     }
-    
+
     return res;
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error checking PayPal order status:", error);
-    return NextResponse.json(
-      { message: error.message || "Internal server error" },
-      { status: 500 }
-    );
+
+    const errorMessage =
+      error instanceof Error ? error.message : "Internal server error";
+
+    return NextResponse.json({ message: errorMessage }, { status: 500 });
   }
 }

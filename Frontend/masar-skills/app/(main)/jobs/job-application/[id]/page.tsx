@@ -1,6 +1,5 @@
 import { verifyAuthAction } from "@/actions/auth-actions";
 import { redirect } from "next/navigation";
-import JobsPage from "@/components/jobs/JobsPage";
 import JobsApplication from "@/components/jobs/jobApplication/JobsApplication";
 interface PageProps {
   params: {

@@ -25,11 +25,14 @@ export async function POST(req: Request) {
     });
 
     return NextResponse.json({ clientSecret: paymentIntent.client_secret });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Stripe error:", error);
-    return NextResponse.json(
-      { error: error.message || "Failed to create payment intent" },
-      { status: 500 }
-    );
+
+    const message =
+      error instanceof Error
+        ? error.message
+        : "Failed to create payment intent";
+
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

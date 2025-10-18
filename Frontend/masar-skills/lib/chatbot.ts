@@ -1,24 +1,25 @@
 'use server'
 import { cookies } from "next/headers";
 
-export async function chatbotResponse(message:string,id:number){
-try {
- const cookieStore = await cookies();
-   const tokenCookie = cookieStore.get("auth-token");
-   
-   if (!tokenCookie?.value) {
-     throw new Error('Not authenticated');
-   }
+export async function chatbotResponse(message: string, id: number) {
+  try {
+    const cookieStore = await cookies();
+    const tokenCookie = cookieStore.get("auth-token");
+
+    if (!tokenCookie?.value) {
+      throw new Error("Not authenticated");
+    }
+
     const response = await fetch(`http://127.0.0.1:5000/api/chat`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization:`Bearer ${tokenCookie.value}`,
+        Authorization: `Bearer ${tokenCookie.value}`,
       },
       body: JSON.stringify({
-            query:message,
-            studentId:id,
-        })
+        query: message,
+        studentId: id,
+      }),
     });
 
     const result = await response.json();
@@ -31,9 +32,10 @@ try {
         },
       };
     }
-    console.log(result)
+
+    console.log(result);
     return result;
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching chatbot response", error);
 
     if (error instanceof TypeError && error.message.includes("fetch")) {
@@ -51,7 +53,8 @@ try {
     };
   }
 }
-export async function transcriptVoice(formData){
+
+export async function transcriptVoice(formData: FormData) {
   try {
     const cookieStore = await cookies();
     const tokenCookie = cookieStore.get("auth-token");
@@ -59,6 +62,7 @@ export async function transcriptVoice(formData){
     if (!tokenCookie?.value) {
       throw new Error("Not authenticated");
     }
+
     const response = await fetch(`http://127.0.0.1:5000/api/transcribe`, {
       method: "POST",
       headers: {
@@ -73,14 +77,15 @@ export async function transcriptVoice(formData){
     if (!result) {
       return {
         errors: {
-          user: "Failed to fetch chatbot response",
+          user: "Failed to transcribe voice",
         },
       };
     }
+
     console.log(result);
     return result;
-  } catch (error: any) {
-    console.error("Error fetching chatbot response", error);
+  } catch (error: unknown) {
+    console.error("Error transcribing voice", error);
 
     if (error instanceof TypeError && error.message.includes("fetch")) {
       return {

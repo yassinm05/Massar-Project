@@ -1,7 +1,6 @@
 import { verifyAuth } from "@/lib/auth";
 import { getAvailableQuizzes } from "@/lib/quiz";
 import { cookies } from "next/headers";
-import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 

@@ -1,18 +1,41 @@
-'use client'
-import { useState } from 'react';
-import JobApply from '@/components/jobs/jobApplication/JobApply';
-import JobSubmit from '@/components/jobs/jobApplication/JobSubmit';
-import JobConfirmation from '@/components/jobs/jobApplication/JobConfirmation';
-import { submitJobApplication } from '@/actions/job-actions';
+"use client";
 
-export default function JobsApplication({id}) {
+import { useState, ChangeEvent } from "react";
+import JobApply from "@/components/jobs/jobApplication/JobApply";
+import JobSubmit from "@/components/jobs/jobApplication/JobSubmit";
+import JobConfirmation from "@/components/jobs/jobApplication/JobConfirmation";
+import { submitJobApplication } from "@/actions/job-actions";
 
-  const [step, setStep] = useState(1);
-  const [error ,setError] =useState('');
-  const [Loading ,setLoading] =useState(false);
-  const [formData, setFormData] = useState({
+// ✅ Define the structure of your form data
+interface JobApplicationFormData {
+  jobId: number;
+  ResumeFile: File | null;
+  LicenseCertificateNumber: string;
+  PreviousWorkExperience: string;
+  NursingCompetencies: string;
+  PreferredShift: string;
+  CoverLetter: string;
+  phone: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+}
+
+// ✅ Define component props
+interface JobsApplicationProps {
+  id: number;
+}
+
+// ✅ Main component
+export default function JobsApplication({ id }: JobsApplicationProps) {
+  const [step, setStep] = useState<number>(1);
+  const [error, setError] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
+  const [confirmationNumber, setConfirmationNumber] = useState<string>("");
+
+  const [formData, setFormData] = useState<JobApplicationFormData>({
     jobId: id,
-    ResumeFile: "",
+    ResumeFile: null,
     LicenseCertificateNumber: "",
     PreviousWorkExperience: "",
     NursingCompetencies: "",
@@ -23,9 +46,11 @@ export default function JobsApplication({id}) {
     firstName: "",
     lastName: "",
   });
-  const [confirmationNumber, setConfirmationNumber] = useState("");
 
-  const handleInputChange = (e) => {
+  // ✅ Handle text input changes
+  const handleInputChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
@@ -33,42 +58,50 @@ export default function JobsApplication({id}) {
     }));
   };
 
-  const handleFileChange = (file) => {
+  // ✅ Handle file uploads
+  const handleFileChange = (file: File) => {
     setFormData((prev) => ({
       ...prev,
       ResumeFile: file,
     }));
   };
 
+  // ✅ Navigation between steps
   const handleNext = () => {
     if (step === 1) {
-      if (formData.ResumeFile && formData.LicenseCertificateNumber) {
+      if (formData.ResumeFile && formData.LicenseCertificateNumber.trim()) {
         setStep(2);
       } else {
-        alert(`Please fill all fields on Step 1 $`);
+        alert("Please fill all required fields in Step 1");
       }
     }
   };
+
   const handleBack = () => {
-    if (step === 2) {
-      setStep(1);
-    }
+    if (step === 2) setStep(1);
   };
 
+  // ✅ Handle submission
   const handleSubmit = async () => {
     setError("");
     setLoading(true);
 
     try {
       const response = await submitJobApplication({ formData });
-      console.log(response);
-      if (response.status) {
+
+      if (!response || response.status) {
         throw new Error("Failed to submit application");
       }
-      setConfirmationNumber(response.confirmationNumber);
+
+      if (response.confirmationNumber) {
+        setConfirmationNumber(response.confirmationNumber);
+      }
+
       setStep(3);
     } catch (err) {
-      setError(err.message || "An error occurred");
+      const errorMessage =
+        err instanceof Error ? err.message : "An unexpected error occurred";
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -91,6 +124,8 @@ export default function JobsApplication({id}) {
           handleInputChange={handleInputChange}
           handleBack={handleBack}
           handleSubmit={handleSubmit}
+          loading={loading}
+          error={error}
         />
       )}
 

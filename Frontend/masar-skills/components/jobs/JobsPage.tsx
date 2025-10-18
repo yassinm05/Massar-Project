@@ -1,5 +1,4 @@
-'use client';
-
+"use client";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Search from "@/public/assets/jobs/search.png";
@@ -7,19 +6,22 @@ import Jobs from "@/components/jobs/Jobs";
 import JobDetails from "@/components/jobs/JobDetails";
 import getJobsAction, { getJobByIdAction } from "@/actions/job-actions";
 
+// Update the Job interface to match what Jobs component expects
 interface Job {
   id: number;
   title: string;
   description: string;
+  companyName: string;
+  location: string;
 }
 
 export default function JobsPage() {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [activeJobId, setActiveJobId] = useState<number>();
-  const [activeJob, setActiveJob] = useState<Job>();
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [activeJobId, setActiveJobId] = useState<number | null>(null);
+  const [activeJob, setActiveJob] = useState<Job | undefined>();
   const [isLoading, setIsLoading] = useState(false);
 
   // Fetch all jobs on mount
@@ -27,21 +29,19 @@ export default function JobsPage() {
     const fetchJobs = async () => {
       try {
         const result = await getJobsAction();
-
         if (result?.errors) {
-          setError(result.errors.user);
+          setErrorMessage(result.errors.user);
           setJobs([]);
         } else {
           setJobs(result);
           setFilteredJobs(result);
-          setActiveJobId(result[0].id);
-          setError(null);
+          setActiveJobId(result[0]?.id ?? null);
+          setErrorMessage(null);
         }
-      } catch (err) {
-        setError("An unexpected error occurred");
+      } catch {
+        setErrorMessage("An unexpected error occurred");
       }
     };
-
     fetchJobs();
   }, []);
 
@@ -53,7 +53,9 @@ export default function JobsPage() {
       const filtered = jobs.filter(
         (job) =>
           job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          job.description.toLowerCase().includes(searchTerm.toLowerCase())
+          job.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          job.companyName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          job.location.toLowerCase().includes(searchTerm.toLowerCase())
       );
       setFilteredJobs(filtered);
     }
@@ -65,20 +67,18 @@ export default function JobsPage() {
       setIsLoading(true);
       try {
         const result = await getJobByIdAction(jobId);
-
         if (result?.errors) {
-          setError(result.errors.user);
+          setErrorMessage(result.errors.user);
         } else {
           setActiveJob(result);
-          setError(null);
+          setErrorMessage(null);
         }
-      } catch (err) {
-        setError("An unexpected error occurred");
+      } catch {
+        setErrorMessage("An unexpected error occurred");
       } finally {
         setIsLoading(false);
       }
     };
-
     if (activeJobId) {
       fetchActiveJob(activeJobId);
     }
@@ -102,18 +102,20 @@ export default function JobsPage() {
             />
           </div>
         </div>
-
         <div className="h-0 w-full border-b border-[#E5E7EB]" />
-
         <Jobs
           jobs={filteredJobs}
           activeJob={activeJobId}
           onSelectJob={setActiveJobId}
         />
       </div>
-
       {/* RIGHT SIDE: job details */}
       <JobDetails isLoading={isLoading} activeJob={activeJob} />
+      {errorMessage && (
+        <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-600">
+          {errorMessage}
+        </div>
+      )}
     </div>
   );
 }

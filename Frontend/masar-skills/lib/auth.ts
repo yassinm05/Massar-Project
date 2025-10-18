@@ -1,9 +1,7 @@
 import { cookies } from "next/headers";
 
-
-
 export async function verifyAuth() {
-   const cookieStore = await cookies(); // wait for it
+  const cookieStore = await cookies();
   const tokenCookie = cookieStore.get("auth-token");
 
   if (!tokenCookie || !tokenCookie.value) {
@@ -32,7 +30,7 @@ export async function verifyAuth() {
 
     if (!response.ok || !data.success || !data.user) {
       // Token is invalid, clear the cookie
-      const cookieStore = await cookies(); // wait for it
+      const cookieStore = await cookies();
       cookieStore.delete("auth-token");
       return {
         user: null,
@@ -44,8 +42,8 @@ export async function verifyAuth() {
       user: data.user,
       session: { token: tokenCookie.value },
     };
-  } catch (error) {
-    
+  } catch {
+    // If an error occurs (network or parsing), treat as no session
     return {
       user: null,
       session: null,
@@ -54,7 +52,7 @@ export async function verifyAuth() {
 }
 
 export async function destroySession() {
-  const cookieStore = await cookies(); // wait for it
+  const cookieStore = await cookies();
   const tokenCookie = cookieStore.get("auth-token");
 
   if (!tokenCookie) {

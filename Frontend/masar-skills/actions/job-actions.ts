@@ -2,19 +2,19 @@
 
 import { cookies } from "next/headers";
 
-export default async function getJobsAction(){
-try {
- const cookieStore = await cookies();
-   const tokenCookie = cookieStore.get("auth-token");
-   
-   if (!tokenCookie?.value) {
-     throw new Error('Not authenticated');
-   }
+export default async function getJobsAction() {
+  try {
+    const cookieStore = await cookies();
+    const tokenCookie = cookieStore.get("auth-token");
+
+    if (!tokenCookie?.value) {
+      throw new Error("Not authenticated");
+    }
     const response = await fetch(`http://localhost:5236/api/jobs`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        Authorization:`Bearer ${tokenCookie.value}`,
+        Authorization: `Bearer ${tokenCookie.value}`,
       },
     });
 
@@ -28,9 +28,9 @@ try {
         },
       };
     }
-    console.log(result)
+    console.log(result);
     return result;
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching available jobs", error);
 
     if (error instanceof TypeError && error.message.includes("fetch")) {
@@ -49,19 +49,19 @@ try {
   }
 }
 
-export async function getJobByIdAction(id:number){
+export async function getJobByIdAction(id: number) {
   try {
- const cookieStore = await cookies();
-   const tokenCookie = cookieStore.get("auth-token");
-   
-   if (!tokenCookie?.value) {
-     throw new Error('Not authenticated');
-   }
+    const cookieStore = await cookies();
+    const tokenCookie = cookieStore.get("auth-token");
+
+    if (!tokenCookie?.value) {
+      throw new Error("Not authenticated");
+    }
     const response = await fetch(`http://localhost:5236/api/jobs/${id}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        Authorization:`Bearer ${tokenCookie.value}`,
+        Authorization: `Bearer ${tokenCookie.value}`,
       },
     });
 
@@ -75,9 +75,9 @@ export async function getJobByIdAction(id:number){
         },
       };
     }
-    console.log(result)
+    console.log(result);
     return result;
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching the job ", error);
 
     if (error instanceof TypeError && error.message.includes("fetch")) {
@@ -96,7 +96,7 @@ export async function getJobByIdAction(id:number){
   }
 }
 
-export async function submitJobApplication({formData}) {
+export async function submitJobApplication({ formData }: any) {
   try {
     const cookieStore = await cookies();
     const tokenCookie = cookieStore.get("auth-token");
@@ -104,24 +104,35 @@ export async function submitJobApplication({formData}) {
     if (!tokenCookie?.value) {
       throw new Error("Not authenticated");
     }
-console.log(formData)
+    console.log(formData);
     // Create FormData for file + text fields
     const formDataToSend = new FormData();
-    if (formData.ResumeFile) formDataToSend.append("ResumeFile", formData.ResumeFile);
-    if (formData.CoverLetter) formDataToSend.append("CoverLetter", formData.CoverLetter);
+    if (formData.ResumeFile)
+      formDataToSend.append("ResumeFile", formData.ResumeFile);
+    if (formData.CoverLetter)
+      formDataToSend.append("CoverLetter", formData.CoverLetter);
     formDataToSend.append("PreferredShift", formData.PreferredShift || "");
-    formDataToSend.append("NursingCompetencies", formData.NursingCompetencies || "");
-    formDataToSend.append("PreviousWorkExperience", formData.PreviousWorkExperience || "");
-    formDataToSend.append("LicenseCertificateNumber", formData.LicenseCertificateNumber || "");
+    formDataToSend.append(
+      "NursingCompetencies",
+      formData.NursingCompetencies || ""
+    );
+    formDataToSend.append(
+      "PreviousWorkExperience",
+      formData.PreviousWorkExperience || ""
+    );
+    formDataToSend.append(
+      "LicenseCertificateNumber",
+      formData.LicenseCertificateNumber || ""
+    );
     formDataToSend.append("JobId", formData.jobId || "");
-    
-console.log(` ${formDataToSend}`);
+
+    console.log(` ${formDataToSend}`);
     const response = await fetch(`http://localhost:5236/api/jobApplications/`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${tokenCookie.value}`,
       },
-      body: formDataToSend, 
+      body: formDataToSend,
     });
 
     const result = await response.json();

@@ -34,7 +34,7 @@ export async function submitAnswerAction(
 
     console.log("User fetched successfully:", result);
     return result;
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching user by ID:", error);
 
     if (error instanceof TypeError && error.message.includes("fetch")) {
