@@ -10,6 +10,7 @@ interface Course {
   description: string;
   durationHours: number;
   difficulty: string;
+  isEnrolled: boolean;
 }
 
 // Define the props for CourseCatalog
@@ -69,12 +70,21 @@ export default function CourseCatalog({
                     </div>
                   </div>
                 </div>
-                <Link
-                  href={`payment/${course.id}`}
-                  className="w-[230px] h-10 rounded-lg bg-[#0083AD] flex justify-center items-center font-semibold text-white"
-                >
-                  Enroll Now
-                </Link>
+                {course.isEnrolled ? (
+                  <Link
+                    href={`course-details/${course.id}`}
+                    className="w-[230px] h-10 rounded-lg bg-[#0083AD] flex justify-center items-center font-semibold text-white"
+                  >
+                    Access Course
+                  </Link>
+                ) : (
+                  <Link
+                    href={`payment/${course.id}`}
+                    className="w-[230px] h-10 rounded-lg bg-[#0083AD] flex justify-center items-center font-semibold text-white"
+                  >
+                    Enroll Now
+                  </Link>
+                )}
               </div>
             </div>
           ))

@@ -8,6 +8,7 @@ interface Course {
   description: string;
   durationHours: number;
   difficulty: string;
+  isEnrolled: boolean;
 }
 
 interface CourseCatalogLogicProps {
