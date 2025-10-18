@@ -53,7 +53,9 @@ namespace MasarSkills.API.Services
         {
             var course = await _context.Courses
                 .Include(c => c.Instructor)
-                .ThenInclude(i => i.User)
+                    .ThenInclude(i => i.User)
+                // 1. Include the CourseModules in the query
+                .Include(c => c.Modules) 
                 .FirstOrDefaultAsync(c => c.Id == id && c.IsActive);
 
             if (course == null) return null;
@@ -68,7 +70,19 @@ namespace MasarSkills.API.Services
                 DurationHours = course.DurationHours,
                 ThumbnailUrl = course.ThumbnailUrl,
                 InstructorName = $"{course.Instructor.User.FirstName} {course.Instructor.User.LastName}",
-                CreatedAt = course.CreatedAt
+                CreatedAt = course.CreatedAt,
+
+                // 2. Map the loaded modules to the DTO collection
+                Modules = course.Modules
+                    .Select(m => new CourseModuleDto
+                    {
+                        Id = m.Id,
+                        Title = m.Title,
+                        Description = m.Description,
+                        Order = m.Order
+                    })
+                    .OrderBy(m => m.Order) // It's good practice to order them
+                    .ToList()
             };
         }
 

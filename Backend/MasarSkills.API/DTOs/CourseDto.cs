@@ -12,5 +12,15 @@
         public string InstructorName { get; set; }
         public DateTime CreatedAt { get; set; }
         public bool IsEnrolled { get; set; }
+
+        public ICollection<CourseModuleDto> Modules { get; set; }
+    }
+
+    public class CourseModuleDto
+    {
+        public int Id { get; set; }
+        public string Title { get; set; }
+        public string Description { get; set; }
+        public int Order { get; set; }
     }
 }
