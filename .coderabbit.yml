@@ -1,0 +1,16 @@
+version: "1"
+
+review:
+  auto_review: true
+  review_on:
+    - pull_request
+  request_changes: true
+  max_comments: 50
+
+assistant:
+  enable_assistant: true
+  summarise_large_diffs: true
+
+labels:
+  exclude:
+    - "dependencies"
