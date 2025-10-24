@@ -90,6 +90,6 @@ public class LearningMaterialService : ILearningMaterialService
                 Type = ConvertMaterialTypeToString(material.Type),
                 DurationMinutes = material.DurationMinutes,
                 IsPreview = material.IsPreview
-            }).ToList();
+            }).ToList();     
         }
     }
