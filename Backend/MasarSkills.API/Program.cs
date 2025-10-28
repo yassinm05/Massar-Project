@@ -285,7 +285,7 @@ app.MapHealthChecks("/health");
     }
 }*/
 
-
+app.UseStaticFiles();
 app.Run();
 
  
