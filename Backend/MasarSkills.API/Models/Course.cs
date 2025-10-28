@@ -30,6 +30,8 @@ namespace MasarSkills.API.Models
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
+
+        public string ImagePaths { get; set; }
         #endregion
         #region Navigation Property
         public virtual InstructorProfile Instructor { get; set; }

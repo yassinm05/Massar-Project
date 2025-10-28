@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MasarSkills.API.Services
 {
-    public class CourseService:ICourseService
+    public class CourseService : ICourseService
     {
         private readonly ApplicationDbContext _context;
 
@@ -14,40 +14,41 @@ namespace MasarSkills.API.Services
             _context = context;
         }
 
-       public async Task<IEnumerable<CourseDto>> GetAllCoursesAsync(int? userId)
-{
-    // If no user is logged in, the set will be empty.
-    var enrolledCourseIds = new HashSet<int>();
-    if (userId.HasValue)
-    {
-        enrolledCourseIds = await _context.CourseEnrollments
-            .Where(e => e.StudentId == userId.Value)
-            .Select(e => e.CourseId)
-            .ToHashSetAsync();
-    }
+        public async Task<IEnumerable<CourseDto>> GetAllCoursesAsync(int? userId)
+        {
+            // If no user is logged in, the set will be empty.
+            var enrolledCourseIds = new HashSet<int>();
+            if (userId.HasValue)
+            {
+                enrolledCourseIds = await _context.CourseEnrollments
+                    .Where(e => e.StudentId == userId.Value)
+                    .Select(e => e.CourseId)
+                    .ToHashSetAsync();
+            }
 
-    var courses = await _context.Courses
-        .Include(c => c.Instructor)
-            .ThenInclude(i => i.User)
-        .Where(c => c.IsActive)
-        .ToListAsync();
+            var courses = await _context.Courses
+                .Include(c => c.Instructor)
+                    .ThenInclude(i => i.User)
+                .Where(c => c.IsActive)
+                .ToListAsync();
 
-    // Step 4: Map to DTO and set the 'IsEnrolled' flag.
-    return courses.Select(c => new CourseDto
-    {
-        Id = c.Id,
-        Title = c.Title,
-        Description = c.Description,
-        Price = c.Price,
-        DurationHours = c.DurationHours,
-        Difficulty = c.Difficulty,
-        ThumbnailUrl = c.ThumbnailUrl,
-        InstructorName = $"{c.Instructor.User.FirstName} {c.Instructor.User.LastName}",
-        CreatedAt = c.CreatedAt,
-        // Check if the course's ID is in the user's enrollment set.
-        IsEnrolled = enrolledCourseIds.Contains(c.Id) 
-    });
-}
+            // Step 4: Map to DTO and set the 'IsEnrolled' flag.
+            return courses.Select(c => new CourseDto
+            {
+                Id = c.Id,
+                Title = c.Title,
+                Description = c.Description,
+                Price = c.Price,
+                DurationHours = c.DurationHours,
+                Difficulty = c.Difficulty,
+                ThumbnailUrl = c.ThumbnailUrl,
+                InstructorName = $"{c.Instructor.User.FirstName} {c.Instructor.User.LastName}",
+                CreatedAt = c.CreatedAt,
+                // Check if the course's ID is in the user's enrollment set.
+                IsEnrolled = enrolledCourseIds.Contains(c.Id),
+                ImagePaths = c.ImagePaths
+            });
+        }
 
         public async Task<CourseDto> GetCourseByIdAsync(int id)
         {
@@ -55,7 +56,7 @@ namespace MasarSkills.API.Services
                 .Include(c => c.Instructor)
                     .ThenInclude(i => i.User)
                 // 1. Include the CourseModules in the query
-                .Include(c => c.Modules) 
+                .Include(c => c.Modules)
                 .FirstOrDefaultAsync(c => c.Id == id && c.IsActive);
 
             if (course == null) return null;
@@ -82,7 +83,8 @@ namespace MasarSkills.API.Services
                         Order = m.Order
                     })
                     .OrderBy(m => m.Order) // It's good practice to order them
-                    .ToList()
+                    .ToList(),
+                ImagePaths = course.ImagePaths
             };
         }
 

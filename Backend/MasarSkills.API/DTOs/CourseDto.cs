@@ -13,6 +13,8 @@
         public DateTime CreatedAt { get; set; }
         public bool IsEnrolled { get; set; }
 
+        public string ImagePaths { get; set; }
+
         public ICollection<CourseModuleDto> Modules { get; set; }
     }
 
