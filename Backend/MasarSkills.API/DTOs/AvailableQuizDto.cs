@@ -12,4 +12,6 @@ public class AvailableQuizDto
     public int MaxAttempts { get; set; }
     public int AttemptsTaken { get; set; }
     public string Status { get; set; }
+
+    public string ImagePath { get; set; }
 }

@@ -337,10 +337,10 @@ namespace MasarSkills.API.Controllers
             {
                 return Unauthorized();
             }
-
+            // This part remains the same
             var studentQuizzes = await _context.CourseEnrollments
-         .Where(ce => ce.StudentId == userId)
-         .SelectMany(ce => ce.Course.Modules.SelectMany(m => m.Quizzes))
+                .Where(ce => ce.StudentId == userId)
+                .SelectMany(ce => ce.Course.Modules.SelectMany(m => m.Quizzes))
                 .Select(q => new
                 {
                     Quiz = q,
@@ -352,19 +352,35 @@ namespace MasarSkills.API.Controllers
                 })
                 .ToListAsync();
 
+            // 1. Map the ImagePath in your DTO projection
             var availableQuizzes = studentQuizzes.Select(x => new AvailableQuizDto
             {
                 QuizId = x.Quiz.Id,
-                // If LatestAttempt is null, its Id is null. The '?? 0' replaces that null with 0.
-                LatestAttemptId = x.LatestAttempt?.Id ?? 0, // <-- MODIFIED THIS LINE
+                LatestAttemptId = x.LatestAttempt?.Id ?? 0,
                 QuizTitle = x.Quiz.Title,
                 CourseName = x.CourseName,
                 TimeLimitMinutes = x.Quiz.TimeLimitMinutes,
                 MaxAttempts = x.Quiz.MaxAttempts,
                 AttemptsTaken = x.LatestAttempt?.AttemptNumber ?? 0,
-                Status = x.LatestAttempt?.Status ?? "Not Started"
-            }).ToList();
+                Status = x.LatestAttempt?.Status ?? "Not Started",
 
+                // --- ADD THIS LINE ---
+                ImagePath = x.Quiz.ImagePath
+            }).ToList(); // .ToList() creates the concrete list
+
+            // 2. Get your server's base URL
+            var baseUrl = $"{Request.Scheme}://{Request.Host}";
+
+            // 3. Loop through the list and fix the paths
+            foreach (var quiz in availableQuizzes)
+            {
+                if (!string.IsNullOrEmpty(quiz.ImagePath))
+                {
+                    quiz.ImagePath = baseUrl + quiz.ImagePath;
+                }
+            }
+
+            // 4. Return the modified list with full URLs
             return Ok(availableQuizzes);
         }
     }
