@@ -17,6 +17,8 @@ namespace MasarSkills.API.Models
         public int TimeLimitMinutes { get; set; }
         public int PassingScore { get; set; }
         public int MaxAttempts { get; set; } = 1;
+
+        public string ImagePath { get; set; }
         #endregion
         #region Navigation Property
         public virtual CourseModule Module { get; set; }
