@@ -11,6 +11,7 @@ type Quiz = {
   courseName: string;
 };
 export default async function page() {
+  
   const result = await verifyAuth();
   if (!result.user) {
     return redirect("/");
@@ -18,9 +19,9 @@ export default async function page() {
   const cookieStore = await cookies(); // wait for it
   const tokenCookie = cookieStore.get("auth-token");
   if (!tokenCookie?.value) {
-      return redirect("/");
-    }
- 
+    return redirect("/");
+  }
+
   const quizzes = await getAvailableQuizzes(tokenCookie?.value);
   return (
     <div className="flex flex-col p-8 gap-8">
@@ -43,7 +44,10 @@ export default async function page() {
               </div>
               <p className="text-sm leading-5">{quiz.courseName}</p>
             </div>
-            <Link href={`/quizzes/${quiz.quizId}`} className="bg-[#0083AD] w-[232px] h-[40px] rounded-xl text-white flex justify-center items-center cursor-pointer">
+            <Link
+              href={`/quizzes/${quiz.quizId}`}
+              className="bg-[#0083AD] w-[232px] h-[40px] rounded-xl text-white flex justify-center items-center cursor-pointer"
+            >
               Start Quiz
             </Link>
           </div>

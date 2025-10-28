@@ -1,53 +1,34 @@
 "use client";
+
 import ChatbotBody from "./ChatbotBody";
 import ChatbotHeader from "./ChatbotHeader";
-import { verifyAuthAction } from "@/actions/auth-actions";
-import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Mic from "@/public/assets/chatbot/Mic.png";
 import Send from "@/public/assets/chatbot/send.png";
-import chatbotResponse from "@/actions/chatbot-actions";
+import chatbotIcon from "@/public/assets/chatbot/icon.png";
+import AI from "@/public/assets/course-details/AI.png";
 import { transcriptVoice } from "@/lib/chatbot";
-
-interface VoiceData {
-  audioUrl: string;
-  duration?: number;
-  transcription?: string;
-  mimeType?: string;
-}
-
-type Message =
-  | {
-      source: "bot" | "user";
-      body: string;
-      typeOfMessage: "string";
-    }
-  | {
-      source: "bot" | "user";
-      body: VoiceData;
-      typeOfMessage: "voice";
-    };
+import { useChatbot } from "@/context/ChatbotContext";
+import { useEffect, useRef, useState } from "react";
+import { verifyAuthAction } from "@/actions/auth-actions";
+import { usePathname } from "next/navigation";
 
 export default function Chatbot() {
-  const [show, setShow] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      source: "bot",
-      body: "Hi there! I'm your virtual study assistant. I can help you find quizzes, explain nursing concepts, and more. What would you like to do?",
-      typeOfMessage: "string",
-    },
-    {
-      source: "user",
-      body: "Can you explain the concept of pharmacology?",
-      typeOfMessage: "string",
-    },
-  ]);
+  const {
+    showChatbot,
+    openChatbot,
+    closeChatbot,
+    messages,
+    sendMessage,
+    isLoading,
+    studentId,
+  } = useChatbot();
+  const pathname = usePathname();
   const [inputText, setInputText] = useState("");
-  const [studentId, setStudentID] = useState<number>();
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const [isRecording, setIsRecording] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
     // Check if user is authenticated via API
@@ -57,38 +38,22 @@ export default function Chatbot() {
         setIsAuthenticated(false);
         return;
       }
-      setStudentID(response.user.id);
       setIsAuthenticated(true);
     }
     checkAuth();
   }, []);
-  async function handleSendMessage(text?: string) {
-    const messageText = text || inputText.trim();
-    if (!messageText) return;
 
-    setMessages((prev) => [
-      ...prev,
-      {
-        source: "user",
-        body: messageText,
-        typeOfMessage: "string",
-      },
-    ]);
-    if (studentId === undefined) {
-      console.error("Student ID is missing.");
-      return;
-    }
-    const result = await chatbotResponse(messageText, studentId);
-    setMessages((prev) => [
-      ...prev,
-      {
-        source: "bot",
-        body: result.response,
-        typeOfMessage: "string",
-      },
-    ]);
+  // ✅ Only render chatbot button or window if authenticated
+  if (!isAuthenticated) return null;
+
+  // 🎯 Handle text message send
+  const handleSendMessage = async () => {
+    if (!inputText.trim()) return;
+    await sendMessage(inputText);
     setInputText("");
-  }
+  };
+
+  // 🎙️ Send recorded audio to backend for transcription
   const sendAudioToAPI = async (audioBlob: Blob) => {
     try {
       if (!studentId) {
@@ -98,25 +63,18 @@ export default function Chatbot() {
 
       const formData = new FormData();
       formData.append("audio", audioBlob, "recording.webm");
-      formData.append("studentId", studentId.toString()); // ✅ fixed
+      formData.append("studentId", studentId.toString());
 
       const response = await transcriptVoice(formData);
       if (response.response) {
-        setMessages((prev) => [
-          ...prev,
-          {
-            source: "bot",
-            body: response.response,
-            typeOfMessage: "string",
-          },
-        ]);
+        await sendMessage(response.response);
       }
     } catch (err) {
       alert(`Failed to process voice recording. Please try again. ${err}`);
     }
   };
 
-  // Start recording
+  // 🎧 Start recording from microphone
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -135,8 +93,6 @@ export default function Chatbot() {
           type: "audio/webm",
         });
         await sendAudioToAPI(audioBlob);
-
-        // Stop all tracks to release microphone
         stream.getTracks().forEach((track) => track.stop());
       };
 
@@ -148,14 +104,15 @@ export default function Chatbot() {
     }
   };
 
-  // Stop recording
+  // 🛑 Stop recording
   const stopRecording = () => {
     if (mediaRecorderRef.current && isRecording) {
       mediaRecorderRef.current.stop();
       setIsRecording(false);
     }
   };
-  // Handle mic button click
+
+  // 🎙️ Handle mic button click
   const handleMicClick = () => {
     if (isRecording) {
       stopRecording();
@@ -164,48 +121,82 @@ export default function Chatbot() {
     }
   };
 
-  // Don't render anything if not authenticated
-  if (!isAuthenticated) return null;
-  if (!show) {
-    return (
-      <div className="fixed right-6 bottom-6 ">
-        <button
-          onClick={() => setShow(true)}
-          className="w-12 h-12 rounded-full bg-black cursor-pointer"
-        ></button>
-      </div>
-    );
+  // 💬 Floating button (closed state)
+  if (!showChatbot) {
+    if (pathname.startsWith("/course-details")) {
+      return (
+        <div className="fixed right-20 bottom-20 z-20">
+          <button className="w-40 h-12 cursor-pointer rounded-l-[30px] rounded-tr-[20px] border border-[#0083AD] flex items-center justify-center gap-2">
+            <p className="font-semibold text-[#0083AD]">Study with AI</p>
+            <div className="relative w-5 h-5">
+              <Image src={AI} alt="" fill />
+            </div>
+          </button>
+        </div>
+      );
+    } else {
+      return (
+        <div className="fixed right-6 bottom-6 z-20">
+          <button
+            onClick={openChatbot}
+            className="w-32 h-32 rounded-full cursor-pointer relative"
+          >
+            <Image
+              src={chatbotIcon}
+              className="object-cover"
+              alt="Chatbot"
+              fill
+            />
+          </button>
+        </div>
+      );
+    }
   }
 
+  // 🪟 Open Chatbot window
   return (
-    <div className="fixed z-20 w-[500px] top-0 left-0 border border-[#DEE1E6] rounded-3xl overflow-hidden bg-white ">
-      <ChatbotHeader setShow={setShow} />
+    <div className="fixed z-20 w-[500px] top-5 right-5 border border-[#DEE1E6] rounded-3xl overflow-hidden bg-white">
+      <ChatbotHeader setShow={closeChatbot} />
       <ChatbotBody messages={messages} />
+
       <div className="h-0 w-full border-b border-[#E5E7EB]"></div>
+
+      {/* Input area */}
       <div className="flex items-center gap-4 py-3 px-7">
         <div className="w-full rounded-[20px] border border-[#DEE1E6]">
           <input
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
             type="text"
-            className="w-full placeholder:text-sm placeholder:text-[#565D6D] p-3 focus:outline-none "
+            disabled={isLoading}
+            className="w-full placeholder:text-sm placeholder:text-[#565D6D] p-3 focus:outline-none disabled:opacity-50"
             placeholder="Ask about nursing topics or quizzes..."
           />
         </div>
-        {/* VOICE RECORDING */}
+
+        {/* Mic button */}
         <div
           onClick={handleMicClick}
-          className=" w-10 h-10  rounded-full bg-[#F3F4F6] flex justify-center items-center shrink-0 cursor-pointer"
+          className={`w-10 h-10 rounded-full flex justify-center items-center shrink-0 cursor-pointer ${
+            isRecording ? "bg-[#FCA5A5]" : "bg-[#F3F4F6]"
+          }`}
         >
-          <Image width={20} height={20} src={Mic} alt="" />
+          <Image width={20} height={20} src={Mic} alt="Mic" />
         </div>
+
+        {/* Send button */}
         <div
-          onClick={() => handleSendMessage()}
-          className=" w-10 h-10 rounded-full bg-[#0083AD] flex justify-center items-center shrink-0 cursor-pointer"
+          onClick={handleSendMessage}
+          className={`w-10 h-10 rounded-full bg-[#0083AD] flex justify-center items-center shrink-0 cursor-pointer ${
+            isLoading ? "opacity-50 cursor-not-allowed" : ""
+          }`}
         >
-          <Image width={20} height={20} src={Send} alt="" />
+          <Image width={20} height={20} src={Send} alt="Send" />
         </div>
       </div>
+
+      {/* Footer info */}
       <div className="px-7 pb-5">
         <div className="p-4 rounded-2xl gap-2 bg-[#F3F4F6] font-medium leading-6 text-[#565D6D]">
           Assistant is powered by AI, so check for mistakes and don&apos;t share

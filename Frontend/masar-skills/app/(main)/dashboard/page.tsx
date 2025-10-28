@@ -6,16 +6,16 @@ import { redirect } from "next/navigation";
 
 export default async function page() {
   const result = await verifyAuth();
-  if(!result.user){
-    return redirect('/');
+  if (!result.user) {
+    return redirect("/");
   }
- 
-  const User = await getUserById(result.user.id);
   const Enrollment = await getCourseEnrollment();
-  console.log(Enrollment)
+  console.log(Enrollment);
   //ROLE => User.role
-  return <div className="py-10 px-12 flex flex-col gap-5">
-    <Welcome firstName={User.firstName} />
-    <LearningJourney enrollments={Enrollment}/>
-  </div>;
+  return (
+    <div className="py-10 px-12 flex flex-col gap-5">
+      <Welcome firstName={result.user.firstName} />
+      <LearningJourney enrollments={Enrollment} />
+    </div>
+  );
 }

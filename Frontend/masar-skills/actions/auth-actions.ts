@@ -4,6 +4,7 @@ import { hashUserPassword } from "@/lib/hash";
 import createUser, { getUser } from "@/lib/user";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
+import { destroySession } from "@/lib/auth";
 
 interface SignupErrors {
   firstName?: string;
@@ -202,7 +203,7 @@ export async function verifyAuthAction() {
 
     const data = await response.json();
     console.log(response);
-    
+
     if (!response.ok || !data.success || !data.user) {
       // Token is invalid, clear the cookie
       const cookieStore = await cookies();
@@ -212,7 +213,6 @@ export async function verifyAuthAction() {
         session: null,
       };
     }
-
     return {
       user: data.user,
       session: { token: tokenCookie.value },
@@ -224,5 +224,13 @@ export async function verifyAuthAction() {
       user: null,
       session: null,
     };
+  }
+}
+export async function logout(currentPath?: string) {
+  await destroySession();
+
+  // Only redirect if not already on home page
+  if (currentPath !== "/") {
+    redirect("/");
   }
 }
