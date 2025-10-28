@@ -18,26 +18,51 @@ namespace MasarSkills.API.Controllers
 
         // GET: api/courses
         [HttpGet]
-        public async Task<IActionResult> GetAllCourses()
+public async Task<IActionResult> GetAllCourses()
+{
+    var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+    int? userId = int.TryParse(userIdString, out var id) ? id : (int?)null;
+    
+    // 1. Get courses AND convert the "plan" (IEnumerable) into a "real list" (List)
+    var courses = (await _courseService.GetAllCoursesAsync(userId)).ToList(); // <-- ADD .ToList() HERE
+
+    // 2. Get your server's base URL
+    var baseUrl = $"{Request.Scheme}://{Request.Host}";
+
+    // 3. Fix the ImagePath for every course (this now modifies the items in the real list)
+    foreach (var course in courses)
+    {
+        if (!string.IsNullOrEmpty(course.ImagePaths))
         {
-            var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            int? userId = int.TryParse(userIdString, out var id) ? id : (int?)null;
-            var courses = await _courseService.GetAllCoursesAsync(userId);
-            return Ok(courses);
+            course.ImagePaths = baseUrl + course.ImagePaths;
         }
+    }
 
-        // GET: api/courses/{id}
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetCourse(int id)
-        {
-            var course = await _courseService.GetCourseByIdAsync(id);
+    // 4. Return the modified list
+    return Ok(courses);
+}
 
-            if (course == null)
-                return NotFound();
+// GET: api/courses/{id}
+[HttpGet("{id}")]
+public async Task<IActionResult> GetCourse(int id)
+{
+    // 1. Get the course from the service (it has a relative path)
+    var course = await _courseService.GetCourseByIdAsync(id);
 
-            return Ok(course);
-        }
+    if (course == null)
+        return NotFound();
 
+    // 2. Fix the ImagePath for the single course
+    if (!string.IsNullOrEmpty(course.ImagePaths))
+    {
+        // 3. Get your server's base URL
+        var baseUrl = $"{Request.Scheme}://{Request.Host}";
+        course.ImagePaths = baseUrl + course.ImagePaths;
+    }
+
+    // 4. Return the modified course
+    return Ok(course);
+}
         // POST: api/courses
         [HttpPost]
         public async Task<IActionResult> CreateCourse([FromBody] CreateCourseDto courseDto)
