@@ -54,6 +54,7 @@ namespace MasarSkills.API.Controllers
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
 
+            // 1. Fetch data and project to DTO, including the relative image path
             var enrollments = await _context.CourseEnrollments
                 .Include(ce => ce.Course)
                 .ThenInclude(c => c.Instructor)
@@ -68,10 +69,26 @@ namespace MasarSkills.API.Controllers
                     EnrollmentDate = ce.EnrollmentDate,
                     ProgressPercentage = ce.ProgressPercentage,
                     Status = ce.Status,
-                    FinalGrade = ce.FinalGrade
-                })
-                .ToListAsync();
+                    FinalGrade = ce.FinalGrade,
 
+                    // --- ADD THIS LINE TO YOUR QUERY ---
+                    ImagePaths = ce.Course.ImagePaths
+                })
+                .ToListAsync(); // This creates the List<EnrollmentResponseDto>
+
+            // 2. Get your server's base URL
+            var baseUrl = $"{Request.Scheme}://{Request.Host}";
+
+            // 3. Loop through the list and fix the paths
+            foreach (var enrollment in enrollments)
+            {
+                if (!string.IsNullOrEmpty(enrollment.ImagePaths))
+                {
+                    enrollment.ImagePaths = baseUrl + enrollment.ImagePaths;
+                }
+            }
+
+            // 4. Return the modified list with full URLs
             return Ok(enrollments);
         }
 
@@ -115,6 +132,7 @@ namespace MasarSkills.API.Controllers
         public decimal ProgressPercentage { get; set; }
         public string Status { get; set; }
         public decimal? FinalGrade { get; set; }
+        public string ImagePaths { get; set; }
     }
 
     public class UpdateProgressDto
