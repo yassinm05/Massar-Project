@@ -24,7 +24,7 @@ export async function submitAnswer(
     const result = await response.json();
 
     // Check if the result indicates success
-    if (!result) {
+    if (!response.ok) {
       return {
         errors: {
           user: "Failed to fetch user data.",

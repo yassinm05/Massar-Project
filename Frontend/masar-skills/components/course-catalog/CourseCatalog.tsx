@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import CourseCatalogFilter from "./CourseCatalogFilter";
 import Link from "next/link";
+import Image from "next/image";
 
 // Define what a single course looks like
 interface Course {
@@ -11,6 +12,7 @@ interface Course {
   durationHours: number;
   difficulty: string;
   isEnrolled: boolean;
+  imagePaths: string;
 }
 
 // Define the props for CourseCatalog
@@ -52,7 +54,9 @@ export default function CourseCatalog({
               className="border border-[#F3F4F6] flex flex-col rounded-2xl overflow-hidden w-[266px]"
               key={course.id}
             >
-              <div className="w-[266px] h-[180px] bg-amber-200"></div>
+              <div className="relative w-[266px] h-[180px] ">
+                <Image src={course.imagePaths} alt="" fill />
+              </div>
               <div className="flex flex-col p-4 gap-4">
                 <p className="font-semibold text-lg leading-6 text-[#171A1F]">
                   {course.title}

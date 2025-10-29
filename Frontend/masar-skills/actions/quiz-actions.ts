@@ -21,19 +21,17 @@ export async function submitAnswerAction(
       tokenCookie.value
     );
 
-    const result = await response.json();
 
     // Check if the result indicates success
-    if (!result) {
+    if (!response) {
       return {
         errors: {
           user: "Failed to fetch user data.",
         },
       };
     }
-
-    console.log("User fetched successfully:", result);
-    return result;
+    console.log("User fetched successfully:", response);
+    return response;
   } catch (error: unknown) {
     console.error("Error fetching user by ID:", error);
 

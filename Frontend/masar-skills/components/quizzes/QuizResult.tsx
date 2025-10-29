@@ -117,11 +117,9 @@ export default function QuizResult({examResult,openChatbot,sendMessage}) {
           <Link
             href={"#"}
             className="w-[161px] h-10 bg-[#F3F4F6] flex justify-center items-center font-semibold text-[#1F2937] rounded-lg"
-          >
-            Analyze my Quiz
-          </Link>
+          ></Link>
         </div>
       </div>
     </div>
-  )
+  );
 }

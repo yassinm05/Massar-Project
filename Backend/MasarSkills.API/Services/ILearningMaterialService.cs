@@ -10,5 +10,6 @@ namespace MasarSkills.API.Services
         Task<List<LearningMaterialDto>> GetAllMaterialsForModuleAsync(int moduleId);
         Task<List<LearningMaterialDto>> GetVideosForModuleAsync(int moduleId);
         Task<List<LearningMaterialDto>> GetDocumentsForModuleAsync(int moduleId);
+        Task<LearningMaterialDto> GetMaterialByIdAsync(int id);
     }
 }

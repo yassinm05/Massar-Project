@@ -3,15 +3,16 @@ import { getAvailableQuizzes } from "@/lib/quiz";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import Image from "next/image";
 
 // Define the Quiz type if not imported from elsewhere
 type Quiz = {
   quizId: string;
   quizTitle: string;
   courseName: string;
+  imagePath: string;
 };
 export default async function page() {
-  
   const result = await verifyAuth();
   if (!result.user) {
     return redirect("/");
@@ -29,14 +30,14 @@ export default async function page() {
       <div className=" flex flex-wrap gap-4 justify-center">
         {quizzes.map((quiz: Quiz, index: number) => (
           <div
-            className="w-[280] h-[364] rounded-xl p-6 flex flex-col justify-between shadow-xl"
+            className="w-[280px] h-[364px] rounded-xl p-6 flex flex-col justify-between shadow-xl"
             key={index}
           >
             {/* Render quiz details here */}
             <div className="flex flex-col gap-4">
               <div className="flex gap-4">
-                <div className="w-12 h-12 bg-amber-300 rounded-lg">
-                  {/* <Image src={} alt="" fill/> */}
+                <div className="relative w-12 min-w-12 h-12 bg-amber-300 rounded-lg overflow-hidden">
+                  <Image src={quiz.imagePath} alt="" fill />
                 </div>
                 <p className="font-semibold text-lg leading-7">
                   {quiz.quizTitle}

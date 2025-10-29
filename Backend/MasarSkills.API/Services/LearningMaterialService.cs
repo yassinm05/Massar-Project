@@ -71,25 +71,47 @@ public class LearningMaterialService : ILearningMaterialService
             }).ToList();
         }
 
-        public async Task<List<LearningMaterialDto>> GetDocumentsForModuleAsync(int moduleId)
+    public async Task<List<LearningMaterialDto>> GetDocumentsForModuleAsync(int moduleId)
+    {
+        // 1. Get the list of raw objects from the database
+        var materials = await _context.LearningMaterials
+            .Where(m => m.ModuleId == moduleId && m.Type == (MaterialType)1)
+            .OrderBy(m => m.Order)
+            .ToListAsync();
+
+
+        // 2. Map the list to a list of DTOs in C# memory
+        return materials.Select(material => new LearningMaterialDto
         {
-            // 1. Get the list of raw objects from the database
-            var materials = await _context.LearningMaterials
-                .Where(m => m.ModuleId == moduleId && m.Type == (MaterialType)1)
-                .OrderBy(m => m.Order)
-                .ToListAsync();
+            Id = material.Id,
+            Title = material.Title,
+            Description = material.Description,
+            ContentUrl = material.ContentUrl,
+            Type = ConvertMaterialTypeToString(material.Type),
+            DurationMinutes = material.DurationMinutes,
+            IsPreview = material.IsPreview
+        }).ToList();
+    }
+        
+        public async Task<LearningMaterialDto> GetMaterialByIdAsync(int id)
+    {
+        var material = await _context.LearningMaterials.FindAsync(id);
 
-
-            // 2. Map the list to a list of DTOs in C# memory
-            return materials.Select(material => new LearningMaterialDto
-            {
-                Id = material.Id,
-                Title = material.Title,
-                Description = material.Description,
-                ContentUrl = material.ContentUrl,
-                Type = ConvertMaterialTypeToString(material.Type),
-                DurationMinutes = material.DurationMinutes,
-                IsPreview = material.IsPreview
-            }).ToList();     
+        if (material == null)
+        {
+            return null; // Controller will handle this as a 404 Not Found
         }
+
+        // Map the entity to the DTO
+        return new LearningMaterialDto
+        {
+            Id = material.Id,
+            Title = material.Title,
+            Description = material.Description,
+            ContentUrl = material.ContentUrl, // This is the relative path
+            Type = ConvertMaterialTypeToString(material.Type),
+            DurationMinutes = material.DurationMinutes,
+            IsPreview = material.IsPreview
+        };
+    }
     }

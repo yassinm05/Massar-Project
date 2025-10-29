@@ -1,4 +1,6 @@
+import Image from "next/image";
 import Link from "next/link";
+import Check from "@/public/assets/jobs/check.png";
 
 interface Job {
   id: number | string;
@@ -6,6 +8,8 @@ interface Job {
   companyName: string;
   location: string;
   description: string;
+  qualifications: string;
+  responsibilities: string;
 }
 
 interface JobDetailsProps {
@@ -14,6 +18,11 @@ interface JobDetailsProps {
 }
 
 export default function JobDetails({ isLoading, activeJob }: JobDetailsProps) {
+  const qualifications = activeJob?.qualifications
+    .split(".")
+    .filter(Boolean)
+    .map((str) => str.trim());
+  const responsibilities = activeJob?.responsibilities.split(",");
   return (
     <div className="w-full bg-white rounded-xl h-full">
       {isLoading && <div className="p-6">Loading...</div>}
@@ -38,6 +47,36 @@ export default function JobDetails({ isLoading, activeJob }: JobDetailsProps) {
             <p className="text-lg font-semibold">Job Description</p>
             <p className="leading-6 text-[#6B7280]">{activeJob.description}</p>
           </div>
+          {responsibilities && (
+            <div className="flex flex-col gap-2.5 p-6">
+              <p className="text-lg font-semibold">Responsibilities</p>
+              <div className="flex flex-col gap-3">
+                {responsibilities.map((responsibility, index) => (
+                  <div key={index} className="flex gap-3 items-center">
+                    <div className="relative w-6 h-6">
+                      <Image src={Check} alt="" fill />
+                    </div>
+                    <p className="text-[#6B7280] leading-0">{responsibility}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          {qualifications && (
+            <div className="flex flex-col gap-2.5 p-6">
+              <p className="text-lg font-semibold">Responsibilities</p>
+              <div className="flex flex-col gap-3">
+                {qualifications.map((qualification, index) => (
+                  <div key={index} className="flex gap-3 items-center">
+                    <div className="relative w-6 h-6">
+                      <Image src={Check} alt="" fill />
+                    </div>
+                    <p className="text-[#6B7280] leading-0">{qualification}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div className="h-0 w-full border-b border-[#E5E7EB]" />
 
