@@ -211,7 +211,7 @@ def main_chatbot_flow(user_query, token, student_id=None):
 if __name__ == '__main__':
     print("--- Starting Chatbot with Text Input ---")
     
-    test_query = "analyze my last quiz"
+    test_query = "Hello"
     
     # For testing, you must now provide a valid token from your backend.
     # This block is for testing the script directly and is NOT used by the Flask API.

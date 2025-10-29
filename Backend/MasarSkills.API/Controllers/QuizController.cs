@@ -25,6 +25,15 @@ namespace MasarSkills.API.Controllers
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
 
+            var studentProfile = await _context.StudentProfiles
+                                       .FirstOrDefaultAsync(sp => sp.UserId == userId);
+
+            if (studentProfile == null)
+            {
+                return BadRequest("Student profile not found for this user.");
+            }
+            int studentId = studentProfile.Id;
+
             // Check if user is enrolled in the course
             var quiz = await _context.Quizzes
                 .Include(q => q.Module.Course)
@@ -36,7 +45,7 @@ namespace MasarSkills.API.Controllers
             }
 
             var enrollment = await _context.CourseEnrollments
-                .FirstOrDefaultAsync(ce => ce.StudentId == userId && ce.CourseId == quiz.Module.CourseId);
+    .FirstOrDefaultAsync(ce => ce.StudentProfileId == studentId && ce.CourseId == quiz.Module.CourseId);
 
             if (enrollment == null)
             {
@@ -57,6 +66,7 @@ namespace MasarSkills.API.Controllers
             var attempt = new QuizAttempt
             {
                 EnrollmentId = enrollment.Id,
+                StudentId = studentId,
                 QuizId = quizId,
                 StartTime = DateTime.UtcNow,
                 Score = 0,
