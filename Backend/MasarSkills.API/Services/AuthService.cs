@@ -215,9 +215,25 @@ namespace MasarSkills.API.Services
 
                 Console.WriteLine($"✅ تم العثور على user: {user.FirstName} {user.LastName}");
 
+                int? studentId = null; // Default to null
+
+                if (user.Role == "Student")
+                {
+                    // Find the matching student profile using the user.Id
+                    var studentProfile = await _context.StudentProfiles
+                                                       .FirstOrDefaultAsync(sp => sp.UserId == user.Id);
+
+                    if (studentProfile != null)
+                    {
+                        // Assign the StudentProfile's Id (the actual studentid)
+                        studentId = studentProfile.Id;
+                    }
+                }
+
                 return new AuthResponse
                 {
                     Success = true,
+                    StudentId = studentId,
                     User = new UserDto
                     {
                         Id = user.Id,
