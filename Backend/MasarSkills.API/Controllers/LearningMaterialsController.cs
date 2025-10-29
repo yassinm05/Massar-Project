@@ -1,4 +1,5 @@
-﻿using MasarSkills.API.Services;
+﻿using MasarSkills.API.DTOs;
+using MasarSkills.API.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,52 +15,6 @@ namespace MasarSkills.API.Controllers
         {
             _service = service;
         }
-
-
-        /// <summary>
-        /// Gets a specific learning material that is a video.
-        /// </summary>
-        // [HttpGet("videos/{id}")]
-        // //[Authorize] // JWT
-        // public async Task<IActionResult> GetVideoMaterial(int id)
-        // {
-        //     // Call the new service method
-        //     var material = await _service.GetVideoMaterialAsync(id);
-
-        //     if (material == null)
-        //         return NotFound();
-
-        //     return Ok(material);
-        // }
-
-        // /// <summary>
-        // /// Gets a specific learning material that is a document (e.g., PDF).
-        // /// </summary>
-        // [HttpGet("documents/{id}")]
-        // //[Authorize] // JWT
-        // public async Task<IActionResult> GetDocumentMaterial(int id)
-        // {
-        //     // Call the new service method
-        //     var material = await _service.GetDocumentMaterialAsync(id);
-
-        //     if (material == null)
-        //         return NotFound();
-
-        //     return Ok(material);
-        // }
-
-        // [HttpGet("{id}")]
-        // //[Authorize] // JWT
-        // public async Task<IActionResult> GetMaterial(int id)
-        // {
-        //     var material = await _service.GetMaterialAsync(id);
-
-        //     if (material == null)
-        //         return NotFound();
-
-        //     return Ok(material);
-        // }
-
         [HttpGet("videos/for-module/{moduleId}")]
         public async Task<IActionResult> GetVideosForModule(int moduleId)
         {
@@ -83,6 +38,35 @@ namespace MasarSkills.API.Controllers
             // Bonus: An endpoint to get ALL materials (videos and documents) for a module
             var materials = await _service.GetAllMaterialsForModuleAsync(moduleId);
             return Ok(materials);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetMaterialById(int id)
+        {
+            var material = await _service.GetMaterialByIdAsync(id);
+            if (material == null)
+            {
+                return NotFound();
+            }
+
+            // Fix the URL
+            FixMaterialUrl(material);
+
+            return Ok(material);
+        }
+
+        private void FixMaterialUrl(LearningMaterialDto material)
+        {
+            if (material == null || string.IsNullOrEmpty(material.ContentUrl))
+                return;
+
+            // Check if it's a relative path (starts with /)
+            // This prevents adding the baseUrl to an external URL (like YouTube)
+            if (material.ContentUrl.StartsWith("/"))
+            {
+                var baseUrl = $"{Request.Scheme}://{Request.Host}";
+                material.ContentUrl = baseUrl + material.ContentUrl;
+            }
         }
     }
 }

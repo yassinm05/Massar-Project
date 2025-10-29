@@ -51,7 +51,7 @@ namespace MasarSkills.API.Services
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow,
                     IsActive = true,
-                    PaymentId = paymentId   
+                    PaymentId = paymentId
                 };
 
                 _context.Users.Add(user);
@@ -64,7 +64,7 @@ namespace MasarSkills.API.Services
                     {
                         UserId = user.Id,
                         PhoneNumber = registerDto.PhoneNumber,
-                        
+
                     };
                     _context.StudentProfiles.Add(studentProfile);
                 }
@@ -121,11 +121,27 @@ namespace MasarSkills.API.Services
 
                 var token = _jwtHelper.GenerateToken(user);
 
+                int? studentId = null; // Default to null
+
+                if (user.Role == "Student")
+                {
+                    // Find the matching student profile using the user.Id
+                    var studentProfile = await _context.StudentProfiles
+                                                       .FirstOrDefaultAsync(sp => sp.UserId == user.Id);
+
+                    if (studentProfile != null)
+                    {
+                        // Assign the StudentProfile's Id (the actual studentid)
+                        studentId = studentProfile.Id;
+                    }
+                    // If no profile is found, studentId will remain null
+                }
+
                 return new AuthResponse
                 {
                     Success = true,
                     Token = token,
-                    StudentId = user.Role == "Student" ? user.Id : (int?)null,
+                    StudentId = studentId,
                     User = new UserDto
                     {
                         Id = user.Id,
