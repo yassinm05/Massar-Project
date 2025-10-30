@@ -68,6 +68,7 @@ namespace MasarSkills.API.Controllers
                 EnrollmentId = enrollment.Id,
                 StudentId = studentId,
                 QuizId = quizId,
+                AttemptDate = DateTime.UtcNow,
                 StartTime = DateTime.UtcNow,
                 Score = 0,
                 AttemptNumber = previousAttempts + 1,

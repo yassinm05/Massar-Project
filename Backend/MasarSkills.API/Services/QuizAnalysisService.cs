@@ -48,7 +48,7 @@ namespace MasarSkills.API.Services
             // Step 4: Calculate the overall performance for the entire quiz.
             var totalQuestions = topicAnalysis.Sum(ta => ta.TotalQuestions);
             var totalCorrectAnswers = topicAnalysis.Sum(ta => ta.CorrectAnswers);
-            var overallScore = (double)totalCorrectAnswers / totalQuestions * 100;
+            var overallScore = totalQuestions > 0 ? (double)totalCorrectAnswers / totalQuestions * 100 : 0;
             
             // Create the final result object
             var result = new QuizAnalysisResult
