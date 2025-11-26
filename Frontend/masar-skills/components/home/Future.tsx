@@ -9,7 +9,8 @@ export default function Future() {
       <div className="w-1/2 flex flex-col pr-3 gap-7">
         <MotionP
           initial={{ opacity: 0, x: -100 }}
-          animate={{ opacity: 1, x: 0 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true, amount: 0.4 }}
           transition={{ duration: 1, ease: "backInOut" }}
           className="font-bold text-5xl max-w-[20ch] leading-12"
         >
@@ -17,7 +18,8 @@ export default function Future() {
         </MotionP>
         <MotionP
           initial={{ opacity: 0, x: -100 }}
-          animate={{ opacity: 1, x: 0 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true, amount: 0.4 }}
           transition={{ duration: 1.3, ease: "backInOut" }}
           className="text-lg leading-7 text-[#6B7280]"
         >
@@ -27,7 +29,8 @@ export default function Future() {
         <div className="flex gap-4">
           <MotionDiv
             initial={{ opacity: 0, x: -100 }}
-            animate={{ opacity: 1, x: 0 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, amount: 0.4 }}
             transition={{ duration: 1.5, ease: "backInOut" }}
           >
             <Link
@@ -40,7 +43,8 @@ export default function Future() {
 
           <MotionDiv
             initial={{ opacity: 0, x: -100 }}
-            animate={{ opacity: 1, x: 0 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, amount: 0.4 }}
             transition={{ duration: 1.6, ease: "backInOut" }}
           >
             <Link
@@ -54,7 +58,8 @@ export default function Future() {
       </div>
       <MotionDiv
         initial={{ opacity: 0, x: 100 }}
-        animate={{ opacity: 1, x: 0 }}
+        whileInView={{ opacity: 1, x: 0 }}
+        viewport={{ once: true, amount: 0.4 }}
         transition={{ duration: 1.6, ease: "backInOut" }}
         className="relative w-1/2 rounded-xl h-[337px] overflow-hidden"
       >

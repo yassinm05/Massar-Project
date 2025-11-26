@@ -12,7 +12,8 @@ export default function Potential() {
       <div className="flex flex-col gap-4">
         <MotionH1
           initial={{ opacity: 0, y: -100 }}
-          animate={{ opacity: 1, y: 0 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.4 }}
           transition={{
             type: "spring",
             stiffness: 50,
@@ -25,7 +26,8 @@ export default function Potential() {
         </MotionH1>
         <MotionP
           initial={{ opacity: 0, y: -100 }}
-          animate={{ opacity: 1, y: 0 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.4 }}
           transition={{
             type: "spring",
             stiffness: 80,
@@ -42,7 +44,8 @@ export default function Potential() {
       <div className="flex gap-8 justify-between w-full">
         <MotionDiv
           initial={{ opacity: 0, x: 150 }}
-          animate={{ opacity: 1, x: 0 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true, amount: 0.4 }}
           transition={{
             type: "spring",
             stiffness: 100,
@@ -62,7 +65,8 @@ export default function Potential() {
         </MotionDiv>
         <MotionDiv
           initial={{ opacity: 0, x: 120 }}
-          animate={{ opacity: 1, x: 0 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true, amount: 0.4 }}
           transition={{
             type: "spring",
             stiffness: 80,
@@ -84,7 +88,8 @@ export default function Potential() {
         </MotionDiv>
         <MotionDiv
           initial={{ opacity: 0, x: 100 }}
-          animate={{ opacity: 1, x: 0 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true, amount: 0.4 }}
           transition={{
             type: "spring",
             stiffness: 60,
@@ -105,7 +110,8 @@ export default function Potential() {
       </div>
       <MotionDiv
         initial={{ opacity: 0, y: 100 }}
-        animate={{ opacity: 1, y: 0 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.4 }}
         transition={{
           type: "spring",
           stiffness: 80,

@@ -7,7 +7,8 @@ export default function Quote() {
     <section className="h-[430px] bg-[#F9FAFB] flex flex-col justify-center items-center gap-5">
       <MotionDiv
         initial={{ opacity: 0, y: -100 }}
-        animate={{ opacity: 1, y: 0 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.4 }}
         transition={{ duration: 1.6, ease: "backInOut" }}
         className="relative rounded-full border border-[#0083AD] w-20 h-20"
       >
@@ -15,7 +16,8 @@ export default function Quote() {
       </MotionDiv>
       <MotionDiv
         initial={{ opacity: 0, y: -100 }}
-        animate={{ opacity: 1, y: 0 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.4 }}
         transition={{ duration: 1.3, ease: "backInOut" }}
         className="leading-[32px] text-lg w-[768px] text-center text-[#374151] "
       >
@@ -25,7 +27,8 @@ export default function Quote() {
       </MotionDiv>
       <MotionDiv
         initial={{ opacity: 0, y: -100 }}
-        animate={{ opacity: 1, y: 0 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.4 }}
         transition={{ duration: 1, ease: "backInOut" }}
       >
         <p className="font-semibold text-center text-[#0083AD]">

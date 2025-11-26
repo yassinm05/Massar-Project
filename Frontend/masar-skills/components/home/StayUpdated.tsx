@@ -9,7 +9,8 @@ export default function StayUpdated() {
       <div className="w-1/2 flex flex-col gap-4 h-full justify-center">
         <MotionDiv
           initial={{ opacity: 0, x: -100 }}
-          animate={{ opacity: 1, x: 0 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true, amount: 0.4 }}
           transition={{ duration: 1, ease: "backInOut" }}
           className="font-bold text-4xl"
         >
@@ -17,7 +18,7 @@ export default function StayUpdated() {
         </MotionDiv>
         <MotionP
           initial={{ opacity: 0, x: -100 }}
-          animate={{ opacity: 1, x: 0 }}
+          whileInView={{ opacity: 1, x: 0 }}
           transition={{ duration: 1.2, ease: "backInOut" }}
           className="text-lg leading-7 text-[#6B7280]"
         >
@@ -26,7 +27,8 @@ export default function StayUpdated() {
         </MotionP>
         <MotionDiv
           initial={{ opacity: 0, x: -100 }}
-          animate={{ opacity: 1, x: 0 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true, amount: 0.4 }}
           transition={{ duration: 1.4, ease: "backInOut" }}
           className="flex gap-3"
         >
@@ -44,7 +46,8 @@ export default function StayUpdated() {
         </MotionDiv>
         <MotionP
           initial={{ opacity: 0, x: -100 }}
-          animate={{ opacity: 1, x: 0 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true, amount: 0.4 }}
           transition={{ duration: 1.6, ease: "backInOut" }}
           className="text-sm text-[#6B7280]"
         >
@@ -53,7 +56,8 @@ export default function StayUpdated() {
       </div>
       <MotionDiv
         initial={{ opacity: 0, x: 100 }}
-        animate={{ opacity: 1, x: 0 }}
+        whileInView={{ opacity: 1, x: 0 }}
+        viewport={{ once: true, amount: 0.4 }}
         transition={{ duration: 1.6, ease: "backInOut" }}
         className="relative w-1/2 rounded-xl overflow-hidden"
       >

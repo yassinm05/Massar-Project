@@ -9,7 +9,8 @@ export default function LearningJourney() {
       <div className="w-1/2 flex flex-col pr-3 gap-7">
         <MotionP
           initial={{ opacity: 0, x: -100 }}
-          animate={{ opacity: 1, x: 0 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true, amount: 0.4 }}
           transition={{
             type: "spring",
             stiffness: 80,
@@ -22,7 +23,8 @@ export default function LearningJourney() {
         </MotionP>
         <MotionP
           initial={{ opacity: 0, x: -100 }}
-          animate={{ opacity: 1, x: 0 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true, amount: 0.4 }}
           transition={{
             type: "spring",
             stiffness: 60,
@@ -36,7 +38,8 @@ export default function LearningJourney() {
         </MotionP>
         <MotionDiv
           initial={{ opacity: 0, x: -100 }}
-          animate={{ opacity: 1, x: 0 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true, amount: 0.4 }}
           transition={{
             type: "spring",
             stiffness: 30,
@@ -67,6 +70,7 @@ export default function LearningJourney() {
           damping: 10,
           bounce: 0.5,
         }}
+        viewport={{ once: true, amount: 0.4 }}
         className="relative w-1/2 rounded-xl h-[337px] overflow-hidden"
       >
         <Image src={HealthCare} alt="" fill />

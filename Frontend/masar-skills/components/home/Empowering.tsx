@@ -9,7 +9,8 @@ export default function Empowering() {
     <section className=" h-[527px] bg-[#F9FAFB] flex items-center py-[96px] px-16 gap-16">
       <MotionDiv
         initial={{ opacity: 0, x: -100 }}
-        animate={{ opacity: 1, x: 0 }}
+        whileInView={{ opacity: 1, x: 0 }}
+        viewport={{ once: true, amount: 0.4 }}
         transition={{
           type: "spring",
           stiffness: 80,
@@ -23,7 +24,8 @@ export default function Empowering() {
       <div className="w-1/2 h-[336px] flex flex-col justify-between gap-6">
         <MotionH1
           initial={{ opacity: 0, x: 100 }}
-          animate={{ opacity: 1, x: 0 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true, amount: 0.4 }}
           transition={{
             type: "spring",
             stiffness: 80,
@@ -36,7 +38,8 @@ export default function Empowering() {
         </MotionH1>
         <MotionP
           initial={{ opacity: 0, x: 100 }}
-          animate={{ opacity: 1, x: 0 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true, amount: 0.4 }}
           transition={{
             type: "spring",
             stiffness: 60,
@@ -52,7 +55,8 @@ export default function Empowering() {
         <div className="flex gap-4">
           <MotionDiv
             initial={{ opacity: 0, x: 100 }}
-            animate={{ opacity: 1, x: 0 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, amount: 0.4 }}
             transition={{
               type: "spring",
               stiffness: 50,
@@ -73,7 +77,8 @@ export default function Empowering() {
           </MotionDiv>
           <MotionDiv
             initial={{ opacity: 0, x: 100 }}
-            animate={{ opacity: 1, x: 0 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, amount: 0.4 }}
             transition={{
               type: "spring",
               stiffness: 30,

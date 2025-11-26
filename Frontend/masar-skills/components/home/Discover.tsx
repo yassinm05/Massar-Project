@@ -17,7 +17,8 @@ export default function Discover() {
       <div className="flex gap-20 items-center justify-between">
         <MotionH3
           initial={{ opacity: 0, x: -100 }}
-          animate={{ opacity: 1, x: 0 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true, amount: 0.4 }}
           transition={{
             type: "spring",
             stiffness: 80,
@@ -30,7 +31,8 @@ export default function Discover() {
         </MotionH3>
         <MotionP
           initial={{ opacity: 0, x: 100 }}
-          animate={{ opacity: 1, x: 0 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true, amount: 0.4 }}
           transition={{
             type: "spring",
             stiffness: 80,
@@ -49,7 +51,8 @@ export default function Discover() {
         <div className="flex flex-col gap-8">
           <MotionDiv
             initial={{ opacity: 0, x: 100 }}
-            animate={{ opacity: 1, x: 0 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, amount: 0.4 }}
             transition={{ duration: 1, ease: "backInOut" }}
           >
             <Image src={Icon1} alt="" />
@@ -64,7 +67,8 @@ export default function Discover() {
           </MotionH5>
           <MotionP
             initial={{ opacity: 0, x: 100 }}
-            animate={{ opacity: 1, x: 0 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, amount: 0.4 }}
             transition={{ duration: 1.4, ease: "backInOut" }}
             className="text-[#4B5563]"
           >
@@ -73,7 +77,8 @@ export default function Discover() {
           </MotionP>
           <MotionDiv
             initial={{ opacity: 0, x: 100 }}
-            animate={{ opacity: 1, x: 0 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, amount: 0.4 }}
             transition={{ duration: 1.6, ease: "backInOut" }}
           >
             <Link href={"/signup"} className="flex gap-2 items-center">
@@ -87,14 +92,16 @@ export default function Discover() {
         <div className="flex flex-col gap-8">
           <MotionDiv
             initial={{ opacity: 0, x: 100 }}
-            animate={{ opacity: 1, x: 0 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, amount: 0.4 }}
             transition={{ duration: 1, ease: "backInOut" }}
           >
             <Image src={Icon2} alt="" />
           </MotionDiv>
           <MotionH5
             initial={{ opacity: 0, x: 100 }}
-            animate={{ opacity: 1, x: 0 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, amount: 0.4 }}
             transition={{ duration: 1.2, ease: "backInOut" }}
             className="font-bold text-2xl"
           >
@@ -102,7 +109,8 @@ export default function Discover() {
           </MotionH5>
           <MotionP
             initial={{ opacity: 0, x: 100 }}
-            animate={{ opacity: 1, x: 0 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, amount: 0.4 }}
             transition={{ duration: 1.4, ease: "backInOut" }}
             className="text-[#4B5563]"
           >
@@ -111,7 +119,8 @@ export default function Discover() {
           </MotionP>
           <MotionDiv
             initial={{ opacity: 0, x: 100 }}
-            animate={{ opacity: 1, x: 0 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, amount: 0.4 }}
             transition={{ duration: 1.6, ease: "backInOut" }}
           >
             <Link href={"#"} className="flex gap-2 items-center">
@@ -125,14 +134,16 @@ export default function Discover() {
         <div className="flex flex-col gap-8">
           <MotionDiv
             initial={{ opacity: 0, x: 100 }}
-            animate={{ opacity: 1, x: 0 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, amount: 0.4 }}
             transition={{ duration: 1, ease: "backInOut" }}
           >
             <Image src={Icon3} alt="" />
           </MotionDiv>
           <MotionH5
             initial={{ opacity: 0, x: 100 }}
-            animate={{ opacity: 1, x: 0 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, amount: 0.4 }}
             transition={{ duration: 1.2, ease: "backInOut" }}
             className="font-bold text-2xl"
           >
@@ -140,7 +151,8 @@ export default function Discover() {
           </MotionH5>
           <MotionP
             initial={{ opacity: 0, x: 100 }}
-            animate={{ opacity: 1, x: 0 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, amount: 0.4 }}
             transition={{ duration: 1.4, ease: "backInOut" }}
             className="text-[#4B5563]"
           >
@@ -149,7 +161,8 @@ export default function Discover() {
           </MotionP>
           <MotionDiv
             initial={{ opacity: 0, x: 100 }}
-            animate={{ opacity: 1, x: 0 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, amount: 0.4 }}
             transition={{ duration: 1.6, ease: "backInOut" }}
           >
             <Link href={"#"} className="flex gap-2 items-center">
