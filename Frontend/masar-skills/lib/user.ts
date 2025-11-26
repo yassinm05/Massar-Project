@@ -9,6 +9,7 @@ interface types {
   phoneNumber: string;
   password: string;
 }
+const base_url = process.env.BACKEND_BASE_URL;
 
 export default async function createUser({
   firstName,
@@ -30,7 +31,7 @@ export default async function createUser({
 
     console.log("Sending user data:", userData);
 
-    const response = await fetch("http://localhost:5236/api/Auth/register", {
+    const response = await fetch(`${base_url}/api/Auth/register`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -61,6 +62,7 @@ export default async function createUser({
     }
 
     console.log("User created successfully:", result);
+
     return { success: true, data: result };
   } catch (error: unknown) {
     console.error("Error creating user:", error);
@@ -85,7 +87,7 @@ export default async function createUser({
 
 export async function getUser(email: string, password: string) {
   try {
-    const response = await fetch(`http://localhost:5236/api/Auth/login`, {
+    const response = await fetch(`${base_url}/api/Auth/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -95,24 +97,25 @@ export async function getUser(email: string, password: string) {
 
     const result = await response.json();
 
-    if (!response.ok) {
-      if (response.status === 404 || response.status === 401) {
-        return {
-          errors: {
-            email:
-              "Could not authenticate user. Please check your credentials.",
-          },
-        };
-      }
-      return {
-        errors: {
-          email: `Server error: ${result.message || "Unknown error occurred"}`,
-        },
-      };
-    }
+    // if (!response.ok) {
+    //   if (response.status === 404 || response.status === 401) {
+    //     return {
+    //       errors: {
+    //         email:
+    //           "Could not authenticate user. Please check your credentials.",
+    //       },
+    //     };
+    //   }
+    //   return {
+    //     errors: {
+    //       email: `Server error: ${result.message || "Unknown error occurred"}`,
+    //     },
+    //   };
+    // }
 
     // Check if the result indicates success
     if (!result.success) {
+      console.log(result);
       return {
         errors: {
           email: "Could not authenticate user. Please check your credentials.",
@@ -144,7 +147,7 @@ export async function getUser(email: string, password: string) {
 
 export async function getUserById(id: number) {
   try {
-    const response = await fetch(`http://localhost:5236/api/Users/${id}`, {
+    const response = await fetch(`${base_url}/api/Users/${id}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -206,16 +209,13 @@ export async function getCourseEnrollment() {
     if (!tokenCookie?.value) {
       return redirect("/");
     }
-    const response = await fetch(
-      `http://localhost:5236/api/Enrollment/my-courses`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${tokenCookie.value}`,
-        },
-      }
-    );
+    const response = await fetch(`${base_url}/api/Enrollment/my-courses`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${tokenCookie.value}`,
+      },
+    });
 
     const result = await response.json();
 
@@ -251,7 +251,7 @@ export async function getCourseEnrollment() {
 
 export async function getCourseByID(id: number) {
   try {
-    const response = await fetch(`http://localhost:5236/api/courses/${id}`, {
+    const response = await fetch(`${base_url}/api/courses/${id}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

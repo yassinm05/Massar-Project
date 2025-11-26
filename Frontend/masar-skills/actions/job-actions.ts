@@ -1,6 +1,7 @@
 'use server'
 
 import { cookies } from "next/headers";
+const base_url = process.env.BACKEND_BASE_URL;
 
 export default async function getJobsAction() {
   try {
@@ -10,7 +11,7 @@ export default async function getJobsAction() {
     if (!tokenCookie?.value) {
       throw new Error("Not authenticated");
     }
-    const response = await fetch(`http://localhost:5236/api/jobs`, {
+    const response = await fetch(`${base_url}/api/jobs`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -57,7 +58,7 @@ export async function getJobByIdAction(id: number) {
     if (!tokenCookie?.value) {
       throw new Error("Not authenticated");
     }
-    const response = await fetch(`http://localhost:5236/api/jobs/${id}`, {
+    const response = await fetch(`${base_url}/api/jobs/${id}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -127,7 +128,7 @@ export async function submitJobApplication({ formData }: any) {
     formDataToSend.append("JobId", formData.jobId || "");
 
     console.log(` ${formDataToSend}`);
-    const response = await fetch(`http://localhost:5236/api/jobApplications/`, {
+    const response = await fetch(`${base_url}/api/jobApplications/`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${tokenCookie.value}`,

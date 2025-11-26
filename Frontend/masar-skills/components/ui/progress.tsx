@@ -18,14 +18,17 @@ function Progress({
     <ProgressPrimitive.Root
       data-slot="progress"
       className={cn(
-        "relative h-2 w-full overflow-hidden rounded-full bg-gray-200", // container rounded
+        "relative h-2 w-full overflow-hidden rounded-full bg-[#9FE7FF]", // container rounded
         className
       )}
       {...props}
     >
       <ProgressPrimitive.Indicator
         data-slot="progress-indicator"
-        className={cn("h-full transition-all rounded-full", className2)}
+        className={cn(
+          "h-full transition-all rounded-full bg-[#0083AD]",
+          className2
+        )}
         style={{ transform: `translateX(-${100 - (value || 0)}%)` }}
       />
     </ProgressPrimitive.Root>

@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-
+const base_url = process.env.BACKEND_BASE_URL;
 export async function verifyAuth() {
   const cookieStore = await cookies();
   const tokenCookie = cookieStore.get("auth-token");
@@ -12,19 +12,16 @@ export async function verifyAuth() {
   }
 
   try {
-    const response = await fetch(
-      "http://localhost:5236/api/auth/validate-token",
-      {
-        method: "POST",
-        headers: {
-          Accept: "*/*",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          token: tokenCookie.value,
-        }),
-      }
-    );
+    const response = await fetch(`${base_url}/api/auth/validate-token`, {
+      method: "POST",
+      headers: {
+        Accept: "*/*",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        token: tokenCookie.value,
+      }),
+    });
 
     const data = await response.json();
 

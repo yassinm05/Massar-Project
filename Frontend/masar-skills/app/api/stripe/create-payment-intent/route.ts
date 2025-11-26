@@ -1,38 +1,31 @@
-import { NextResponse } from "next/server";
 import Stripe from "stripe";
+import { NextRequest, NextResponse } from "next/server";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+  apiVersion: "2024-06-20",
+});
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
-    const { amount, paymentMethodId } = await req.json();
+    const { amount } = await req.json();
 
-    if (!amount || !paymentMethodId) {
+    if (!amount) {
       return NextResponse.json(
-        { error: "Missing required fields" },
+        { error: "Amount is required" },
         { status: 400 }
       );
     }
 
-    // ✅ Create a PaymentIntent
+    // Stripe uses cents → multiply by 100
     const paymentIntent = await stripe.paymentIntents.create({
-      amount,
+      amount: Math.round(amount * 100),
       currency: "usd",
-      payment_method: paymentMethodId,
-      confirmation_method: "manual",
-      confirm: true,
-      return_url: "http://localhost:3000/payment-success", // ✅ Required for 3D Secure
+      automatic_payment_methods: { enabled: true },
     });
 
     return NextResponse.json({ clientSecret: paymentIntent.client_secret });
-  } catch (error: unknown) {
-    console.error("Stripe error:", error);
-
-    const message =
-      error instanceof Error
-        ? error.message
-        : "Failed to create payment intent";
-
-    return NextResponse.json({ error: message }, { status: 500 });
+  } catch (err) {
+    console.log(err);
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }

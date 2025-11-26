@@ -84,6 +84,7 @@ export default function SignupForm() {
         <select
           className="w-[512px] h-[46px] bg-[#F0F9FF] rounded-lg border  border-[#D1E9F6]"
           name="role"
+          id="role"
         >
           <option value="" disabled>
             Select Your role

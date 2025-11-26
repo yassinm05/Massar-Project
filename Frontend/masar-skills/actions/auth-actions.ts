@@ -23,6 +23,7 @@ const COOKIE_OPTIONS = {
   httpOnly: true,
   secure: process.env.NODE_ENV === "production",
 };
+const base_url = process.env.BACKEND_BASE_URL;
 
 export async function signup(prevState: FormState, formData: FormData) {
   const firstName = formData.get("firstName") as string;
@@ -106,6 +107,7 @@ export async function signup(prevState: FormState, formData: FormData) {
     errors.password = "Password must contain at least one special character";
   }
 
+  // Return validation errors if any
   if (Object.keys(errors).length > 0) {
     return {
       errors,
@@ -115,7 +117,8 @@ export async function signup(prevState: FormState, formData: FormData) {
   const hashedPassword = hashUserPassword(password);
 
   try {
-    createUser({
+    // ✅ Await the createUser function
+    const result = await createUser({
       firstName: firstName.trim(),
       lastName: lastName.trim(),
       email: email.trim().toLowerCase(),
@@ -123,28 +126,41 @@ export async function signup(prevState: FormState, formData: FormData) {
       role: role.toLowerCase(),
       phoneNumber: phoneNumber.trim(),
     });
-    redirect("/login");
-  } catch (error: unknown) {
-    if (error instanceof Error && "code" in error) {
-      const err = error as { code?: string };
-      if (err.code === "SQLITE_CONSTRAINT_UNIQUE") {
-        return {
-          errors: {
-            email:
-              "It seems like an account for the chosen email already exists.",
-          },
-        };
-      }
-    }
-  }
 
-  // fallback for other errors
-  console.error("Signup error:", errors);
-  return {
-    errors: {
-      email: "An unexpected error occurred. Please try again.",
-    },
-  };
+    // ✅ Check if there were errors returned from the API
+    if (result.errors) {
+      return {
+        errors: result.errors,
+      };
+    }
+
+    // ✅ Only redirect if successful
+    if (result.success) {
+      redirect("/login");
+    }
+
+    // ✅ Fallback if result doesn't have success or errors
+    return {
+      errors: {
+        email: "An unexpected error occurred. Please try again.",
+      },
+    };
+  } catch (error: unknown) {
+    // This catch block handles redirect throws and other unexpected errors
+    console.error("Signup error:", error);
+
+    // Check if it's a redirect error (Next.js throws errors for redirects)
+    if (error instanceof Error && error.message.includes("NEXT_REDIRECT")) {
+      throw error; // Re-throw redirect errors
+    }
+
+    // Handle other errors
+    return {
+      errors: {
+        email: "An unexpected error occurred. Please try again.",
+      },
+    };
+  }
 }
 
 export async function login(
@@ -187,19 +203,16 @@ export async function verifyAuthAction() {
   }
 
   try {
-    const response = await fetch(
-      "http://localhost:5236/api/auth/validate-token",
-      {
-        method: "POST",
-        headers: {
-          Accept: "*/*",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          token: tokenCookie.value,
-        }),
-      }
-    );
+    const response = await fetch(`${base_url}/api/auth/validate-token`, {
+      method: "POST",
+      headers: {
+        Accept: "*/*",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        token: tokenCookie.value,
+      }),
+    });
 
     const data = await response.json();
     console.log(response);
@@ -215,6 +228,7 @@ export async function verifyAuthAction() {
     }
     return {
       user: data.user,
+      studentId: data.studentId,
       session: { token: tokenCookie.value },
     };
   } catch (error: unknown) {

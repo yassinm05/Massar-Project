@@ -5,20 +5,24 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 export default async function page({ params }: { params: { id: number } }) {
-    const result = await verifyAuth();
+  const result = await verifyAuth();
   if (!result.user) {
     return redirect("/");
   }
   const cookieStore = await cookies(); // wait for it
   const tokenCookie = cookieStore.get("auth-token");
   if (!tokenCookie?.value) {
-      return redirect("/");
-    }
+    return redirect("/");
+  }
   const { id } = params;
-  const quiz = await getQuizByID(id,tokenCookie.value);
-  return(
+  const quiz = await getQuizByID(id, tokenCookie.value);
+  return (
     <div className="w-full bg-[#F8FAFC] flex justify-center ">
-        <QuizExam quiz={quiz} userId={result.user.id}/>
+      {quiz ? (
+        <div>no questions found in this exam</div>
+      ) : (
+        <QuizExam quiz={quiz} userId={result.user.id} />
+      )}
     </div>
   );
 }

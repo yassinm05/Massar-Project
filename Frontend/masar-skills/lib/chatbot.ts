@@ -1,6 +1,6 @@
 'use server'
 import { cookies } from "next/headers";
-
+const base_url = process.env.CHATBOT_BASE_URL;
 export async function chatbotResponse(message: string, id: number) {
   try {
     const cookieStore = await cookies();
@@ -10,7 +10,7 @@ export async function chatbotResponse(message: string, id: number) {
       throw new Error("Not authenticated");
     }
 
-    const response = await fetch(`http://127.0.0.1:5000/api/chat`, {
+    const response = await fetch(`${base_url}/api/chat`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -23,6 +23,7 @@ export async function chatbotResponse(message: string, id: number) {
     });
 
     const result = await response.json();
+    console.log(result);
 
     // Check if the result indicates success
     if (!result) {
@@ -63,7 +64,7 @@ export async function transcriptVoice(formData: FormData) {
       throw new Error("Not authenticated");
     }
 
-    const response = await fetch(`http://127.0.0.1:5000/api/transcribe`, {
+    const response = await fetch(`${base_url}/api/transcribe`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${tokenCookie.value}`,

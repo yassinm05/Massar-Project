@@ -22,7 +22,7 @@ interface BackendResponse {
   message?: string;
   [key: string]: unknown;
 }
-
+const base_url = process.env.BACKEND_BASE_URL;
 export default async function handlePaymentAction({
   courseId,
   amount,
@@ -41,7 +41,7 @@ export default async function handlePaymentAction({
       };
     }
 
-    const response = await fetch("http://localhost:5236/api/Payment/process", {
+    const response = await fetch(`${base_url}/api/Payment/process`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -121,7 +121,7 @@ export async function getPaymentPlansAction(
     }
 
     const response = await fetch(
-      `http://localhost:5236/api/Payment/${courseId}/payment-plans`,
+      `${base_url}/api/Payment/${courseId}/payment-plans`,
       {
         method: "GET",
         headers: {
@@ -193,16 +193,13 @@ export async function getPaymentDetailsAction(
       };
     }
 
-    const response = await fetch(
-      `http://localhost:5236/api/Payment/course/${courseId}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${tokenCookie.value}`,
-        },
-      }
-    );
+    const response = await fetch(`${base_url}/api/Payment/course/${courseId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${tokenCookie.value}`,
+      },
+    });
 
     const contentType = response.headers.get("content-type");
     const result: BackendResponse | string =

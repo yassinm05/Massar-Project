@@ -14,6 +14,9 @@ module.exports = {
         pathname: "/photos/**",
       },
     ],
+    domains: [
+      "masarskillsapi-production-v1-ashfbxekhaeffba7.canadacentral-01.azurewebsites.net",
+    ],
   },
 };
 

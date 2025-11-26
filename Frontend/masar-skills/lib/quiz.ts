@@ -1,3 +1,4 @@
+const base_url = process.env.BACKEND_BASE_URL;
 export async function submitAnswer(
   attemptId: number,
   questionId: number,
@@ -5,21 +6,18 @@ export async function submitAnswer(
   token: string
 ) {
   try {
-    const response = await fetch(
-      `http://localhost:5236/api/Quiz/submit-answer`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          attemptId: attemptId,
-          questionId: questionId,
-          selectedOptionId: selectedOption,
-        }),
-      }
-    );
+    const response = await fetch(`${base_url}/api/Quiz/submit-answer`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        attemptId: attemptId,
+        questionId: questionId,
+        selectedOptionId: selectedOption,
+      }),
+    });
 
     const result = await response.json();
 
@@ -55,7 +53,7 @@ export async function submitAnswer(
 
 export async function getQuizByID(id: number, token: string) {
   try {
-    const response = await fetch(`http://localhost:5236/api/quiz/start/${id}`, {
+    const response = await fetch(`${base_url}/api/quiz/start/${id}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -96,7 +94,7 @@ export async function getQuizByID(id: number, token: string) {
 }
 export async function getAvailableQuizzes(token: string) {
   try {
-    const response = await fetch(`http://localhost:5236/api/Quiz/available`, {
+    const response = await fetch(`${base_url}/api/Quiz/available`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -138,16 +136,13 @@ export async function getAvailableQuizzes(token: string) {
 
 export async function getResult(id: number, token: string) {
   try {
-    const response = await fetch(
-      `http://localhost:5236/api/Quiz/results/${id}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const response = await fetch(`${base_url}/api/Quiz/results/${id}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
     const result = await response.json();
 
     // Check if the result indicates success

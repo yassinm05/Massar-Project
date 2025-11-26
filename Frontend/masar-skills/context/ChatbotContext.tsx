@@ -23,19 +23,19 @@ type Message =
 
 type ChatbotContextType = {
   showChatbot: boolean;
-  openChatbot: () => void;
-  closeChatbot: () => void;
-  toggleChatbot: () => void;
+  openChatbot: () => void; // ✅ Added
+  closeChatbot: () => void; // ✅ Added
+  toggleChatbot: () => void; // ✅ Added
   messages: Message[];
   sendMessage: (text: string) => Promise<void>;
   isLoading: boolean;
   studentId?: number;
+  isAuthChecking: boolean; // ✅ Added for better UX
 };
 
 const ChatbotContext = createContext<ChatbotContextType | undefined>(undefined);
 
 export function ChatbotProvider({ children }: { children: ReactNode }) {
-  
   const [showChatbot, setShowChatbot] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -45,41 +45,63 @@ export function ChatbotProvider({ children }: { children: ReactNode }) {
     },
   ]);
   const [isLoading, setIsLoading] = useState(false);
-  
-  // ✅ Auth states
-
   const [studentId, setStudentId] = useState<number | undefined>();
- useEffect(() => {
-    // Check if user is authenticated via API
+  const [isAuthChecking, setIsAuthChecking] = useState(true);
+
+  useEffect(() => {
     async function checkAuth() {
+      setIsAuthChecking(true);
       const response = await verifyAuthAction();
-      if (!response.user) {
-        return;
+      if (response.user) {
+        setStudentId(response.studentId);
       }
-      setStudentId(response.user.id);
+      setIsAuthChecking(false);
     }
     checkAuth();
   }, []);
 
-
-
-
+  // ✅ Chatbot control functions
   const openChatbot = () => {
-
-      setShowChatbot(true);
-
+    setShowChatbot(true);
   };
-  
-  const closeChatbot = () => setShowChatbot(false);
+
+  const closeChatbot = () => {
+    setShowChatbot(false);
+  };
+
   const toggleChatbot = () => {
-
-      setShowChatbot((prev) => !prev);
-
+    setShowChatbot((prev) => !prev);
   };
 
   const sendMessage = async (text: string) => {
     const messageText = text.trim();
-    if (!messageText || isLoading ) return;
+    if (!messageText || isLoading) return;
+
+    // Wait for auth check to complete
+    if (isAuthChecking) {
+      setMessages((prev) => [
+        ...prev,
+        {
+          source: "bot",
+          body: "Please wait while I verify your credentials...",
+          typeOfMessage: "string",
+        },
+      ]);
+      return;
+    }
+
+    // Check if authenticated
+    if (!studentId) {
+      setMessages((prev) => [
+        ...prev,
+        {
+          source: "bot",
+          body: "You need to be logged in to use the chatbot. Please log in and try again.",
+          typeOfMessage: "string",
+        },
+      ]);
+      return;
+    }
 
     setMessages((prev) => [
       ...prev,
@@ -93,11 +115,8 @@ export function ChatbotProvider({ children }: { children: ReactNode }) {
     setIsLoading(true);
 
     try {
-      if (!studentId) {
-        throw new Error("Student ID not found");
-      }
-
-      const chatbotResponse = (await import("@/actions/chatbot-actions")).default;
+      const chatbotResponse = (await import("@/actions/chatbot-actions"))
+        .default;
       const result = await chatbotResponse(messageText, studentId);
 
       setMessages((prev) => [
@@ -127,13 +146,14 @@ export function ChatbotProvider({ children }: { children: ReactNode }) {
     <ChatbotContext.Provider
       value={{
         showChatbot,
-        openChatbot,
-        closeChatbot,
-        toggleChatbot,
+        openChatbot, // ✅ Provided
+        closeChatbot, // ✅ Provided
+        toggleChatbot, // ✅ Provided
         messages,
         sendMessage,
         isLoading,
         studentId,
+        isAuthChecking, // ✅ Provided
       }}
     >
       {children}

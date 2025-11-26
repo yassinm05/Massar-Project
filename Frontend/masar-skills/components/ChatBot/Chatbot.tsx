@@ -125,7 +125,7 @@ export default function Chatbot() {
   if (!showChatbot) {
     if (pathname.startsWith("/course-details")) {
       return (
-        <div className="fixed right-20 bottom-20 z-20">
+        <div className="fixed right-20 bottom-20 bg-white z-20">
           <button className="w-40 h-12 cursor-pointer rounded-l-[30px] rounded-tr-[20px] border border-[#0083AD] flex items-center justify-center gap-2">
             <p className="font-semibold text-[#0083AD]">Study with AI</p>
             <div className="relative w-5 h-5">

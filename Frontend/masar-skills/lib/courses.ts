@@ -1,14 +1,14 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-
-export async function getCourses(){
+const base_url = process.env.BACKEND_BASE_URL;
+export async function getCourses() {
   try {
     const cookieStore = await cookies(); // wait for it
     const tokenCookie = cookieStore.get("auth-token");
     if (!tokenCookie?.value) {
       return redirect("/");
     }
-    const response = await fetch(`http://localhost:5236/api/courses`, {
+    const response = await fetch(`${base_url}/api/courses`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
