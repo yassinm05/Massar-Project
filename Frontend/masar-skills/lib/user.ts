@@ -9,7 +9,7 @@ interface types {
   phoneNumber: string;
   password: string;
 }
-const base_url = process.env.BACKEND_BASE_URL;
+
 
 export default async function createUser({
   firstName,
@@ -19,6 +19,7 @@ export default async function createUser({
   role,
   phoneNumber,
 }: types) {
+  const base_url = process.env.BACKEND_BASE_URL;
   try {
     const userData = {
       firstName,
@@ -86,6 +87,7 @@ export default async function createUser({
 }
 
 export async function getUser(email: string, password: string) {
+  const base_url = process.env.BACKEND_BASE_URL;
   try {
     const response = await fetch(`${base_url}/api/Auth/login`, {
       method: "POST",
@@ -146,6 +148,7 @@ export async function getUser(email: string, password: string) {
 }
 
 export async function getUserById(id: number) {
+  const base_url = process.env.BACKEND_BASE_URL;
   try {
     const response = await fetch(`${base_url}/api/Users/${id}`, {
       method: "GET",
@@ -203,6 +206,7 @@ export async function getUserById(id: number) {
 }
 
 export async function getCourseEnrollment() {
+  const base_url = process.env.BACKEND_BASE_URL;
   try {
     const cookieStore = await cookies(); // wait for it
     const tokenCookie = cookieStore.get("auth-token");
@@ -250,6 +254,7 @@ export async function getCourseEnrollment() {
 }
 
 export async function getCourseByID(id: number) {
+  const base_url = process.env.BACKEND_BASE_URL;
   try {
     const response = await fetch(`${base_url}/api/courses/${id}`, {
       method: "GET",

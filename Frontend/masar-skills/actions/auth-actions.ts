@@ -23,7 +23,6 @@ const COOKIE_OPTIONS = {
   httpOnly: true,
   secure: process.env.NODE_ENV === "production",
 };
-const base_url = process.env.BACKEND_BASE_URL;
 
 export async function signup(prevState: FormState, formData: FormData) {
   const firstName = formData.get("firstName") as string;
@@ -192,6 +191,7 @@ export async function login(
   }
 }
 export async function verifyAuthAction() {
+  const base_url = process.env.BACKEND_BASE_URL;
   const cookieStore = await cookies();
   const tokenCookie = cookieStore.get("auth-token");
 

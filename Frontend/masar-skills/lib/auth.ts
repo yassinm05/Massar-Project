@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
-const base_url = process.env.BACKEND_BASE_URL;
 export async function verifyAuth() {
+  const base_url = process.env.BACKEND_BASE_URL;
   const cookieStore = await cookies();
   const tokenCookie = cookieStore.get("auth-token");
 

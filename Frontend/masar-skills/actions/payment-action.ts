@@ -22,7 +22,6 @@ interface BackendResponse {
   message?: string;
   [key: string]: unknown;
 }
-const base_url = process.env.BACKEND_BASE_URL;
 export default async function handlePaymentAction({
   courseId,
   amount,
@@ -31,6 +30,8 @@ export default async function handlePaymentAction({
   paymentToken,
 }: PaymentData): Promise<ApiResponse> {
   try {
+    const base_url = process.env.BACKEND_BASE_URL;
+
     const cookieStore = await cookies();
     const tokenCookie = cookieStore.get("auth-token");
 
@@ -110,6 +111,8 @@ export async function getPaymentPlansAction(
   courseId: number
 ): Promise<ApiResponse> {
   try {
+    const base_url = process.env.BACKEND_BASE_URL;
+
     const cookieStore = await cookies();
     const tokenCookie = cookieStore.get("auth-token");
 
@@ -183,6 +186,8 @@ export async function getPaymentDetailsAction(
   courseId: number
 ): Promise<ApiResponse> {
   try {
+    const base_url = process.env.BACKEND_BASE_URL;
+
     const cookieStore = await cookies();
     const tokenCookie = cookieStore.get("auth-token");
 

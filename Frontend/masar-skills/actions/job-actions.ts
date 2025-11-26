@@ -1,10 +1,11 @@
 'use server'
 
 import { cookies } from "next/headers";
-const base_url = process.env.BACKEND_BASE_URL;
 
 export default async function getJobsAction() {
   try {
+    const base_url = process.env.BACKEND_BASE_URL;
+
     const cookieStore = await cookies();
     const tokenCookie = cookieStore.get("auth-token");
 
@@ -52,6 +53,8 @@ export default async function getJobsAction() {
 
 export async function getJobByIdAction(id: number) {
   try {
+    const base_url = process.env.BACKEND_BASE_URL;
+
     const cookieStore = await cookies();
     const tokenCookie = cookieStore.get("auth-token");
 
@@ -99,6 +102,8 @@ export async function getJobByIdAction(id: number) {
 
 export async function submitJobApplication({ formData }: any) {
   try {
+    const base_url = process.env.BACKEND_BASE_URL;
+
     const cookieStore = await cookies();
     const tokenCookie = cookieStore.get("auth-token");
 

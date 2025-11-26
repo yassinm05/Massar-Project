@@ -1,8 +1,8 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-const base_url = process.env.BACKEND_BASE_URL;
 export async function getCourses() {
   try {
+    const base_url = process.env.BACKEND_BASE_URL;
     const cookieStore = await cookies(); // wait for it
     const tokenCookie = cookieStore.get("auth-token");
     if (!tokenCookie?.value) {

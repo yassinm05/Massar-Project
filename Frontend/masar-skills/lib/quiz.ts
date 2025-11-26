@@ -1,10 +1,10 @@
-const base_url = process.env.BACKEND_BASE_URL;
 export async function submitAnswer(
   attemptId: number,
   questionId: number,
   selectedOption: number,
   token: string
 ) {
+  const base_url = process.env.BACKEND_BASE_URL;
   try {
     const response = await fetch(`${base_url}/api/Quiz/submit-answer`, {
       method: "POST",
@@ -52,6 +52,7 @@ export async function submitAnswer(
 }
 
 export async function getQuizByID(id: number, token: string) {
+  const base_url = process.env.BACKEND_BASE_URL;
   try {
     const response = await fetch(`${base_url}/api/quiz/start/${id}`, {
       method: "POST",
@@ -93,6 +94,7 @@ export async function getQuizByID(id: number, token: string) {
   }
 }
 export async function getAvailableQuizzes(token: string) {
+  const base_url = process.env.BACKEND_BASE_URL;
   try {
     const response = await fetch(`${base_url}/api/Quiz/available`, {
       method: "GET",
@@ -135,6 +137,7 @@ export async function getAvailableQuizzes(token: string) {
 }
 
 export async function getResult(id: number, token: string) {
+  const base_url = process.env.BACKEND_BASE_URL;
   try {
     const response = await fetch(`${base_url}/api/Quiz/results/${id}`, {
       method: "GET",
