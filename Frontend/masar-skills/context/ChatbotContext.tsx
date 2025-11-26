@@ -31,6 +31,7 @@ type ChatbotContextType = {
   isLoading: boolean;
   studentId?: number;
   isAuthChecking: boolean; // ✅ Added for better UX
+  submitAudioMessage: (message: string, response: string) => void;
 };
 
 const ChatbotContext = createContext<ChatbotContextType | undefined>(undefined);
@@ -73,7 +74,7 @@ export function ChatbotProvider({ children }: { children: ReactNode }) {
     setShowChatbot((prev) => !prev);
   };
 
-  const sendMessage = async (text: string) => {
+  const sendMessage = async (text: string, source: string = "chat") => {
     const messageText = text.trim();
     if (!messageText || isLoading) return;
 
@@ -142,6 +143,54 @@ export function ChatbotProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const submitAudioMessage = async (message: string, response: string) => {
+    const messageText = message.trim();
+    const responseText = response.trim();
+    if (!messageText || isLoading || !responseText) return;
+    setMessages((prev) => [
+      ...prev,
+      {
+        source: "user",
+        body: messageText,
+        typeOfMessage: "string",
+      },
+    ]);
+
+    // Wait for auth check to complete
+    if (isAuthChecking) {
+      setMessages((prev) => [
+        ...prev,
+        {
+          source: "bot",
+          body: "Please wait while I verify your credentials...",
+          typeOfMessage: "string",
+        },
+      ]);
+      return;
+    }
+
+    // Check if authenticated
+    if (!studentId) {
+      setMessages((prev) => [
+        ...prev,
+        {
+          source: "bot",
+          body: "You need to be logged in to use the chatbot. Please log in and try again.",
+          typeOfMessage: "string",
+        },
+      ]);
+      return;
+    }
+    setMessages((prev) => [
+      ...prev,
+      {
+        source: "bot",
+        body: responseText,
+        typeOfMessage: "string",
+      },
+    ]);
+  };
+
   return (
     <ChatbotContext.Provider
       value={{
@@ -154,6 +203,7 @@ export function ChatbotProvider({ children }: { children: ReactNode }) {
         isLoading,
         studentId,
         isAuthChecking, // ✅ Provided
+        submitAudioMessage,
       }}
     >
       {children}

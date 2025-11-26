@@ -2,7 +2,7 @@
 import { cookies } from "next/headers";
 export async function chatbotResponse(message: string, id: number) {
   try {
-    const base_url = process.env.BACKEND_BASE_URL;
+    const base_url = process.env.CHATBOT_BASE_URL;
     const cookieStore = await cookies();
     const tokenCookie = cookieStore.get("auth-token");
 

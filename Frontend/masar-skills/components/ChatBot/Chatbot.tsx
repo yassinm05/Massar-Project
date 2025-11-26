@@ -22,6 +22,7 @@ export default function Chatbot() {
     sendMessage,
     isLoading,
     studentId,
+    submitAudioMessage,
   } = useChatbot();
   const pathname = usePathname();
   const [inputText, setInputText] = useState("");
@@ -67,7 +68,7 @@ export default function Chatbot() {
 
       const response = await transcriptVoice(formData);
       if (response.response) {
-        await sendMessage(response.response);
+        await submitAudioMessage(response.transcription, response.response);
       }
     } catch (err) {
       alert(`Failed to process voice recording. Please try again. ${err}`);
