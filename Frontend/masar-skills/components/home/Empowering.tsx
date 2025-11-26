@@ -2,24 +2,65 @@ import Image from "next/image";
 import MedicalStudent from "@/public/assets/home/Empowering/Medical student in a classroom.png";
 import ChatBot from "@/public/assets/home/Empowering/chatbot.png";
 import Tick from "@/public/assets/home/Empowering/tick.png";
+import { MotionDiv, MotionH1, MotionP } from "../framer-motion/motion";
 
 export default function Empowering() {
   return (
     <section className=" h-[527px] bg-[#F9FAFB] flex items-center py-[96px] px-16 gap-16">
-      <div className="relative w-1/2 h-[333px] rounded-xl overflow-hidden">
+      <MotionDiv
+        initial={{ opacity: 0, x: -100 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{
+          type: "spring",
+          stiffness: 80,
+          damping: 10,
+          bounce: 0.5,
+        }}
+        className="relative w-1/2 h-[333px] rounded-xl overflow-hidden"
+      >
         <Image src={MedicalStudent} alt="" fill />
-      </div>
+      </MotionDiv>
       <div className="w-1/2 h-[336px] flex flex-col justify-between gap-6">
-        <h1 className="font-bold text-4xl leading-12 max-w-[25ch]">
+        <MotionH1
+          initial={{ opacity: 0, x: 100 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{
+            type: "spring",
+            stiffness: 80,
+            damping: 10,
+            bounce: 0.5,
+          }}
+          className="font-bold text-4xl leading-12 max-w-[25ch]"
+        >
           Empowering Your Healthcare Career.
-        </h1>
-        <p className="text-lg leading-7 text-[#6B7280] max-w-[50ch]">
+        </MotionH1>
+        <MotionP
+          initial={{ opacity: 0, x: 100 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{
+            type: "spring",
+            stiffness: 60,
+            damping: 10,
+            bounce: 0.5,
+          }}
+          className="text-lg leading-7 text-[#6B7280] max-w-[50ch]"
+        >
           At Masar Skills, we are dedicated to transforming healthcare
           education. Our platform provides students and professionals with tools
           for skill enhancement.
-        </p>
+        </MotionP>
         <div className="flex gap-4">
-          <div className="flex w-1/2 gap-4">
+          <MotionDiv
+            initial={{ opacity: 0, x: 100 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{
+              type: "spring",
+              stiffness: 50,
+              damping: 10,
+              bounce: 0.5,
+            }}
+            className="flex w-1/2 gap-4"
+          >
             <div>
               <Image src={ChatBot} alt="" />
             </div>
@@ -29,8 +70,18 @@ export default function Empowering() {
                 Get instant answers and guidance with our AI Career Advisor.
               </p>
             </div>
-          </div>
-          <div className="flex w-1/2  gap-4">
+          </MotionDiv>
+          <MotionDiv
+            initial={{ opacity: 0, x: 100 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{
+              type: "spring",
+              stiffness: 30,
+              damping: 10,
+              bounce: 0.5,
+            }}
+            className="flex w-1/2  gap-4"
+          >
             <div>
               <Image src={Tick} alt="" />
             </div>
@@ -40,7 +91,7 @@ export default function Empowering() {
                 Showcase your accomplishments with secure digital certificates.
               </p>
             </div>
-          </div>
+          </MotionDiv>
         </div>
       </div>
     </section>
