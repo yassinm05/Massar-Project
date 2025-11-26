@@ -1,38 +1,37 @@
 "use client";
 
 import {
-  useStripe,
-  useElements,
+  // useStripe,
+  // useElements,
   PaymentRequestButtonElement,
 } from "@stripe/react-stripe-js";
-import { useEffect, useState } from "react";
+// import { useEffect, useState } from "react";
 
-export default function ApplePayButton({ amount }) {
-  const stripe = useStripe();
-  const elements = useElements();
-  const [paymentRequest, setPaymentRequest] = useState(null);
+export default function ApplePayButton() {
+  // const stripe = useStripe();
+  // const [paymentRequest, setPaymentRequest] = useState(null);
 
-  useEffect(() => {
-    if (!stripe) return;
+  // useEffect(() => {
+  //   if (!stripe) return;
 
-    const pr = stripe.paymentRequest({
-      country: "US",
-      currency: "usd",
-      total: { label: "Course Payment", amount: amount * 100 },
-      requestPayerName: true,
-      requestPayerEmail: true,
-    });
+  //   const pr = stripe.paymentRequest({
+  //     country: "US",
+  //     currency: "usd",
+  //     total: { label: "Course Payment", amount: amount * 100 },
+  //     requestPayerName: true,
+  //     requestPayerEmail: true,
+  //   });
 
-    pr.canMakePayment().then((result) => {
-      if (result) setPaymentRequest(pr);
-    });
-  }, [stripe]);
+  //   pr.canMakePayment().then((result) => {
+  //     if (result) setPaymentRequest(pr);
+  //   });
+  // }, [stripe]);
 
-  if (!paymentRequest) return <p>Apple Pay not supported.</p>;
+  // if (!paymentRequest) return <p>Apple Pay not supported.</p>;
 
   return (
     <PaymentRequestButtonElement
-      options={{ paymentRequest }}
+      // options={{ paymentRequest }}
       className="w-full"
     />
   );

@@ -10,11 +10,12 @@ import getJobsAction, { getJobByIdAction } from "@/actions/job-actions";
 interface Job {
   id: number;
   title: string;
-  description: string;
   companyName: string;
   location: string;
+  description: string;
+  qualifications: string;
+  responsibilities: string;
 }
-
 export default function JobsPage() {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
@@ -110,7 +111,7 @@ export default function JobsPage() {
         />
       </div>
       {/* RIGHT SIDE: job details */}
-      <JobDetails isLoading={isLoading} activeJob={activeJob} />
+      <JobDetails isLoading={isLoading} activeJob={activeJob as Job} />
       {errorMessage && (
         <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-600">
           {errorMessage}

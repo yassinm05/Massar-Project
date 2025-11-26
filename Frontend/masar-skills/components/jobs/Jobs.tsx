@@ -1,14 +1,17 @@
 interface Job {
-  id: number; // Changed from number | string to just number
+  id: number;
   title: string;
   companyName: string;
   location: string;
+  description: string;
+  qualifications: string;
+  responsibilities: string;
 }
 
 interface JobsProps {
   jobs: Job[];
-  activeJob: number | null; // Changed from number | string | null
-  onSelectJob: (id: number) => void; // Changed from (id: number | string)
+  activeJob: number | string | null;
+  onSelectJob: (id: number) => void;
 }
 
 export default function Jobs({ jobs, activeJob, onSelectJob }: JobsProps) {

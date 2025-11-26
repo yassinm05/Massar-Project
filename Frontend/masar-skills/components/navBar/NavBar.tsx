@@ -1,6 +1,4 @@
-// app/components/NavBar.tsx (Server Component)
-import { redirect } from "next/navigation";
-import { verifyAuth } from "@/lib/auth"; // your auth function
+import { verifyAuth } from "@/lib/auth";
 import NavBarClient from "./NavBarClient";
 
 export default async function NavBar() {

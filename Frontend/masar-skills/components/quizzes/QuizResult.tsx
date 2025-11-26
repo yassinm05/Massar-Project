@@ -4,9 +4,35 @@ import CertificateIcon from "@/public/assets/quizzes/Certificate.png";
 import Link from "next/link";
 import Eye from "@/public/assets/quizzes/eye.png";
 import Arrow from "@/public/assets/quizzes/forwardArrow.png";
+interface Option {
+  optionId: number;
+  optionText: string;
+}
+interface Question {
+  questionId: number;
+  questionText: string;
+  questionType: string;
+  points: number;
+  options: Option[];
+}
+interface QuizResultProps {
+  examResult: {
+    isPassed: boolean;
+    quizTitle: string;
+    score: number;
+    passingScore: number;
+    questions: Question[];
+  };
+  openChatbot: () => void;
+  sendMessage: (message: string) => Promise<void>;
+}
 
-export default function QuizResult({examResult,openChatbot,sendMessage}) {
-    const AnalyzeMyQuiz = async () => {
+export default function QuizResult({
+  examResult,
+  openChatbot,
+  sendMessage,
+}: QuizResultProps) {
+  const AnalyzeMyQuiz = async () => {
     openChatbot();
     await sendMessage("analyze my last quiz");
   };

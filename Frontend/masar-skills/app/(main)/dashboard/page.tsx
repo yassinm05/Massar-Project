@@ -1,7 +1,7 @@
 import Welcome from "@/components/dashboard/Welcome";
 import LearningJourney from "@/components/dashboard/LearningJourney";
 import { verifyAuth } from "@/lib/auth";
-import { getCourseEnrollment, getUserById } from "@/lib/user";
+import { getCourseEnrollment } from "@/lib/user";
 import { redirect } from "next/navigation";
 
 export default async function page() {
