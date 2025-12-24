@@ -11,11 +11,11 @@ export default function Footer() {
   return (
     <footer className="w-full px-16 py-20 overflow-x-hidden flex flex-col gap-20 max-sm:px-4">
       <div className="w-full flex justify-between items-center max-sm:flex-col max-sm:gap-10">
-        <div className="flex items-center gap-6  ">
+        <div className="flex items-center gap-6 max-sm:px-4 ">
           <div className="relative w-16 h-16">
             <Image src={Logo} fill alt="logo" />
           </div>
-          <p className="font-sans text-[51px] max-sm:text-5xl italic font-bold text-[#0083AD]">
+          <p className="font-sans text-[51px] max-sm:text-4xl italic font-bold text-[#0083AD]">
             MasarSkills
           </p>
         </div>
