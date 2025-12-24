@@ -16,7 +16,7 @@ interface Props {
 
 export default function LearningJourney({ enrollments }: Props) {
   return (
-    <section className="flex flex-col gap-3">
+    <section className="flex flex-col gap-3 max-sm:px-4">
       <p className="font-semibold text-3xl">My Learning Progress</p>
       <div className="w-full flex flex-wrap justify-center gap-10">
         {enrollments.map((Enrollment, index) => (

@@ -4,7 +4,7 @@ import { MotionDiv } from "../framer-motion/motion";
 
 export default function Quote() {
   return (
-    <section className="h-[430px] bg-[#F9FAFB] flex flex-col justify-center items-center gap-5">
+    <section className="h-[430px] bg-[#F9FAFB] flex flex-col justify-center items-center gap-5 max-sm:w-full">
       <MotionDiv
         initial={{ opacity: 0, y: -100 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -19,7 +19,7 @@ export default function Quote() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, amount: 0.4 }}
         transition={{ duration: 1.3, ease: "backInOut" }}
-        className="leading-[32px] text-lg w-[768px] text-center text-[#374151] "
+        className="leading-[32px] text-lg w-[768px] text-center text-[#374151] max-sm:w-full"
       >
         &quot;Masar Skills transformed my learning experience. The interactive
         content and instant feedback kept me engaged and motivated throughout my

@@ -9,34 +9,34 @@ import X from "@/public/assets/footer/x.png";
 
 export default function Footer() {
   return (
-    <footer className="w-full px-16 py-20 bg-white flex flex-col gap-20 ">
-      <div className="w-full flex justify-between items-center">
-        <div className="flex items-center gap-6">
-          <div className="w-16 h-16">
-            <Image src={Logo} alt="logo" />
+    <footer className="w-full px-16 py-20 overflow-x-hidden flex flex-col gap-20 max-sm:px-4">
+      <div className="w-full flex justify-between items-center max-sm:flex-col max-sm:gap-10">
+        <div className="flex items-center gap-6  ">
+          <div className="relative w-16 h-16">
+            <Image src={Logo} fill alt="logo" />
           </div>
-          <p className="font-sans text-[51px] italic font-bold text-[#0083AD]">
+          <p className="font-sans text-[51px] max-sm:text-5xl italic font-bold text-[#0083AD]">
             MasarSkills
           </p>
         </div>
-        <ul className="flex gap-8">
-          <li >
+        <ul className="flex max-sm:flex-col gap-8 max-sm:gap-4 max-sm:items-center">
+          <li>
             <Link href={"#"}>Contact Us</Link>
           </li>
-          <li >
+          <li>
             <Link href={"#"}>Help Center</Link>
           </li>
-          <li >
+          <li>
             <Link href={"#"}>Careers Page</Link>
           </li>
-          <li >
+          <li>
             <Link href={"#"}>Blog Updates</Link>
           </li>
-          <li >
+          <li>
             <Link href={"#"}>FeedBack Form</Link>
           </li>
         </ul>
-        <ul className="flex gap-4">
+        <ul className="flex gap-4 max-sm:flex-col">
           <li className="flex justify-center items-center">
             <Link href={"#"}>
               <Image src={Facebook} alt="" />
@@ -66,11 +66,11 @@ export default function Footer() {
       </div>
       <div className="flex flex-col gap-8 ">
         <div className="w-full h-[0] border border-[#E5E7EB]"></div>
-        <ul className="w-full flex gap-6 justify-center">
+        <ul className="w-full flex gap-6 justify-center max-sm:flex-col max-sm:items-center">
           <li className={`font-normal `}>
             @ 2025 Masar Skills. All rights reserved.
           </li>
-          <li >
+          <li>
             <Link href={"#"}>Privacy Policy</Link>
           </li>
           <li className={`font-normal  `}>

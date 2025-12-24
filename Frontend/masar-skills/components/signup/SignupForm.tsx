@@ -26,26 +26,30 @@ export default function SignupForm() {
   );
 
   return (
-    <form id="auth-form" className="flex flex-col gap-4" action={formAction}>
+    <form
+      id="auth-form"
+      className="flex flex-col gap-4 w-full"
+      action={formAction}
+    >
       {/* first and last name */}
-      <div className="flex gap-8 justify-between">
-        <div className="flex flex-col gap-2">
-          <label htmlFor="firstName" className="text-sm font-sans">
+      <div className="flex gap-8 justify-between w-full max-sm:flex-col max-sm:gap-4">
+        <div className="flex flex-col gap-2 max-sm:w-full">
+          <label htmlFor="firstName" className="text-sm font-sans ">
             First Name
           </label>
           <input
-            className="w-[229px] h-[46px] bg-[#F0F9FF] rounded-lg border  border-[#D1E9F6] "
+            className="w-[229px] h-[46px] max-sm:w-full bg-[#F0F9FF] rounded-lg border  border-[#D1E9F6] "
             type="text"
             id="firstName"
             name="firstName"
           />
         </div>
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2 w-full">
           <label htmlFor="lastName" className="text-sm font-sans">
             Last Name
           </label>
           <input
-            className="bg-[#F0F9FF] w-[229px] h-[46px] rounded-lg border  border-[#D1E9F6]"
+            className="bg-[#F0F9FF] w-[229px] h-[46px] max-sm:w-full rounded-lg border  border-[#D1E9F6]"
             type="text"
             id="lastName"
             name="lastName"
@@ -58,7 +62,7 @@ export default function SignupForm() {
           Email address
         </label>
         <input
-          className="w-[512px] h-[46px] bg-[#F0F9FF] rounded-lg border  border-[#D1E9F6]"
+          className="w-[512px] h-[46px] max-sm:w-full bg-[#F0F9FF] rounded-lg border  border-[#D1E9F6]"
           type="email"
           id="email"
           name="email"
@@ -70,7 +74,7 @@ export default function SignupForm() {
           Phone Number
         </label>
         <input
-          className="w-[512px] h-[46px] bg-[#F0F9FF] rounded-lg border  border-[#D1E9F6]"
+          className="w-[512px] h-[46px] max-sm:w-full bg-[#F0F9FF] rounded-lg border  border-[#D1E9F6]"
           type="tel"
           id="phoneNumber"
           name="phoneNumber"
@@ -82,7 +86,7 @@ export default function SignupForm() {
           Role
         </label>
         <select
-          className="w-[512px] h-[46px] bg-[#F0F9FF] rounded-lg border  border-[#D1E9F6]"
+          className="w-[512px] h-[46px] max-sm:w-full bg-[#F0F9FF] rounded-lg border  border-[#D1E9F6]"
           name="role"
           id="role"
         >
@@ -100,7 +104,7 @@ export default function SignupForm() {
           Password
         </label>
         <input
-          className="w-[512px] h-[46px] bg-[#F0F9FF] rounded-lg border  border-[#D1E9F6]"
+          className="w-[512px] h-[46px] max-sm:w-full bg-[#F0F9FF] rounded-lg border  border-[#D1E9F6]"
           type="password"
           id="password"
           name="password"

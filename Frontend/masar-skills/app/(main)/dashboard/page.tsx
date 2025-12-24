@@ -13,7 +13,7 @@ export default async function page() {
   console.log(Enrollment);
   //ROLE => User.role
   return (
-    <div className="py-10 px-12 flex flex-col gap-5">
+    <div className="py-10 px-12 max-sm:px-0 flex flex-col gap-5">
       <Welcome firstName={result.user.firstName} />
       <LearningJourney enrollments={Enrollment} />
     </div>

@@ -8,7 +8,7 @@ import StayUpdated from "@/components/home/StayUpdated";
 
 export default function Home() {
   return (
-    <div className="flex flex-col ">
+    <div className="w-full flex flex-col ">
       <LearningJourney />
       <Empowering />
       <Potential />

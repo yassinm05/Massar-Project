@@ -13,28 +13,30 @@ export default async function page() {
         return redirect('/');
       }
   return (
-    <div className="w-full h-screen flex">
-      <div className="py-12 px-28 flex flex-col gap-4 justify-center">
+    <div className="w-full  h-screen max-sm:h-full flex max-sm:flex-col">
+      <div className="py-12 bg px-28 max-sm:px-5 flex flex-col gap-4 justify-center max-sm:w-full">
         <div className="flex flex-col ">
-          <p className="font-bold text-4xl">Create your account</p>
-          <p className="text-[16px] text-[#4C809A]">Join our community of learners and educators.</p>
+          <p className="font-bold text-4xl ">Create your account</p>
+          <p className="text-[16px] text-[#4C809A]">
+            Join our community of learners and educators.
+          </p>
         </div>
         {/* THE FORM */}
-        <SignupForm/>
+        <SignupForm />
         <div className="flex items-center gap-3">
           <div className="flex-1 h-0 border border-[#E5E7EB]"></div>
           <p className="text-sm text-[#6B7280]">Or sign up with</p>
           <div className="flex-1 h-0 border border-[#E5E7EB]"></div>
         </div>
-        
+
         <div className="flex w-full justify-center items-center gap-1.5">
-            <p className="text-sm text-[#6B7280]">Already have an account?</p>
-            <Link href={"/login"} className="font-bold text-sm text-[#0083AD]">
-              Sign in
-            </Link>
-          </div>
+          <p className="text-sm text-[#6B7280]">Already have an account?</p>
+          <Link href={"/login"} className="font-bold text-sm text-[#0083AD]">
+            Sign in
+          </Link>
+        </div>
       </div>
-      <div className="w-full relative">
+      <div className="w-full relative max-sm:h-[416px]">
         <Image src={nurse} alt="nurse" fill />
       </div>
     </div>

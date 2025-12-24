@@ -65,12 +65,25 @@ export async function transcriptVoice(formData: FormData) {
       throw new Error("Not authenticated");
     }
 
+    // ✅ Parse studentId to number and create new FormData
+    const studentIdString = formData.get("studentId");
+    const studentId = studentIdString
+      ? parseInt(studentIdString as string, 10)
+      : null;
+
+    // Create new FormData with parsed studentId
+    const newFormData = new FormData();
+    newFormData.append("audio", formData.get("audio") as Blob);
+    if (studentId !== null) {
+      newFormData.append("studentId", studentId.toString()); // Still needs to be string in FormData
+    }
+
     const response = await fetch(`${base_url}/api/transcribe`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${tokenCookie.value}`,
       },
-      body: formData,
+      body: newFormData,
     });
 
     const result = await response.json();

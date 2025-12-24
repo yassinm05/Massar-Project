@@ -5,14 +5,14 @@ import { MotionDiv, MotionP } from "../framer-motion/motion";
 
 export default function Future() {
   return (
-    <section className="h-[561px] flex px-16 py-28 items-center">
-      <div className="w-1/2 flex flex-col pr-3 gap-7">
+    <section className="h-[561px] flex px-16 py-28 items-center max-sm:flex-col-reverse max-sm:px-4 max-sm:h-full max-sm:gap-5 max-sm:py-8">
+      <div className="w-1/2 flex flex-col pr-3 gap-7 max-sm:w-full max-sm:gap-5">
         <MotionP
           initial={{ opacity: 0, x: -100 }}
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true, amount: 0.4 }}
           transition={{ duration: 1, ease: "backInOut" }}
-          className="font-bold text-5xl max-w-[20ch] leading-12"
+          className="font-bold text-5xl max-w-[20ch] leading-12 max-sm:text-3xl max-sm:leading-11"
         >
           Your Learning Journey Starts Here.
         </MotionP>
@@ -61,7 +61,7 @@ export default function Future() {
         whileInView={{ opacity: 1, x: 0 }}
         viewport={{ once: true, amount: 0.4 }}
         transition={{ duration: 1.6, ease: "backInOut" }}
-        className="relative w-1/2 rounded-xl h-[337px] overflow-hidden"
+        className="relative w-1/2 rounded-xl h-[337px] overflow-hidden max-sm:w-full"
       >
         <Image src={group} alt="" fill />
       </MotionDiv>

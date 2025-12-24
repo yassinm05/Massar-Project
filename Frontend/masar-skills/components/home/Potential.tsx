@@ -8,8 +8,8 @@ import { MotionDiv, MotionH1, MotionP } from "../framer-motion/motion";
 
 export default function Potential() {
   return (
-    <section className="h-[804px] pt-28 px-16 flex flex-col gap-16 items-center justify-center">
-      <div className="flex flex-col gap-4">
+    <section className="h-[804px] max-sm:h-full pt-28 px-16 max-sm:px-4 max-sm:w-full flex flex-col gap-16 items-center justify-center">
+      <div className="flex flex-col gap-4 max-sm:w-full">
         <MotionH1
           initial={{ opacity: 0, y: -100 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -20,7 +20,7 @@ export default function Potential() {
             damping: 10,
             bounce: 0.5,
           }}
-          className="font-bold text-4xl leading-10 text-center"
+          className="font-bold text-4xl max-sm:text-3xl leading-10 text-center"
         >
           Unlock Your Potential with Masar Skills
         </MotionH1>
@@ -34,14 +34,14 @@ export default function Potential() {
             damping: 10,
             bounce: 0.5,
           }}
-          className="w-[716px] text-lg leading-7 text-[#6B7280] text-center"
+          className="w-[716px] text-lg leading-7 text-[#6B7280] text-center max-sm:w-full"
         >
           Experience a transformative learning journey with our extensive
           catalog of accredited courses, providing the skills and certifications
           needed for success.
         </MotionP>
       </div>
-      <div className="flex gap-8 justify-between w-full">
+      <div className="flex gap-8 justify-between w-full max-sm:flex-col">
         <MotionDiv
           initial={{ opacity: 0, x: 150 }}
           whileInView={{ opacity: 1, x: 0 }}

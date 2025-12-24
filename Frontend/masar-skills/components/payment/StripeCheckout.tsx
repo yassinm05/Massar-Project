@@ -1,5 +1,6 @@
 "use client";
 
+import PayPalPaymentForm from "./PayPalPaymentForm";
 import StripePaymentForm from "./StripePaymentForm";
 import { FormData } from "@/types/payment";
 
@@ -19,7 +20,7 @@ export default function PaymentCheckout({
 
   return (
     <div className="flex gap-1 w-full">
-       {/* LEFT SIDE: Course and pricing details */}
+      {/* LEFT SIDE: Course and pricing details */}
       <div className="flex flex-col gap-6 pt-12 w-2/3">
         <p className="font-bold text-[28px] text-[#0D252C]">Payment</p>
 
@@ -47,9 +48,7 @@ export default function PaymentCheckout({
             <div className="h-0 w-full border-b border-[#E5E7EB]" />
             <div className="flex flex-col">
               <p className="text-sm text-[#47739E]">Course Price</p>
-              <p className="text-sm">
-                ${formData.totalAmount }
-              </p>
+              <p className="text-sm">${formData.totalAmount}</p>
             </div>
           </div>
 
@@ -67,9 +66,7 @@ export default function PaymentCheckout({
             <div className="h-0 w-full border-b border-[#E5E7EB]" />
             <div className="flex flex-col">
               <p className="text-sm text-[#47739E]">Total</p>
-              <p className="text-sm">
-                ${formData.finalPrice }
-              </p>
+              <p className="text-sm">${formData.finalPrice}</p>
             </div>
           </div>
         </div>
@@ -89,16 +86,18 @@ export default function PaymentCheckout({
           {/* CARD */}
           <div
             className={`border p-4 rounded-xl cursor-pointer transition-all ${
-              selected === "card" 
-                ? "border-blue-500 bg-blue-50" 
+              selected === "card"
+                ? "border-blue-500 bg-blue-50"
                 : "border-gray-300 hover:border-gray-400"
             }`}
             onClick={() => handleSelection("paymentMethod", "card")}
           >
             <div className="flex items-center gap-3">
-              <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
-                selected === "card" ? "border-blue-500" : "border-gray-300"
-              }`}>
+              <div
+                className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
+                  selected === "card" ? "border-blue-500" : "border-gray-300"
+                }`}
+              >
                 {selected === "card" && (
                   <div className="w-2 h-2 rounded-full bg-blue-500"></div>
                 )}
@@ -110,16 +109,18 @@ export default function PaymentCheckout({
           {/* PAYPAL */}
           <div
             className={`border p-4 rounded-xl cursor-pointer transition-all ${
-              selected === "paypal" 
-                ? "border-blue-500 bg-blue-50" 
+              selected === "paypal"
+                ? "border-blue-500 bg-blue-50"
                 : "border-gray-300 hover:border-gray-400"
             }`}
             onClick={() => handleSelection("paymentMethod", "paypal")}
           >
             <div className="flex items-center gap-3">
-              <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
-                selected === "paypal" ? "border-blue-500" : "border-gray-300"
-              }`}>
+              <div
+                className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
+                  selected === "paypal" ? "border-blue-500" : "border-gray-300"
+                }`}
+              >
                 {selected === "paypal" && (
                   <div className="w-2 h-2 rounded-full bg-blue-500"></div>
                 )}
@@ -131,16 +132,20 @@ export default function PaymentCheckout({
           {/* APPLE PAY */}
           <div
             className={`border p-4 rounded-xl cursor-pointer transition-all ${
-              selected === "applePay" 
-                ? "border-blue-500 bg-blue-50" 
+              selected === "applePay"
+                ? "border-blue-500 bg-blue-50"
                 : "border-gray-300 hover:border-gray-400"
             }`}
             onClick={() => handleSelection("paymentMethod", "applePay")}
           >
             <div className="flex items-center gap-3">
-              <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
-                selected === "applePay" ? "border-blue-500" : "border-gray-300"
-              }`}>
+              <div
+                className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
+                  selected === "applePay"
+                    ? "border-blue-500"
+                    : "border-gray-300"
+                }`}
+              >
                 {selected === "applePay" && (
                   <div className="w-2 h-2 rounded-full bg-blue-500"></div>
                 )}
@@ -163,13 +168,13 @@ export default function PaymentCheckout({
 
         {selected === "paypal" && (
           <div className="mt-4">
-            {/* <CustomPayPalCheckout
-              amount={paymentDetails.finalPrice}
-              courseId={paymentDetails.courseId}
-              onSuccess={handlePaymentSuccess}
-            /> */}
-
-            coming soon...
+            <div className="mt-4">
+              {/* 2. Render the PayPal Component */}
+              <PayPalPaymentForm
+                amount={formData.finalPrice}
+                onSuccess={handlePaymentSuccess}
+              />
+            </div>
           </div>
         )}
 

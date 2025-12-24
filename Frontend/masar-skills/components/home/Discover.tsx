@@ -13,8 +13,8 @@ import {
 
 export default function Discover() {
   return (
-    <section className="px-20 py-28 flex flex-col gap-20">
-      <div className="flex gap-20 items-center justify-between">
+    <section className="px-20 py-28 flex flex-col gap-20 max-sm:px-4 max-sm:w-full">
+      <div className="flex gap-20 items-center justify-between max-sm:flex-col max-sm:gap-5">
         <MotionH3
           initial={{ opacity: 0, x: -100 }}
           whileInView={{ opacity: 1, x: 0 }}
@@ -25,7 +25,7 @@ export default function Discover() {
             damping: 10,
             bounce: 0.5,
           }}
-          className="w-1/2 font-bold text-[45px] leading-[1.2]"
+          className="w-1/2 font-bold text-[45px] max-sm:text-3xl leading-[1.2] max-sm:w-full max-sm:text-center"
         >
           Discover Our Comprehensive Services for Students and Instructors
         </MotionH3>
@@ -39,7 +39,7 @@ export default function Discover() {
             damping: 10,
             bounce: 0.5,
           }}
-          className="w-1/2 text-lg text-[#4B5563] leading-[1.5] max-w-[52ch]"
+          className="w-1/2 text-lg text-[#4B5563] leading-[1.5] max-w-[52ch] max-sm:w-full max-sm:text-center"
         >
           At Masar Skills, we prioritize your educational journey. Our platform
           offers seamless student registration, easy course enrollment, and
@@ -47,8 +47,8 @@ export default function Discover() {
           interface designed to support your learning and professional growth.
         </MotionP>
       </div>
-      <div className="flex justify-between gap-12">
-        <div className="flex flex-col gap-8">
+      <div className="flex justify-between gap-12 max-sm:flex-col max-sm:text-center max-sm:items-center">
+        <div className="flex flex-col gap-8 max-sm:items-center max-sm:gap-4">
           <MotionDiv
             initial={{ opacity: 0, x: 100 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -89,7 +89,7 @@ export default function Discover() {
             </Link>
           </MotionDiv>
         </div>
-        <div className="flex flex-col gap-8">
+        <div className="flex flex-col gap-8 max-sm:items-center max-sm:gap-4">
           <MotionDiv
             initial={{ opacity: 0, x: 100 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -131,7 +131,7 @@ export default function Discover() {
             </Link>
           </MotionDiv>
         </div>
-        <div className="flex flex-col gap-8">
+        <div className="flex flex-col gap-8 max-sm:items-center max-sm:gap-4">
           <MotionDiv
             initial={{ opacity: 0, x: 100 }}
             whileInView={{ opacity: 1, x: 0 }}

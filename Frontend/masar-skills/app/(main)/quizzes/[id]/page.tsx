@@ -22,16 +22,16 @@ export default async function page({ params }: { params: { id: number } }) {
   const { id } = params;
   const quiz = await getQuizByID(id,tokenCookie.value);
   return (
-    <div className="bg-[#F9FAFB] w-full py-20 flex justify-center">
-      <div className="w-fit bg-white shadow-sm p-[41px] flex flex-col gap-8 justify-center items-center rounded-xl">
+    <div className="bg-[#F9FAFB] w-full py-20 flex justify-center max-sm:px-4">
+      <div className="w-fit bg-white shadow-sm p-[41px] max-sm:px-4 flex flex-col gap-8 justify-center items-center rounded-xl max-sm:w-full">
         <div className="flex flex-col gap-2">
-          <h1 className="font-bold text-3xl text-center">{quiz.quizTitle}</h1>
-          <p className="leading-6 text-center">
+          <h1 className="font-bold text-xl text-center">{quiz.quizTitle}</h1>
+          <p className="leading-6 text-center text-sm">
             Test your knowledge on the essential principles and practices of
             nursing.
           </p>
         </div>
-        <div className="flex gap-8 ">
+        <div className="flex gap-8 max-sm:flex-col max-sm:items-center">
           <div className="flex gap-2">
             <div className="relative w-6 h-6 ">
               <Image src={questionMark} alt="" fill />
@@ -49,7 +49,7 @@ export default async function page({ params }: { params: { id: number } }) {
               <Image src={tick} alt="" fill />
             </div>
             {/* passing score */}
-            <p className="text-[#4B5563]">{quiz.timeLimitMinutes} Minutes</p>
+            <p className="text-[#4B5563]">{quiz.passingScore}% Passing Score</p>
           </div>
         </div>
         <div className="rounded-xl bg-[#F9FAFB] border border-[#E5E7EB] p-6 flex flex-col gap-3 items-center">
@@ -95,12 +95,15 @@ export default async function page({ params }: { params: { id: number } }) {
             </div>
           </div>
         </div>
-        <Link className="rounded-xl px-12 py-3 bg-[#16A34A] flex justify-center items-center text-white font-semibold text-lg" href={`/quizzes/start/${id}`} >
-            Start Quiz
-          </Link>
-          <Link className=" text-[#4B5563] font-semibold " href={"/quizzes"} >
-            Back to Quizzes
-          </Link>
+        <Link
+          className="rounded-xl px-12 py-3 bg-[#16A34A] flex justify-center items-center text-white font-semibold text-lg"
+          href={`/quizzes/start/${id}`}
+        >
+          Start Quiz
+        </Link>
+        <Link className=" text-[#4B5563] font-semibold " href={"/quizzes"}>
+          Back to Quizzes
+        </Link>
       </div>
     </div>
   );

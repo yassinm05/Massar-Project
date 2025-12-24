@@ -64,7 +64,7 @@ export default function Chatbot() {
 
       const formData = new FormData();
       formData.append("audio", audioBlob, "recording.webm");
-      formData.append("studentId", studentId.toString());
+      formData.append("studentId", String(studentId));
 
       const response = await transcriptVoice(formData);
       if (response.response) {
@@ -126,8 +126,11 @@ export default function Chatbot() {
   if (!showChatbot) {
     if (pathname.startsWith("/course-details")) {
       return (
-        <div className="fixed right-20 bottom-20 bg-white z-20">
-          <button className="w-40 h-12 cursor-pointer rounded-l-[30px] rounded-tr-[20px] border border-[#0083AD] flex items-center justify-center gap-2">
+        <div
+          onClick={openChatbot}
+          className="fixed right-20 bottom-20  z-20 max-sm:right-6"
+        >
+          <button className="w-40 h-12 cursor-pointer rounded-l-[30px] rounded-tr-[20px] border border-[#0083AD] bg-white flex items-center justify-center gap-2 overflow-hidden">
             <p className="font-semibold text-[#0083AD]">Study with AI</p>
             <div className="relative w-5 h-5">
               <Image src={AI} alt="" fill />
@@ -156,7 +159,7 @@ export default function Chatbot() {
 
   // 🪟 Open Chatbot window
   return (
-    <div className="fixed z-20 w-[500px] top-5 right-5 border border-[#DEE1E6] rounded-3xl overflow-hidden bg-white">
+    <div className="fixed z-20 w-[500px] max-sm:w-full top-5 right-5 border border-[#DEE1E6] rounded-3xl overflow-hidden bg-white">
       <ChatbotHeader setShow={closeChatbot} />
       <ChatbotBody messages={messages} />
 

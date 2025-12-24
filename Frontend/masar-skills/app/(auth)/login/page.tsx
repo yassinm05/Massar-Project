@@ -7,43 +7,42 @@ import { verifyAuth } from "@/lib/auth";
 
 export default async function page() {
   const result = await verifyAuth();
-    if(result.user){
-      return redirect('/');
-    }
-  
+  if (result.user) {
+    return redirect("/");
+  }
+
   return (
-    <div className="bg-white w-full h-screen flex justify-center items-center">
-  <div className="w-[900px] h-[600px] shadow-2xl flex overflow-hidden rounded-2xl">
-    {/* Left Side */}
-    <div className="w-1/2 flex flex-col justify-center gap-8 px-10 py-8 bg-white">
-      <div className="flex items-center gap-3">
-        <div className="w-12 h-12 relative">
-          <Image src={Logo} alt="logo" fill />
+    <div className="bg-white w-full h-screen max-sm:h-full flex justify-center items-center">
+      <div className="w-[900px] h-[600px] max-sm:w-full max-sm:h-full shadow-2xl flex max-sm:flex-col  overflow-hidden rounded-2xl">
+        {/* Left Side */}
+        <div className="w-1/2 max-sm:w-full flex flex-col justify-center gap-8 px-10 py-8 bg-white">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 relative">
+              <Image src={Logo} alt="logo" fill />
+            </div>
+            <p className="font-bold text-3xl text-[#0083AD]">Masar Skills</p>
+          </div>
+
+          <div className="flex flex-col gap-3">
+            <p className="font-bold text-3xl">Welcome Back!</p>
+            <p className="text-[#4C809A] text-[15px]">
+              Sign in to continue your journey with us.
+            </p>
+          </div>
+
+          <LoginForm />
         </div>
-        <p className="font-bold text-3xl">Masar Skills</p>
+
+        {/* Right Side */}
+        <div className="w-1/2 max-sm:w-full max-sm:h-[670px]   relative">
+          <Image
+            src={nurse}
+            alt="nurse"
+            fill
+            className="object-cover object-center"
+          />
+        </div>
       </div>
-
-      <div className="flex flex-col gap-3">
-        <p className="font-bold text-3xl">Create your account</p>
-        <p className="text-[#4C809A] text-[15px]">
-          Join our community of learners and educators.
-        </p>
-      </div>
-
-      <LoginForm />
     </div>
-
-    {/* Right Side */}
-    <div className="w-1/2 relative">
-      <Image
-        src={nurse}
-        alt="nurse"
-        fill
-        className="object-cover object-center"
-      />
-    </div>
-  </div>
-</div>
-
   );
 }

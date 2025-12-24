@@ -13,8 +13,8 @@ export default function CourseCatalogFilter({
   handleApplyFilters,
 }: CourseCatalogFilterProps) {
   return (
-    <div className="flex items-center justify-between border border-[#F3F4F6] p-4 rounded-xl">
-      <div className="flex items-center gap-3">
+    <div className="w-full flex items-center justify-between border border-[#F3F4F6] p-4 rounded-xl max-sm:flex-col max-sm:gap-4">
+      <div className="flex items-center gap-3 max-sm:flex-col max-sm:gap-4">
         <label className="font-medium text-sm text-[#565D6D]">
           Difficulty:
         </label>

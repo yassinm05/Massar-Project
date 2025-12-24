@@ -34,7 +34,7 @@ export default function CourseCatalog({
   };
 
   return (
-    <div className="px-16 py-6 flex flex-col gap-6">
+    <div className="overflow-y-hidden px-16 py-6 flex flex-col gap-6 max-sm:px-4">
       <div className="flex flex-col gap-7">
         <h1 className="font-bold text-3xl">Course Catalog</h1>
 
@@ -45,7 +45,7 @@ export default function CourseCatalog({
         />
       </div>
 
-      <div className="flex flex-wrap gap-6">
+      <div className="flex flex-wrap gap-6 max-sm:justify-center">
         {isLoading ? (
           <p>Loading...</p>
         ) : (

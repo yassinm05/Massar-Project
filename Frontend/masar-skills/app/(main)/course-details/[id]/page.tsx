@@ -55,7 +55,7 @@ export default async function CoursePage({ params }: PageProps) {
   const durationInWeeks = (course.durationHours / 24 / 7).toFixed(2);
 
   return (
-    <div className="flex flex-col px-12 py-10 gap-6">
+    <div className="flex flex-col px-12 py-10 gap-6 max-sm:px-4">
       {/* Course name and duration */}
       <div className="flex flex-col gap-3">
         <h1 className="font-bold text-4xl">{course.title}</h1>
@@ -81,10 +81,10 @@ export default async function CoursePage({ params }: PageProps) {
       </div>
 
       {/* About the course and video of the course */}
-      <div className="flex gap-6">
+      <div className="flex gap-6 max-sm:flex-col">
         <div className="flex flex-col gap-5 p-5 rounded-xl border border-[#F3F4F6]">
           <p className="font-semibold text-2xl">Course Video</p>
-          <div className="w-[720px] bg-amber-300 h-[405px] rounded-xl">
+          <div className="w-[720px] bg-amber-300 h-[405px] max-sm:w-full rounded-xl">
             {/* <video width="720" height="405" controls preload="none">
               <source src="/path/to/video.mp4" type="video/mp4" />
             </video> */}
@@ -103,8 +103,8 @@ export default async function CoursePage({ params }: PageProps) {
       </div>
 
       {/* Course modules and materials */}
-      <div className="flex gap-6">
-        <div className="w-1/2 flex flex-col p-5 gap-5 rounded-xl border border-[#F3F4F6]">
+      <div className="flex gap-6 max-sm:flex-col">
+        <div className="w-1/2 flex flex-col p-5 gap-5 rounded-xl border border-[#F3F4F6] max-sm:w-full">
           <p className="font-semibold text-xl">Course Modules</p>
           {course.modules.map((module, index) => (
             <CourseModule
@@ -115,7 +115,7 @@ export default async function CoursePage({ params }: PageProps) {
             />
           ))}
         </div>
-        <div className="w-1/2 gap-5 flex flex-col p-5 rounded-xl border border-[#F3F4F6]">
+        <div className="w-1/2 gap-5 flex flex-col p-5 rounded-xl border border-[#F3F4F6] max-sm:w-full">
           <p className="font-semibold text-xl">Download Materials</p>
           <div className="flex flex-col gap-3">
             <Link href="#" className="flex gap-3 items-center">

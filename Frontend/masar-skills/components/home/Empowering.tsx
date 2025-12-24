@@ -6,7 +6,7 @@ import { MotionDiv, MotionH1, MotionP } from "../framer-motion/motion";
 
 export default function Empowering() {
   return (
-    <section className=" h-[527px] bg-[#F9FAFB] flex items-center py-[96px] px-16 gap-16">
+    <section className="  h-[527px] bg-[#F9FAFB] flex items-center py-[96px] max-sm:py-14 px-16 gap-16 max-sm:px-4 max-sm:flex-col max-sm:h-auto ">
       <MotionDiv
         initial={{ opacity: 0, x: -100 }}
         whileInView={{ opacity: 1, x: 0 }}
@@ -17,11 +17,11 @@ export default function Empowering() {
           damping: 10,
           bounce: 0.5,
         }}
-        className="relative w-1/2 h-[333px] rounded-xl overflow-hidden"
+        className="relative w-1/2 h-[333px] rounded-xl overflow-hidden max-sm:w-full"
       >
         <Image src={MedicalStudent} alt="" fill />
       </MotionDiv>
-      <div className="w-1/2 h-[336px] flex flex-col justify-between gap-6">
+      <div className="w-1/2 max-sm:w-full h-[336px] flex flex-col justify-between gap-6 max-sm:h-full">
         <MotionH1
           initial={{ opacity: 0, x: 100 }}
           whileInView={{ opacity: 1, x: 0 }}
@@ -32,7 +32,7 @@ export default function Empowering() {
             damping: 10,
             bounce: 0.5,
           }}
-          className="font-bold text-4xl leading-12 max-w-[25ch]"
+          className="font-bold text-4xl max-sm:text-3xl leading-12 max-w-[25ch] max-sm:leading-11"
         >
           Empowering Your Healthcare Career.
         </MotionH1>
@@ -52,7 +52,7 @@ export default function Empowering() {
           education. Our platform provides students and professionals with tools
           for skill enhancement.
         </MotionP>
-        <div className="flex gap-4">
+        <div className="flex  gap-4 max-sm:flex-col max-sm:gap-6">
           <MotionDiv
             initial={{ opacity: 0, x: 100 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -63,7 +63,7 @@ export default function Empowering() {
               damping: 10,
               bounce: 0.5,
             }}
-            className="flex w-1/2 gap-4"
+            className="flex w-1/2 gap-4 max-sm:w-full"
           >
             <div>
               <Image src={ChatBot} alt="" />
@@ -85,7 +85,7 @@ export default function Empowering() {
               damping: 10,
               bounce: 0.5,
             }}
-            className="flex w-1/2  gap-4"
+            className="flex w-1/2  gap-4 max-sm:w-full"
           >
             <div>
               <Image src={Tick} alt="" />

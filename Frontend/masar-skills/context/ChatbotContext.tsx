@@ -74,7 +74,7 @@ export function ChatbotProvider({ children }: { children: ReactNode }) {
     setShowChatbot((prev) => !prev);
   };
 
-  const sendMessage = async (text: string, source: string = "chat") => {
+  const sendMessage = async (text: string) => {
     const messageText = text.trim();
     if (!messageText || isLoading) return;
 

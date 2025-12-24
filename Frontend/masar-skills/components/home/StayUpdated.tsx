@@ -5,14 +5,14 @@ import { MotionDiv, MotionP } from "../framer-motion/motion";
 
 export default function StayUpdated() {
   return (
-    <section className="h-[406px] px-16 py-12 bg-[#F9FAFB] flex gap-12">
-      <div className="w-1/2 flex flex-col gap-4 h-full justify-center">
+    <section className="h-[406px] px-16 py-12 bg-[#F9FAFB] flex gap-12 max-sm:px-4 max-sm:h-full max-sm:flex-col-reverse max-sm:gap-8">
+      <div className="w-1/2 flex flex-col gap-4 h-full justify-center max-sm:w-full">
         <MotionDiv
           initial={{ opacity: 0, x: -100 }}
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true, amount: 0.4 }}
           transition={{ duration: 1, ease: "backInOut" }}
-          className="font-bold text-4xl"
+          className="font-bold text-4xl max-sm:text-3xl"
         >
           Stay Updated with Masar Skills
         </MotionDiv>
@@ -59,7 +59,7 @@ export default function StayUpdated() {
         whileInView={{ opacity: 1, x: 0 }}
         viewport={{ once: true, amount: 0.4 }}
         transition={{ duration: 1.6, ease: "backInOut" }}
-        className="relative w-1/2 rounded-xl overflow-hidden"
+        className="relative w-1/2 rounded-xl overflow-hidden max-sm:w-full max-sm:h-[310px]"
       >
         <Image src={typing} alt="" fill />
       </MotionDiv>

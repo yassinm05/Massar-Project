@@ -5,8 +5,8 @@ import { MotionDiv, MotionP } from "../framer-motion/motion";
 
 export default function LearningJourney() {
   return (
-    <section className="h-[561px] flex px-16 py-28 items-center">
-      <div className="w-1/2 flex flex-col pr-3 gap-7">
+    <section className="w-full h-[561px] flex px-16 max-sm:px-4 py-28 max-sm:py-20 max-sm:h-full items-center max-sm:flex-col-reverse max-sm:gap-5">
+      <div className="w-1/2 max-sm:w-full flex flex-col pr-3 gap-7 max-sm:gap-5">
         <MotionP
           initial={{ opacity: 0, x: -100 }}
           whileInView={{ opacity: 1, x: 0 }}
@@ -17,7 +17,7 @@ export default function LearningJourney() {
             damping: 10,
             bounce: 0.5,
           }}
-          className="font-bold text-5xl max-w-[20ch] leading-12"
+          className="font-bold text-5xl max-sm:text-3xl max-w-[20ch] leading-12 max-sm:leading-11"
         >
           Your Learning Journey Starts Here.
         </MotionP>
@@ -71,7 +71,7 @@ export default function LearningJourney() {
           bounce: 0.5,
         }}
         viewport={{ once: true, amount: 0.4 }}
-        className="relative w-1/2 rounded-xl h-[337px] overflow-hidden"
+        className="relative w-1/2 max-sm:w-full rounded-xl h-[337px] overflow-hidden"
       >
         <Image src={HealthCare} alt="" fill />
       </MotionDiv>
