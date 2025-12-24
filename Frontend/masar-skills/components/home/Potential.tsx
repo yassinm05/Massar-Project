@@ -52,9 +52,9 @@ export default function Potential() {
             damping: 10,
             bounce: 0.5,
           }}
-          className="flex flex-col w-[400px] h-[346px] justify-between"
+          className="flex flex-col w-[400px] h-[346px] justify-between max-sm:w-full max-sm:gap-3 max-sm:justify-normal"
         >
-          <div className=" relative w-[400px] h-[242px] rounded-lg">
+          <div className=" relative w-[400px] h-[242px] rounded-lg max-sm:w-full">
             <Image src={dashBoard} alt="" fill />
           </div>
           <h3 className="font-semibold text-xl">Your Learning, Your Way</h3>
@@ -73,9 +73,9 @@ export default function Potential() {
             damping: 10,
             bounce: 0.5,
           }}
-          className="flex flex-col w-[400px] h-[346px] justify-between"
+          className="flex flex-col w-[400px] h-[346px] justify-between max-sm:w-full max-sm:gap-3 max-sm:justify-normal"
         >
-          <div className=" relative w-[400px] h-[242px] rounded-lg">
+          <div className=" relative w-[400px] h-[242px] rounded-lg max-sm:w-full">
             <Image src={certificates} alt="" fill />
           </div>
           <h3 className="font-semibold text-xl">
@@ -96,9 +96,9 @@ export default function Potential() {
             damping: 10,
             bounce: 0.5,
           }}
-          className="flex flex-col w-[400px] h-[346px] justify-between"
+          className="flex flex-col w-[400px] h-[346px] justify-between max-sm:w-full max-sm:gap-3 max-sm:justify-normal"
         >
-          <div className=" relative w-[400px] h-[242px] rounded-lg">
+          <div className=" relative w-[400px] h-[242px] rounded-lg max-sm:w-full">
             <Image src={support} alt="" fill />
           </div>
           <h3 className="font-semibold text-xl">Job Placement Support</h3>
