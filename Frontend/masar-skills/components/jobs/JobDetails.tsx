@@ -124,7 +124,7 @@ export default function JobDetails({
             animate={{ width: "auto", opacity: 1 }}
             exit={{ width: 0, opacity: 0 }}
             transition={{ duration: 0.6, ease: "easeInOut" }}
-            className="sm:hidden fixed top-0 right-0 z-30 w-full bg-white rounded-xl h-full"
+            className="sm:hidden fixed top-0 right-0 z-30 w-full bg-white rounded-xl h-full overflow-y-scroll"
           >
             {isLoading && (
               <div className="p-6 w-screen h-screen flex justify-center items-center">
