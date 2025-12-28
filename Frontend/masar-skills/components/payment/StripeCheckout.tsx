@@ -3,7 +3,8 @@
 import PayPalPaymentForm from "./PayPalPaymentForm";
 import StripePaymentForm from "./StripePaymentForm";
 import { FormData } from "@/types/payment";
-
+import Payment from "@/public/assets/payment/payment.png";
+import Image from "next/image";
 
 interface PaymentCheckoutProps {
   formData: FormData;
@@ -19,12 +20,12 @@ export default function PaymentCheckout({
   const selected = formData.paymentMethod;
 
   return (
-    <div className="flex gap-1 w-full">
+    <div className="flex gap-1 w-full max-sm:flex-col">
       {/* LEFT SIDE: Course and pricing details */}
-      <div className="flex flex-col gap-6 pt-12 w-2/3">
+      <div className="flex flex-col gap-6 pt-12 w-2/3 max-sm:w-full">
         <p className="font-bold text-[28px] text-[#0D252C]">Payment</p>
 
-        <div className="flex justify-between">
+        <div className="flex justify-between max-sm:flex-col max-sm:gap-4">
           <div className="flex flex-col gap-1">
             <p className="font-bold text-[#0D252C]">
               Introduction to Patient Care
@@ -38,7 +39,7 @@ export default function PaymentCheckout({
           </div>
 
           <div className="relative w-[289px] h-[154px] rounded-xl">
-            {/* <Image src={Payment} alt="Payment illustration" fill /> */}
+            <Image src={Payment} alt="Payment illustration" fill />
           </div>
         </div>
 
@@ -71,14 +72,14 @@ export default function PaymentCheckout({
           </div>
         </div>
 
-        <p className="text-[#47739E] text-sm">
+        <p className="text-[#47739E] text-sm max-sm:hidden">
           By continuing, you agree to our Terms of Service and Privacy Policy.
         </p>
       </div>
 
-      {/* left side … unchanged */}
+      {/* right side … payment method*/}
 
-      <div className="w-1/3 py-5 px-4 flex flex-col gap-6">
+      <div className="w-1/3 py-5 px-4 flex flex-col gap-6 max-sm:w-full max-sm:px-0">
         <p className="font-bold text-2xl">Payment method</p>
 
         {/* PAYMENT METHOD RADIO */}

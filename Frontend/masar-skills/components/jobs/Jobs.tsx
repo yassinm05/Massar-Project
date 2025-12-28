@@ -1,3 +1,5 @@
+import { FiChevronRight } from "react-icons/fi";
+
 interface Job {
   id: number;
   title: string;
@@ -30,8 +32,10 @@ export default function Jobs({ jobs, activeJob, onSelectJob }: JobsProps) {
                 : "border-[#E5E7EB]"
             }`}
           >
-            <div>
+            <div className="flex justify-between items-start">
               <p className="font-semibold text-lg">{job.title}</p>
+              <div></div>
+              <FiChevronRight className="text-[#6B7280] w-6 h-6 pt-2" />
             </div>
             <div className="flex flex-col gap-1 text-[#6B7280]">
               <p>{job.companyName}</p>

@@ -45,8 +45,8 @@ export default async function createUser({
     if (!response.ok) {
       // Handle specific error cases
       if (
-        response.status === 409 ||
-        result.message?.includes("email already exists")
+        response.status === 400 ||
+        result.message?.includes("User already exists")
       ) {
         return {
           errors: {
@@ -99,21 +99,21 @@ export async function getUser(email: string, password: string) {
 
     const result = await response.json();
 
-    // if (!response.ok) {
-    //   if (response.status === 404 || response.status === 401) {
-    //     return {
-    //       errors: {
-    //         email:
-    //           "Could not authenticate user. Please check your credentials.",
-    //       },
-    //     };
-    //   }
-    //   return {
-    //     errors: {
-    //       email: `Server error: ${result.message || "Unknown error occurred"}`,
-    //     },
-    //   };
-    // }
+    if (!response.ok) {
+      if (response.status === 404 || response.status === 401) {
+        return {
+          errors: {
+            email:
+              "Could not authenticate user. Please check your credentials.",
+          },
+        };
+      }
+      return {
+        errors: {
+          email: `Server error: ${result.message || "Unknown error occurred"}`,
+        },
+      };
+    }
 
     // Check if the result indicates success
     if (!result.success) {

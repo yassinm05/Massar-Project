@@ -24,6 +24,7 @@ export default function JobsPage() {
   const [activeJobId, setActiveJobId] = useState<number | null>(null);
   const [activeJob, setActiveJob] = useState<Job | undefined>();
   const [isLoading, setIsLoading] = useState(false);
+  const [show, setShow] = useState(false);
 
   // Fetch all jobs on mount
   useEffect(() => {
@@ -36,7 +37,6 @@ export default function JobsPage() {
         } else {
           setJobs(result);
           setFilteredJobs(result);
-          setActiveJobId(result[0]?.id ?? null);
           setErrorMessage(null);
         }
       } catch {
@@ -81,14 +81,15 @@ export default function JobsPage() {
       }
     };
     if (activeJobId) {
+      setShow(true);
       fetchActiveJob(activeJobId);
     }
   }, [activeJobId]);
 
   return (
-    <div className="bg-[#F9FAFB] p-6 flex gap-6">
+    <div className="bg-[#F9FAFB] p-6 flex gap-6 h-full w-full max-sm:px-4">
       {/* LEFT SIDE: job list */}
-      <div className="flex flex-col bg-white rounded-xl">
+      <div className="flex flex-col bg-white rounded-xl max-sm:flex-1">
         <div className="flex flex-col p-4">
           <div className="flex items-center py-3 px-4 bg-[#F9FAFB] border border-[#E5E7EB] gap-3 rounded-xl">
             <div className="relative w-6 h-6">
@@ -110,8 +111,20 @@ export default function JobsPage() {
           onSelectJob={setActiveJobId}
         />
       </div>
-      {/* RIGHT SIDE: job details */}
-      <JobDetails isLoading={isLoading} activeJob={activeJob as Job} />
+
+      {activeJob ? (
+        <JobDetails
+          setActiveJob={(jobId) => setActiveJobId(jobId)}
+          setShow={setShow}
+          show={show}
+          isLoading={isLoading}
+          activeJob={activeJob as Job}
+        />
+      ) : (
+        <div className="w-full bg-white flex justify-center items-center font-bold text-xl max-sm:hidden">
+          <p>select a job to see its details!</p>
+        </div>
+      )}
       {errorMessage && (
         <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-600">
           {errorMessage}

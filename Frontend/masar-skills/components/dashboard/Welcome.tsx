@@ -10,7 +10,7 @@ export default function Welcome({ firstName }: WelcomeProps) {
     <section className="rounded-[10px] h-40 max-sm:h-full py-6 px-10 max-sm:px-4 flex max-sm:flex-col justify-between items-center bg-[#F0FBFF]">
       <div className="flex flex-col h-full justify-evenly max-sm:items-center max-sm:gap-4 ">
         <p className="font-bold text-3xl">Welcome Back, {firstName}!</p>
-        <div className="relative w-24 h-24 rounded-full">
+        <div className="relative w-24 h-24 rounded-full sm:hidden">
           <Image src={student} alt="" fill />
         </div>
         <p className="text-lg max-sm:text-center">

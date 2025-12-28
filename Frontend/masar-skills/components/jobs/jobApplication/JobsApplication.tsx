@@ -108,7 +108,7 @@ export default function JobsApplication({ id }: JobsApplicationProps) {
   };
 
   return (
-    <div className="min-h-screen bg-[#F9FAFB] flex justify-center items-center py-6">
+    <div className="min-h-screen bg-[#F9FAFB] flex justify-center items-center py-6 max-sm:px-4">
       {step === 1 && (
         <JobApply
           formData={formData}

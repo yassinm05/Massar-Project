@@ -104,7 +104,7 @@ export default function PaymentFlow({
 
   return (
     <div className="bg-[#F9FAFB] min-h-screen">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 max-sm:h-full">
         {/* Progress Bar */}
         {step < 4 && (
           <div className="mb-8">

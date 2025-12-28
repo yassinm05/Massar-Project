@@ -48,22 +48,24 @@ export default function PaymentConfirmation({
       <p className="text-[#0D141C] font-bold text-3xl">Payment Details</p>
 
       {/* Payment method */}
-      <div className="flex gap-6 items-center">
+      <div className="flex gap-6 items-center w-full ">
         <div className="w-10 h-6 bg-white border border-[#C4C4C4] rounded-[3.5px]" />
         <div className="font-medium">{getPaymentMethodDisplay()}</div>
       </div>
 
       {/* Transaction Details */}
-      <div className="flex gap-8">
-        <div className="flex flex-col gap-7">
+      <div className="flex gap-8 w-full">
+        <div className="flex flex-col gap-7 max-sm:w-1/2">
           <div className="h-0 w-full border-b border-[#E5E7EB]" />
-          <div>
+          <div className="w-full">
             <p className="text-sm text-[#47739E]">Transaction ID</p>
-            <p className="text-sm font-mono">{formData.transactionId || "N/A"}</p>
+            <p className="text-sm font-mono w-full break-all">
+              {formData.transactionId || "N/A"}
+            </p>
           </div>
         </div>
 
-        <div className="flex flex-col gap-7">
+        <div className="flex flex-col gap-7 max-sm:w-1/2">
           <div className="h-0 w-full border-b border-[#E5E7EB]" />
           <div>
             <p className="text-sm text-[#47739E]">Payment Date</p>
@@ -104,7 +106,7 @@ export default function PaymentConfirmation({
 
       {/* Complete button */}
       <button
-        className="w-[480px] h-12 rounded-xl bg-[#0083AD] flex justify-center items-center text-[#F7FAFC] font-bold hover:bg-[#006B8F] transition-colors"
+        className="w-[480px] h-12 rounded-xl bg-[#0083AD] flex justify-center items-center text-[#F7FAFC] font-bold hover:bg-[#006B8F] transition-colors max-sm:w-full"
         onClick={handleNext}
       >
         Complete

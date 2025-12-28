@@ -22,13 +22,13 @@ export default function PaymentSuccess({
     <div className="w-full flex flex-col items-center justify-center min-h-[60vh] gap-6">
       <div className="flex flex-col items-center gap-4">
         <CheckCircle className="w-20 h-20 text-green-500" />
-        <h1 className="text-3xl font-bold text-[#0D141C]">Payment Successful!</h1>
+        <h1 className="text-3xl font-bold text-[#0D141C]">
+          Payment Successful!
+        </h1>
       </div>
 
       <div className="flex flex-col items-center gap-2 text-center">
-        <p className="text-lg text-[#47739E]">
-          Thank you for your purchase
-        </p>
+        <p className="text-lg text-[#47739E]">Thank you for your purchase</p>
         <p className="text-[#0D141C] font-medium">
           You have successfully enrolled in
         </p>
@@ -46,7 +46,7 @@ export default function PaymentSuccess({
         )}
       </div>
 
-      <div className="flex gap-4 mt-6">
+      <div className="flex gap-4 mt-6 max-sm:flex-col">
         <button
           onClick={() => router.push("/dashboard")}
           className="px-6 py-3 bg-[#0083AD] text-white font-bold rounded-xl hover:bg-[#006B8F] transition-colors"
