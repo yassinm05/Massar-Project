@@ -140,14 +140,14 @@ export default function Chatbot() {
       );
     } else {
       return (
-        <div className="fixed right-6 bottom-6 z-20">
+        <div className="fixed right-6 bottom-6 z-20 max-sm:right-0">
           <button
             onClick={openChatbot}
-            className="w-32 h-32 rounded-full cursor-pointer relative"
+            className="w-32 h-32 max-sm:w-28 max-sm:h-28 transition-transform hover:scale-105 active:scale-95 relative cursor-pointer"
           >
             <Image
               src={chatbotIcon}
-              className="object-cover"
+              className="object-contain drop-shadow-xl"
               alt="Chatbot"
               fill
             />

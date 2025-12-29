@@ -9,7 +9,7 @@ export default async function page({ params }: { params: { id: number } }) {
   if (!result.user) {
     return redirect("/");
   }
-  const cookieStore = await cookies(); // wait for it
+  const cookieStore = await cookies();
   const tokenCookie = cookieStore.get("auth-token");
   if (!tokenCookie?.value) {
     return redirect("/");
@@ -19,9 +19,9 @@ export default async function page({ params }: { params: { id: number } }) {
   return (
     <div className="w-full bg-[#F8FAFC] flex justify-center ">
       {quiz ? (
-        <div>no questions found in this exam</div>
-      ) : (
         <QuizExam quiz={quiz} userId={result.user.id} />
+      ) : (
+        <div>no questions found in this exam</div>
       )}
     </div>
   );

@@ -54,7 +54,7 @@ export function ChatbotProvider({ children }: { children: ReactNode }) {
       setIsAuthChecking(true);
       const response = await verifyAuthAction();
       if (response.user) {
-        setStudentId(response.studentId);
+        setStudentId(response.user.id);
       }
       setIsAuthChecking(false);
     }

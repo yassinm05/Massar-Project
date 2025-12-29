@@ -8,7 +8,7 @@ import Close from "@/public/assets/quizzes/close.png";
 import Check from "@/public/assets/quizzes/check.png";
 import { Progress } from "../ui/progress";
 import QuestionView from "./QuestionView";
-import { submitAnswerAction } from "@/actions/quiz-actions";
+import { handleFinishQuiz, submitAnswerAction } from "@/actions/quiz-actions";
 
 interface Option {
   optionId: number;
@@ -71,24 +71,13 @@ export default function QuizExam({ quiz }: QuizExamProps) {
   /**
    * Sends a request to the backend to finish the quiz attempt.
    */
-  const handleFinishQuiz = useCallback(async (): Promise<void> => {
+  const finishQuiz = useCallback(async (): Promise<void> => {
     try {
-      const response = await fetch(
-        `http://localhost:5236/api/Quiz/finish/${quiz.attemptId}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const base_url = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
+      console.log(base_url);
+      const response = await handleFinishQuiz(quiz.attemptId);
 
-      if (!response.ok) {
-        throw new Error(`Failed to finish quiz: ${response.status}`);
-      }
-
-      const data = await response.json();
-      console.log("Quiz finished successfully:", data);
+      console.log("Quiz finished successfully:", response);
       setStatus("end of questions");
     } catch (err) {
       console.error("Error finishing quiz:", err);
@@ -137,7 +126,7 @@ export default function QuizExam({ quiz }: QuizExamProps) {
         setCurrentQuestion((prev) => prev + 1);
         setStatus("submitted");
       } else {
-        await handleFinishQuiz();
+        await finishQuiz();
         setStatus("end of questions");
       }
     } catch (err) {
@@ -145,7 +134,7 @@ export default function QuizExam({ quiz }: QuizExamProps) {
       setError("Failed to submit answer. Please try again.");
       setStatus("still not");
     }
-  }, [status, quiz, currentQuestion, selectedAnswers, handleFinishQuiz]);
+  }, [status, quiz, currentQuestion, selectedAnswers, finishQuiz]);
 
   /**
    * Timer effect — decreases the time remaining each second.

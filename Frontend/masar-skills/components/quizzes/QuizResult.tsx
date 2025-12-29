@@ -37,7 +37,7 @@ export default function QuizResult({
     await sendMessage("analyze my last quiz");
   };
   return (
-    <div className="flex flex-col px-36 py-8 gap-8 bg-[#F9FAFB]">
+    <div className="flex flex-col px-36 py-8 gap-8 bg-[#F9FAFB] max-sm:pt-0 max-sm:px-0 max-sm:bg-white">
       {/* QUIZ RESULT */}
       <div
         className={`flex flex-col  p-8 items-center gap-16 rounded-xl ${
@@ -46,7 +46,7 @@ export default function QuizResult({
       >
         <div className="flex flex-col gap-2 items-center">
           <p className="font-bold text-3xl text-[#1F2937]">Quiz Completed!</p>
-          <p>
+          <p className="text-[#4B5563] max-sm:text-center">
             You have {examResult.isPassed ? "successfully" : ""} completed the
             &apos;{examResult.quizTitle}&apos; quiz.
           </p>
@@ -78,7 +78,9 @@ export default function QuizResult({
       </div>
       {/* CERTIFICATE */}
       <div className="w-full rounded-xl p-8 flex flex-col items-center gap-6 bg-white">
-        <p className="text-2xl font-bold">Your Digital Certificate Awaits!</p>
+        <p className="text-2xl font-bold max-sm:text-center">
+          Your Digital Certificate Awaits!
+        </p>
         <div className="relative w-24 h-24">
           <Image src={CertificateIcon} alt="" fill />
         </div>
@@ -96,7 +98,7 @@ export default function QuizResult({
           <p className="font-bold text-white">View Certificate</p>
         </Link>
       </div>
-      <div className="w-full rounded-xl p-8 flex flex-col items-start gap-4 bg-white">
+      <div className="w-full rounded-xl p-8 flex flex-col items-start gap-4 bg-white max-sm:px-4">
         <p className="font-semibold text-xl">What&apos;s Next?</p>
         <div className="flex flex-col gap-3 pb-4">
           <div className="flex items-center gap-3">

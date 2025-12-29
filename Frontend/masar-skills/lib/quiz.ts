@@ -50,6 +50,48 @@ export async function submitAnswer(
     };
   }
 }
+export async function finishQuiz(attemptId: number, token: string) {
+  const base_url = process.env.BACKEND_BASE_URL;
+  try {
+    const response = await fetch(`${base_url}/api/Quiz/finish/${attemptId}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const result = await response.json();
+
+    // Check if the result indicates success
+    if (!response.ok) {
+      return {
+        errors: {
+          user: "Failed to finish the quiz",
+        },
+      };
+    }
+
+    console.log("quiz subitted successfully:", result);
+    return result;
+  } catch (error: unknown) {
+    console.error("Error submitting the quiz:", error);
+
+    if (error instanceof TypeError && error.message.includes("fetch")) {
+      return {
+        errors: {
+          user: "Network error: Unable to connect to the server. Please check if the server is running.",
+        },
+      };
+    }
+
+    return {
+      errors: {
+        user: "An unexpected error occurred. Please try again.",
+      },
+    };
+  }
+}
 
 export async function getQuizByID(id: number, token: string) {
   const base_url = process.env.BACKEND_BASE_URL;
