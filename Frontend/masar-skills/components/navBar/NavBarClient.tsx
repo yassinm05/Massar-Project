@@ -36,9 +36,9 @@ export default function NavBarClient({ user }: { user: unknown }) {
   return (
     <header className="bg-white relative">
       <div className=" w-full relative  flex items-center h-20 px-10 max-sm:px-4 justify-between">
-        <div className="flex items-center gap-6 max-sm:gap-3">
-          <div className="w-16 h-16 max-sm:w-10 max-sm:h-10">
-            <Image src={Logo} alt="logo" />
+        <div className="flex items-center gap-0 max-sm:gap-0">
+          <div className="relative w-24 h-12 max-sm:w-18 max-sm:h-10">
+            <Image src={Logo} alt="logo" fill className="bg-transperent" />
           </div>
           <p className="font-sans text-[51px] max-sm:text-2xl italic font-bold text-[#0083AD]">
             MasarSkills
