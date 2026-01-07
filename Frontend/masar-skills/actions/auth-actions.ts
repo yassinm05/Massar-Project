@@ -1,6 +1,5 @@
 "use server";
 
-import { hashUserPassword } from "@/lib/hash";
 import createUser, { getUser } from "@/lib/user";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
@@ -113,15 +112,13 @@ export async function signup(prevState: FormState, formData: FormData) {
     };
   }
 
-  const hashedPassword = hashUserPassword(password);
-
   try {
     // ✅ Await the createUser function
     const result = await createUser({
       firstName: firstName.trim(),
       lastName: lastName.trim(),
       email: email.trim().toLowerCase(),
-      password: hashedPassword,
+      password: password,
       role: role.toLowerCase(),
       phoneNumber: phoneNumber.trim(),
     });
