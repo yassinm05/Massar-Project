@@ -37,7 +37,7 @@ export default function NavBarClient({ user }: { user: unknown }) {
     <header className="bg-white relative ">
       <div className=" w-full relative  flex items-center h-20 px-10 max-sm:px-4 justify-between overflow-hidden">
         <div className="flex items-center gap-0 max-sm:gap-0">
-          <div className="relative w-[100px] h-[82px] max-sm:w-[70px] ">
+          <div className="relative w-[160px] h-[142px] max-sm:w-[70px] ">
             <Image src={Logo} alt="logo" fill />
           </div>
           <p className="font-sans text-[51px] max-sm:text-2xl italic font-bold text-[#0083AD]">
